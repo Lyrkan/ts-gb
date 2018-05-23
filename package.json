@@ -1,0 +1,27 @@
+{
+  "name": "ts-gb",
+  "version": "1.0.0",
+  "description": "TypeScript Game Boy emulator",
+  "author": "Vincent Le Biannic",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint './src/**/*.ts' './test/**/*.ts'",
+    "nsp": "nsp check",
+    "precommit": "yarn run lint",
+    "prepush": "yarn run nsp && yarn run lint && yarn run test",
+    "start": "tsc && node dist/index.js",
+    "test": "mocha -r ts-node/register \"./test/**/*.spec.ts\""
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.3",
+    "@types/mocha": "^5.2.0",
+    "chai": "^4.1.2",
+    "husky": "^0.14.3",
+    "mocha": "^5.1.1",
+    "nsp": "^3.2.1",
+    "ts-node": "^6.0.3",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3"
+  }
+}

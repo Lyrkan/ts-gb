@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "lib": ["es2015"],
+        "typeRoots": [
+            "node_modules/@types",
+            "src/@types"
+        ],
+        "outDir": "./dist",
+        "importHelpers": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "inlineSources": true,
+        "strictNullChecks": true
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
