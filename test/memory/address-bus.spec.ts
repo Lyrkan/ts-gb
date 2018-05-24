@@ -1,65 +1,22 @@
 import 'mocha';
 import { expect } from 'chai';
-import {
-  AddressBus,
-  CARTRIDGE_RAM_BANK_LENGTH,
-  CARTRIDGE_ROM_BANK_LENGTH
-} from '../../src/memory/address-bus';
+import { AddressBus } from '../../src/memory/address-bus';
+import { GameCartridge } from '../../src/memory/game-cartridge';
 
 describe('AddressBus', () => {
   let addressBus: AddressBus;
 
   beforeEach(() => {
     addressBus = new AddressBus();
+
+    // Load an empty cartridge
+    const emptyCartridge = new GameCartridge(new ArrayBuffer(32 * 1024));
+    addressBus.loadCartridge(emptyCartridge);
   });
 
   describe('Cartridge ROM', () => {
-    it('should be able to load and switch between cartridge ROM banks', () => {
-      const bank1Data = new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH);
-      const bank1View = new DataView(bank1Data);
-
-      const bank2Data = new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH);
-      const bank2View = new DataView(bank2Data);
-
-      // Initial data
-      bank1View.setUint8(0, 0x12);
-      bank1View.setUint8(CARTRIDGE_ROM_BANK_LENGTH - 1, 0x34);
-      bank2View.setUint8(0, 0x56);
-      bank2View.setUint8(CARTRIDGE_ROM_BANK_LENGTH - 1, 0x78);
-
-      // Load banks
-      addressBus.loadCartridgeRom([bank1Data, bank2Data]);
-
-      // Bank #0
-      expect(addressBus[0x0000].byte).to.equal(0x12);
-      expect(addressBus[0x3FFF].byte).to.equal(0x34);
-
-      // Switchable bank (= bank #0)
-      expect(addressBus[0x4000].byte).to.equal(0x12);
-      expect(addressBus[0x7FFF].byte).to.equal(0x34);
-
-      // Switch to bank #1
-      addressBus.switchCartridgeRomBank(1);
-
-      // Bank #0 should be unchanged
-      expect(addressBus[0x0000].byte).to.equal(0x12);
-      expect(addressBus[0x3FFF].byte).to.equal(0x34);
-
-      // Switchable bank (= bank #1)
-      expect(addressBus[0x4000].byte).to.equal(0x56);
-      expect(addressBus[0x7FFF].byte).to.equal(0x78);
-
-      // Switch back to bank #0
-      addressBus.switchCartridgeRomBank(0);
-
-      // Bank #0
-      expect(addressBus[0x0000].byte).to.equal(0x12);
-      expect(addressBus[0x3FFF].byte).to.equal(0x34);
-
-      // Switchable bank (= bank #0)
-      expect(addressBus[0x4000].byte).to.equal(0x12);
-      expect(addressBus[0x7FFF].byte).to.equal(0x34);
-    });
+    it('should be able to read from cartridge ROM');
+    it('should be able to write into cartridge ROM if allowed');
   });
 
   describe('Video RAM', () => {
@@ -77,64 +34,7 @@ describe('AddressBus', () => {
   });
 
   describe('Switchable cartridge RAM bank', () => {
-    it('should be able to read/write from/into current cartridge RAM bank', () => {
-      addressBus[0xA000].byte = 0x12;
-      addressBus[0xB000].word = 0x5678;
-      addressBus[0xBFFF].byte = 0x9A;
-
-      expect(addressBus[0xA000].byte).to.equal(0x12);
-      expect(addressBus[0xB000].byte).to.equal(0x56);
-      expect(addressBus[0xB001].byte).to.equal(0x78);
-      expect(addressBus[0xB000].word).to.equal(0x5678);
-      expect(addressBus[0xBFFF].byte).to.equal(0x9A);
-    });
-
-    it('should be able to load and switch between cartridge RAM banks', () => {
-      const bank1Data = new ArrayBuffer(CARTRIDGE_RAM_BANK_LENGTH);
-      const bank1View = new DataView(bank1Data);
-
-      const bank2Data = new ArrayBuffer(CARTRIDGE_RAM_BANK_LENGTH);
-      const bank2View = new DataView(bank2Data);
-
-      // Initial data
-      bank1View.setUint8(0, 0x12);
-      bank1View.setUint8(CARTRIDGE_RAM_BANK_LENGTH - 1, 0x34);
-      bank2View.setUint8(0, 0x56);
-      bank2View.setUint8(CARTRIDGE_RAM_BANK_LENGTH - 1, 0x78);
-
-      // Load banks
-      addressBus.loadCartridgeRam([bank1Data, bank2Data]);
-
-      // Read/write from bank #0
-      expect(addressBus[0xA000].byte).to.equal(0x12);
-      expect(addressBus[0xBFFF].byte).to.equal(0x34);
-
-      addressBus[0xA000].byte = 0x9A;
-      addressBus[0xBFFF].byte = 0xBC;
-
-      expect(addressBus[0xA000].byte).to.equal(0x9A);
-      expect(addressBus[0xBFFF].byte).to.equal(0xBC);
-
-      // Switch to bank #1
-      addressBus.switchCartridgeRamBank(1);
-
-      // Read/write from bank #1
-      expect(addressBus[0xA000].byte).to.equal(0x56);
-      expect(addressBus[0xBFFF].byte).to.equal(0x78);
-
-      addressBus[0xA000].byte = 0xDE;
-      addressBus[0xBFFF].byte = 0xFF;
-
-      expect(addressBus[0xA000].byte).to.equal(0xDE);
-      expect(addressBus[0xBFFF].byte).to.equal(0xFF);
-
-      // Switch back to bank #0
-      addressBus.switchCartridgeRamBank(0);
-
-      // Check if data is still the same
-      expect(addressBus[0xA000].byte).to.equal(0x9A);
-      expect(addressBus[0xBFFF].byte).to.equal(0xBC);
-    });
+    it('should be able to read/write from/into cartridge RAM if available');
   });
 
   describe('Internal RAM', () => {
@@ -256,11 +156,9 @@ describe('AddressBus', () => {
 
   describe('Reset', () => {
     it('should empty all segments on reset', () => {
-      const romBankData = new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH);
-      const romBankView = new DataView(romBankData);
-      romBankView.setUint8(0, 0x12);
-      addressBus.loadCartridgeRom([romBankData]);
+      // TODO Use MBC2 cartridge
 
+      addressBus[0x0000].byte = 0x00;
       addressBus[0x8000].byte = 0x12;
       addressBus[0xA000].byte = 0x12;
       addressBus[0xC000].byte = 0x12;
@@ -297,56 +195,6 @@ describe('AddressBus', () => {
       expect(() => {
         (addressBus[0x00] as any) = 1; // tslint:disable-line:no-unused-expression
       }).to.throw('not allowed');
-    });
-
-    it('should not allow to load invalid cartridge ROM banks', () => {
-      expect(() => {
-        addressBus.loadCartridgeRom([new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH - 1)]);
-      }).to.throw('Invalid cartridge ROM bank length');
-
-      expect(() => {
-        addressBus.loadCartridgeRom([new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH + 1)]);
-      }).to.throw('Invalid cartridge ROM bank length');
-    });
-
-    it('should not allow to load invalid cartridge RAM banks', () => {
-      expect(() => {
-        addressBus.loadCartridgeRam([new ArrayBuffer(CARTRIDGE_RAM_BANK_LENGTH - 1)]);
-      }).to.throw('Invalid cartridge RAM bank length');
-
-      expect(() => {
-        addressBus.loadCartridgeRam([new ArrayBuffer(CARTRIDGE_RAM_BANK_LENGTH + 1)]);
-      }).to.throw('Invalid cartridge RAM bank length');
-    });
-
-    it('should not allow to switch to an invalid cartridge ROM bank', () => {
-      expect(() => {
-        addressBus.switchCartridgeRomBank(1);
-      }).to.throw('Invalid cartridge ROM bank');
-    });
-
-    it('should not allow to switch to an invalid cartridge RAM bank', () => {
-      expect(() => {
-        addressBus.switchCartridgeRamBank(1);
-      }).to.throw('Invalid cartridge RAM bank');
-    });
-
-    it('should not allow to write into cartridge ROM', () => {
-      // Default ROM bank
-      expect(() => { addressBus[0x0000].byte = 1; }).to.throw('not writable');
-      expect(() => { addressBus[0x4000].byte = 1; }).to.throw('not writable');
-
-      // Loaded ROM banks
-      addressBus.loadCartridgeRom([
-        new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH),
-        new ArrayBuffer(CARTRIDGE_ROM_BANK_LENGTH)
-      ]);
-
-      expect(() => { addressBus[0x0000].byte = 1; }).to.throw('not writable');
-      expect(() => { addressBus[0x4000].byte = 1; }).to.throw('not writable');
-
-      addressBus.switchCartridgeRomBank(1);
-      expect(() => { addressBus[0x4000].byte = 1; }).to.throw('not writable');
     });
   });
 });

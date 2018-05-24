@@ -16,55 +16,33 @@
  *   const w0 = accessor0.word;
  *   const w1 = accessor1.word;
  */
-export class MemoryAccessor {
+export class MemoryAccessor implements IMemoryAccessor {
   private view: DataView;
   private offset: number;
-  private writable: boolean;
-  private readable: boolean;
 
-  public constructor({ view, offset, writable = true, readable = true }: IMemoryAccessorOptions) {
+  public constructor(view: DataView, offset: number) {
     this.view = view;
     this.offset = offset;
-    this.writable = writable;
-    this.readable = readable;
   }
 
   public get byte(): number {
-    if (!this.readable) {
-      throw new Error('Memory is not readable');
-    }
-
     return this.view.getUint8(this.offset);
   }
 
   public set byte(value: number) {
-    if (!this.writable) {
-      throw new Error('Memory is not writable');
-    }
-
     this.view.setUint8(this.offset, value);
   }
 
   public get word() {
-    if (!this.readable) {
-      throw new Error('Memory is not readable');
-    }
-
     return this.view.getUint16(this.offset);
   }
 
   public set word(value: number) {
-    if (!this.writable) {
-      throw new Error('Memory is not writable');
-    }
-
     this.view.setUint16(this.offset, value);
   }
 }
 
-interface IMemoryAccessorOptions {
-  view: DataView;
-  offset: number;
-  writable?: boolean;
-  readable?: boolean;
+export interface IMemoryAccessor {
+  byte: number;
+  word: number;
 }

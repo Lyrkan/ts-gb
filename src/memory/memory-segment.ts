@@ -1,4 +1,4 @@
-import { MemoryAccessor } from './memory-accessor';
+import { MemoryAccessor, IMemoryAccessor } from './memory-accessor';
 
 /**
  * Usage:
@@ -15,42 +15,37 @@ import { MemoryAccessor } from './memory-accessor';
  *   const b1 = segment[1].byte;
  *   const w2 = segment[2].word;
  */
-export class MemorySegment {
+export class MemorySegment implements IMemorySegment {
   [index: number]: MemoryAccessor;
 
   private data: ArrayBuffer;
   private view: DataView;
 
-  public constructor({ byteLength, writable = true, readable = true }: IMemorySegmentOptions) {
+  public constructor(byteLength: number) {
     this.data = new ArrayBuffer(byteLength);
     this.view = new DataView(this.data);
 
     return new Proxy(this, {
-      get: (obj, prop: any) => {
+      get: (obj: this, prop: PropertyKey) => {
         if (typeof prop === 'string' && /^-?\d+$/.test(prop)) {
           const offset = parseInt(prop, 10);
 
           if (offset >= 0 && offset < this.data.byteLength) {
-            return new MemoryAccessor({
-              view: this.view,
-              offset: parseInt(prop, 10),
-              writable,
-              readable,
-            });
+            return new MemoryAccessor(this.view, parseInt(prop, 10));
           }
 
           throw new TypeError(`Invalid address "${prop}"`);
         }
 
-        return obj[prop];
+        return obj[prop as any];
       },
 
-      set: (obj, prop: any, value: any) => {
+      set: (obj: this, prop: PropertyKey, value: any) => {
         if (typeof prop === 'string' && /^-?\d+$/.test(prop)) {
           throw new Error('[[Set]] method is not allowed for MemorySegment elements');
         }
 
-        obj[prop] = value;
+        obj[prop as any] = value;
         return true;
       }
     });
@@ -73,8 +68,6 @@ export class MemorySegment {
   }
 }
 
-interface IMemorySegmentOptions {
-  byteLength: number;
-  writable?: boolean;
-  readable?: boolean;
+export interface IMemorySegment {
+  [index: number]: IMemoryAccessor;
 }

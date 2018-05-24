@@ -7,7 +7,7 @@ describe('MemorySegment', () => {
   let memorySegment: MemorySegment;
 
   beforeEach(() => {
-    memorySegment = new MemorySegment({ byteLength: 4 });
+    memorySegment = new MemorySegment(4);
   });
 
   describe('Memory access', () => {
@@ -45,12 +45,6 @@ describe('MemorySegment', () => {
       expect(() => {
         (memorySegment[0] as any) = 1;
       }).to.throw('not allowed');
-    });
-
-    it('should not allow to set values if not writable', () => {
-      const readOnlySegment = new MemorySegment({ byteLength: 4, writable: false });
-      expect(() => { readOnlySegment[0].byte = 0; }).to.throw('not writable');
-      expect(() => { readOnlySegment[0].word = 0; }).to.throw('not writable');
     });
 
     it('should not allow to load data if they are the wrong size', () => {

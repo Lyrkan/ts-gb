@@ -1,9 +1,8 @@
-import { MemorySegment } from './memory-segment';
+import { MemorySegment, IMemorySegment } from './memory-segment';
 import { MemoryAccessor } from './memory-accessor';
+import { GameCartridge } from './game-cartridge';
 
-export const CARTRIDGE_ROM_BANK_LENGTH = 16 * 1024;
 export const VRAM_LENGTH = 8 * 1024;
-export const CARTRIDGE_RAM_BANK_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
 export const OAM_LENGTH = 160;
 export const IOREGISTERS_LENGTH = 128;
@@ -26,20 +25,15 @@ export const IEREGISTER_LENGTH = 1;
 export class AddressBus {
   [index: number]: MemoryAccessor;
 
-  // Cartridge ROM
-  // First bank: 0x0000 to 0x3FFF
-  // Switchable bank: 0x4000 to 0x7FFF
-  private cartridgeRomBanks: MemorySegment[];
-  private currentCartridgeRomBank: number;
+  // Game cartridge
+  // First ROM bank: 0x0000 to 0x3FFF
+  // Switchable ROM bank: 0x4000 to 0x7FFF
+  // Switchable RAM bank: 0xA000 to 0xBFFF
+  private gameCartridge: GameCartridge;
 
   // Video RAM
   // 0x8000 to 0x9FFF
   private videoRam: MemorySegment;
-
-  // Switchable cartridge RAM bank
-  // 0xA000 to 0xBFFF
-  private cartridgeRamBanks: MemorySegment[];
-  private currentCartridgeRamBank: number;
 
   // Internal RAM
   // Real: 0xC000 to 0xDFFF
@@ -94,48 +88,28 @@ export class AddressBus {
    * Empty the whole memory.
    */
   public reset(): void {
-    // Empty cartridge ROM (16kB)
-    this.cartridgeRomBanks = [new MemorySegment({
-      byteLength: CARTRIDGE_ROM_BANK_LENGTH,
-      writable: false,
-    })];
-    this.currentCartridgeRomBank = 0;
+    // Empty cartridge RAM if there is one
+    if (this.gameCartridge) {
+      this.gameCartridge.reset();
+    }
 
     // Empty video RAM (8kB)
-    this.videoRam = new MemorySegment({
-      byteLength: VRAM_LENGTH,
-    });
-
-    // Empty cartridge RAM (8kB)
-    this.cartridgeRamBanks = [new MemorySegment({
-      byteLength: CARTRIDGE_RAM_BANK_LENGTH,
-    })];
-    this.currentCartridgeRamBank = 0;
+    this.videoRam = new MemorySegment(VRAM_LENGTH);
 
     // Empty RAM (8kB)
-    this.internalRam = new MemorySegment({
-      byteLength: INTERNAL_RAM_LENGTH,
-    });
+    this.internalRam = new MemorySegment(INTERNAL_RAM_LENGTH);
 
     // Empty OAM (160B)
-    this.oam = new MemorySegment({
-      byteLength: OAM_LENGTH,
-    });
+    this.oam = new MemorySegment(OAM_LENGTH);
 
     // Empty I/O Registers (128B)
-    this.ioRegisters = new MemorySegment({
-      byteLength: IOREGISTERS_LENGTH,
-    });
+    this.ioRegisters = new MemorySegment(IOREGISTERS_LENGTH);
 
     // Empty HRAM (127B)
-    this.hram = new MemorySegment({
-      byteLength: HRAM_LENGTH,
-    });
+    this.hram = new MemorySegment(HRAM_LENGTH);
 
     // Empty Interrupts Enable Register (1B)
-    this.ieRegister = new MemorySegment({
-      byteLength: IEREGISTER_LENGTH,
-    });
+    this.ieRegister = new MemorySegment(IEREGISTER_LENGTH);
   }
 
   /**
@@ -143,78 +117,8 @@ export class AddressBus {
    *
    * @param banks Cartridge ROM banks
    */
-  public loadCartridgeRom(banks: ArrayBuffer[]) {
-    for (const bank of banks) {
-      if (bank.byteLength !== CARTRIDGE_ROM_BANK_LENGTH) {
-        throw new Error(`Invalid cartridge ROM bank length: ${bank.byteLength}`);
-      }
-    }
-
-    this.cartridgeRomBanks = [];
-    this.currentCartridgeRomBank = 0;
-
-    for (const bank of banks) {
-      const segment = new MemorySegment({
-        byteLength: CARTRIDGE_ROM_BANK_LENGTH,
-        writable: false,
-      });
-
-      segment.loadData(bank);
-
-      this.cartridgeRomBanks.push(segment);
-    }
-  }
-
-  /**
-   * Load the given cartridge RAM banks into memory.
-   *
-   * @param banks Cartridge RAM banks
-   */
-  public loadCartridgeRam(banks: ArrayBuffer[]) {
-    for (const bank of banks) {
-      if (bank.byteLength !== CARTRIDGE_RAM_BANK_LENGTH) {
-        throw new Error(`Invalid cartridge RAM bank length`);
-      }
-    }
-
-    this.cartridgeRamBanks = [];
-    this.currentCartridgeRamBank = 0;
-
-    for (const bank of banks) {
-      const segment = new MemorySegment({
-        byteLength: CARTRIDGE_RAM_BANK_LENGTH,
-      });
-
-      segment.loadData(bank);
-
-      this.cartridgeRamBanks.push(segment);
-    }
-  }
-
-  /**
-   * Switch current cartridge ROM bank.
-   *
-   * @param bank New bank index
-   */
-  public switchCartridgeRomBank(bank: number): void {
-    if (bank < 0 || bank >= this.cartridgeRomBanks.length) {
-      throw new RangeError(`Invalid cartridge ROM bank: ${bank}`);
-    }
-
-    this.currentCartridgeRomBank = bank;
-  }
-
-  /**
-   * Switch current cartridge RAM bank.
-   *
-   * @param bank New bank index
-   */
-  public switchCartridgeRamBank(bank: number): void {
-    if (bank < 0 || bank >= this.cartridgeRamBanks.length) {
-      throw new RangeError(`Invalid cartridge RAM bank: ${bank}`);
-    }
-
-    this.currentCartridgeRamBank = bank;
+  public loadCartridge(gameCartridge: GameCartridge) {
+    this.gameCartridge = gameCartridge;
   }
 
   /**
@@ -223,7 +127,7 @@ export class AddressBus {
    *
    * @param address Memory address
    */
-  private getSegment(address: number): {segment: MemorySegment, offset: number} {
+  private getSegment(address: number): {segment: IMemorySegment, offset: number} {
     if (address < 0) {
       throw new RangeError(
         `Invalid address ${address}: Memory addresses must be superior or equal to 0x0000`
@@ -232,16 +136,24 @@ export class AddressBus {
 
     // ROM bank #0
     if (address < 0x4000) {
+      if (!this.gameCartridge) {
+        throw new Error('Game cartridge is not available');
+      }
+
       return {
-        segment: this.cartridgeRomBanks[0],
+        segment: this.gameCartridge.staticRomBank,
         offset: 0
       };
     }
 
     // Switchable ROM bank
     if (address < 0x8000) {
+      if (!this.gameCartridge) {
+        throw new Error('Game cartridge is not available');
+      }
+
       return {
-        segment: this.cartridgeRomBanks[this.currentCartridgeRomBank],
+        segment: this.gameCartridge.switchableRomBank,
         offset: 0x4000
       };
     }
@@ -256,8 +168,12 @@ export class AddressBus {
 
     // Switchable RAM bank
     if (address < 0xC000) {
+      if (!this.gameCartridge) {
+        throw new Error('Game cartridge is not available');
+      }
+
       return {
-        segment: this.cartridgeRamBanks[this.currentCartridgeRamBank],
+        segment: this.gameCartridge.ramBank,
         offset: 0xA000
       };
     }

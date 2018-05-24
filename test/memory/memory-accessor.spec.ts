@@ -17,10 +17,10 @@ describe('MemoryAccessor', () => {
     dataView.setUint8(3, 3);
 
     memoryAccessors = [
-      new MemoryAccessor({ view: dataView, offset: 0 }),
-      new MemoryAccessor({ view: dataView, offset: 1 }),
-      new MemoryAccessor({ view: dataView, offset: 2 }),
-      new MemoryAccessor({ view: dataView, offset: 3 }),
+      new MemoryAccessor(dataView, 0),
+      new MemoryAccessor(dataView, 1),
+      new MemoryAccessor(dataView, 2),
+      new MemoryAccessor(dataView, 3),
     ];
   });
 
@@ -64,56 +64,18 @@ describe('MemoryAccessor', () => {
   describe('Errors handling', () => {
     it('should fail for invalid addresses', () => {
       expect(() => {
-        const invalidAccessor = new MemoryAccessor({ view: dataView, offset: -1 });
+        const invalidAccessor = new MemoryAccessor(dataView, -1);
         invalidAccessor.word; // tslint:disable-line:no-unused-expression
       }).to.throw('outside the bounds');
 
       expect(() => {
-        const invalidAccessor = new MemoryAccessor({ view: dataView, offset: 4 });
+        const invalidAccessor = new MemoryAccessor(dataView, 4);
         invalidAccessor.byte; // tslint:disable-line:no-unused-expression
       }).to.throw('outside the bounds');
 
       expect(() => {
         memoryAccessors[3].word; // tslint:disable-line:no-unused-expression
       }).to.throw('outside the bounds');
-    });
-
-    it('should not allow to set values if not writable', () => {
-      const readOnlyAccessor = new MemoryAccessor({
-        view: dataView,
-        offset: 0,
-        writable: false
-      });
-
-      expect(() => {
-        readOnlyAccessor.byte; // tslint:disable-line:no-unused-expression
-      }).not.to.throw();
-
-      expect(() => {
-        readOnlyAccessor.word; // tslint:disable-line:no-unused-expression
-      }).not.to.throw();
-
-      expect(() => { readOnlyAccessor.byte = 0; }).to.throw('not writable');
-      expect(() => { readOnlyAccessor.word = 0; }).to.throw('not writable');
-    });
-
-    it('should not allow to read values if not readable', () => {
-      const readOnlyAccessor = new MemoryAccessor({
-        view: dataView,
-        offset: 0,
-        readable: false
-      });
-
-      expect(() => { readOnlyAccessor.byte = 0; }).not.to.throw();
-      expect(() => { readOnlyAccessor.word = 0; }).not.to.throw();
-
-      expect(() => {
-        readOnlyAccessor.byte; // tslint:disable-line:no-unused-expression
-      }).to.throw('not readable');
-
-      expect(() => {
-        readOnlyAccessor.word; // tslint:disable-line:no-unused-expression
-      }).to.throw('not readable');
     });
   });
 });
