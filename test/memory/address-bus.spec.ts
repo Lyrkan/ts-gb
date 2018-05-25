@@ -1,22 +1,62 @@
 import 'mocha';
+import * as sinon from 'sinon';
 import { expect } from 'chai';
 import { AddressBus } from '../../src/memory/address-bus';
-import { GameCartridge } from '../../src/memory/game-cartridge';
+import { GameCartridge } from '../../src/cartridge/game-cartridge';
 
 describe('AddressBus', () => {
   let addressBus: AddressBus;
 
   beforeEach(() => {
     addressBus = new AddressBus();
-
-    // Load an empty cartridge
-    const emptyCartridge = new GameCartridge(new ArrayBuffer(32 * 1024));
-    addressBus.loadCartridge(emptyCartridge);
   });
 
-  describe('Cartridge ROM', () => {
-    it('should be able to read from cartridge ROM');
-    it('should be able to write into cartridge ROM if allowed');
+  describe('Cartridge', () => {
+    let staticRomBankSpy: any;
+    let switchableRomBankSpy: any;
+    let ramBankSpy: any;
+
+    beforeEach(() => {
+      const cartridge = new GameCartridge(new ArrayBuffer(32 * 1024));
+
+      // Current SinonJS's DefinitelyTyped definition
+      // does not support spying on properties.
+      staticRomBankSpy = (sinon.spy as any)(cartridge, 'staticRomBank', ['get']);
+      switchableRomBankSpy = (sinon.spy as any)(cartridge, 'switchableRomBank', ['get']);
+      ramBankSpy = (sinon.spy as any)(cartridge, 'ramBank', ['get']);
+
+      addressBus.loadCartridge(cartridge);
+    });
+
+    it('should be able to access cartridge static ROM bank', () => {
+      addressBus[0x0000]; // tslint:disable-line:no-unused-expression
+      addressBus[0x2000]; // tslint:disable-line:no-unused-expression
+      addressBus[0x3FFF]; // tslint:disable-line:no-unused-expression
+
+      expect(staticRomBankSpy.get.callCount).to.equal(3);
+      expect(switchableRomBankSpy.get.callCount).to.equal(0);
+      expect(ramBankSpy.get.callCount).to.equal(0);
+    });
+
+    it('should be able to access cartridge switchable ROM bank', () => {
+      addressBus[0x4000]; // tslint:disable-line:no-unused-expression
+      addressBus[0x6000]; // tslint:disable-line:no-unused-expression
+      addressBus[0x7FFF]; // tslint:disable-line:no-unused-expression
+
+      expect(staticRomBankSpy.get.callCount).to.equal(0);
+      expect(switchableRomBankSpy.get.callCount).to.equal(3);
+      expect(ramBankSpy.get.callCount).to.equal(0);
+    });
+
+    it('should be able to access cartridge RAM bank', () => {
+      addressBus[0xA000]; // tslint:disable-line:no-unused-expression
+      addressBus[0xB000]; // tslint:disable-line:no-unused-expression
+      addressBus[0xBFFF]; // tslint:disable-line:no-unused-expression
+
+      expect(staticRomBankSpy.get.callCount).to.equal(0);
+      expect(switchableRomBankSpy.get.callCount).to.equal(0);
+      expect(ramBankSpy.get.callCount).to.equal(3);
+    });
   });
 
   describe('Video RAM', () => {
@@ -31,10 +71,6 @@ describe('AddressBus', () => {
       expect(addressBus[0x8ABC].word).to.equal(0x5678);
       expect(addressBus[0x9FFF].byte).to.equal(0x9A);
     });
-  });
-
-  describe('Switchable cartridge RAM bank', () => {
-    it('should be able to read/write from/into cartridge RAM if available');
   });
 
   describe('Internal RAM', () => {
@@ -156,11 +192,11 @@ describe('AddressBus', () => {
 
   describe('Reset', () => {
     it('should empty all segments on reset', () => {
-      // TODO Use MBC2 cartridge
+      const cartridge = new GameCartridge(new ArrayBuffer(32 * 1024));
+      const cartridgeResetSpy = sinon.spy(cartridge, 'reset');
+      addressBus.loadCartridge(cartridge);
 
-      addressBus[0x0000].byte = 0x00;
       addressBus[0x8000].byte = 0x12;
-      addressBus[0xA000].byte = 0x12;
       addressBus[0xC000].byte = 0x12;
       addressBus[0xFE00].byte = 0x12;
       addressBus[0xFF00].byte = 0x12;
@@ -169,14 +205,14 @@ describe('AddressBus', () => {
 
       addressBus.reset();
 
-      expect(addressBus[0x0000].byte).to.equal(0x00);
       expect(addressBus[0x8000].byte).to.equal(0x00);
-      expect(addressBus[0xA000].byte).to.equal(0x00);
       expect(addressBus[0xC000].byte).to.equal(0x00);
       expect(addressBus[0xFE00].byte).to.equal(0x00);
       expect(addressBus[0xFF00].byte).to.equal(0x00);
       expect(addressBus[0xFF80].byte).to.equal(0x00);
       expect(addressBus[0xFFFF].byte).to.equal(0x00);
+
+      expect(cartridgeResetSpy.calledOnce).to.equal(true);
     });
   });
 

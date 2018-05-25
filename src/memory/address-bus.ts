@@ -1,6 +1,7 @@
 import { MemorySegment, IMemorySegment } from './memory-segment';
 import { MemoryAccessor } from './memory-accessor';
-import { GameCartridge } from './game-cartridge';
+import { GameCartridge } from '../cartridge/game-cartridge';
+import { isIntegerPropertyKey } from './utils';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -63,22 +64,22 @@ export class AddressBus {
       this.reset();
 
       return new Proxy(this, {
-        get: (obj, prop: any) => {
-          if (typeof prop === 'string' && /^-?\d+$/.test(prop)) {
-            const address = parseInt(prop, 10);
+        get: (obj: this, prop: PropertyKey) => {
+          if (isIntegerPropertyKey(prop)) {
+            const address = parseInt(prop as string, 10);
             const { segment, offset } = this.getSegment(address);
             return segment[address - offset];
           }
 
-          return obj[prop];
+          return obj[prop as any];
         },
 
-        set: (obj, prop: any, value: any) => {
-          if (typeof prop === 'string' && /^-?\d+$/.test(prop)) {
+        set: (obj: this, prop: PropertyKey, value: any) => {
+          if (isIntegerPropertyKey(prop)) {
             throw new Error('[[Set]] method is not allowed for AddressBus elements');
           }
 
-          obj[prop] = value;
+          obj[prop as any] = value;
           return true;
         }
       });

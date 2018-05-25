@@ -19,21 +19,6 @@ describe('MemorySegment', () => {
     });
   });
 
-  describe('Memory loading', () => {
-    it('should allow to load arbitrary data', () => {
-      const buffer = new ArrayBuffer(4);
-      const view = new DataView(buffer);
-
-      view.setUint16(0, 0x1234);
-      view.setUint16(2, 0x5678);
-
-      memorySegment.loadData(buffer);
-
-      expect(memorySegment[0].word).to.equal(0x1234);
-      expect(memorySegment[2].word).to.equal(0x5678);
-    });
-  });
-
   describe('Errors handling', () => {
     it('should not allow to access an invalid address', () => {
       expect(() => {
@@ -45,16 +30,6 @@ describe('MemorySegment', () => {
       expect(() => {
         (memorySegment[0] as any) = 1;
       }).to.throw('not allowed');
-    });
-
-    it('should not allow to load data if they are the wrong size', () => {
-      expect(() => {
-        memorySegment.loadData(new ArrayBuffer(3));
-      }).to.throw('Invalid data length');
-
-      expect(() => {
-        memorySegment.loadData(new ArrayBuffer(5));
-      }).to.throw('Invalid data length');
     });
   });
 });

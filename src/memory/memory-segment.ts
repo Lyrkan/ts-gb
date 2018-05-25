@@ -1,4 +1,5 @@
 import { MemoryAccessor, IMemoryAccessor } from './memory-accessor';
+import { isIntegerPropertyKey } from './utils';
 
 /**
  * Usage:
@@ -27,21 +28,21 @@ export class MemorySegment implements IMemorySegment {
 
     return new Proxy(this, {
       get: (obj: this, prop: PropertyKey) => {
-        if (typeof prop === 'string' && /^-?\d+$/.test(prop)) {
-          const offset = parseInt(prop, 10);
+        if (isIntegerPropertyKey(prop)) {
+          const offset = parseInt(prop as string, 10);
 
-          if (offset >= 0 && offset < this.data.byteLength) {
-            return new MemoryAccessor(this.view, parseInt(prop, 10));
+          if (offset < 0 || offset >= this.data.byteLength) {
+            throw new TypeError(`Invalid address "${prop}"`);
           }
 
-          throw new TypeError(`Invalid address "${prop}"`);
+          return new MemoryAccessor(this.view, offset);
         }
 
         return obj[prop as any];
       },
 
       set: (obj: this, prop: PropertyKey, value: any) => {
-        if (typeof prop === 'string' && /^-?\d+$/.test(prop)) {
+        if (isIntegerPropertyKey(prop)) {
           throw new Error('[[Set]] method is not allowed for MemorySegment elements');
         }
 
@@ -49,22 +50,6 @@ export class MemorySegment implements IMemorySegment {
         return true;
       }
     });
-  }
-
-  /**
-   * Load arbitrary data into the segment.
-   *
-   * @param data New data
-   */
-  public loadData(data: ArrayBuffer) {
-    if (data.byteLength !== this.data.byteLength) {
-      throw new Error(
-        `Invalid data length ${data.byteLength} (expected ${this.data.byteLength})`
-      );
-    }
-
-    this.data = data;
-    this.view = new DataView(this.data);
   }
 }
 
