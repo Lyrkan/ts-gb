@@ -2,6 +2,7 @@ import { MemorySegment, IMemorySegment } from './memory-segment';
 import { MemoryAccessor } from './memory-accessor';
 import { GameCartridge } from '../cartridge/game-cartridge';
 import { isIntegerPropertyKey } from './utils';
+import { STATIC_0000_SEGMENT } from './static-memory-segment';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -205,9 +206,10 @@ export class AddressBus {
 
     // Unuseable range
     if (address < 0xFF00) {
-      throw new RangeError(
-        `Invalid address ${address}: Memory addresses from 0xFEA0 to 0xFEFF are not usable`
-      );
+      return {
+        segment: STATIC_0000_SEGMENT,
+        offset: 0xFEA0
+      };
     }
 
     // I/O Registers

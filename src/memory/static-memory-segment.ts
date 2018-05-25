@@ -25,8 +25,8 @@ export class StaticMemorySegment implements IMemorySegment {
       get: (obj: this, prop: PropertyKey) => {
         if (isIntegerPropertyKey(prop)) {
           return {
-            byte: filledWith.byte,
-            word: filledWith.word,
+            byte: filledWith.byte & 0xFF,
+            word: filledWith.word & 0xFFFF,
           };
         }
 
@@ -39,3 +39,7 @@ export class StaticMemorySegment implements IMemorySegment {
     });
   }
 }
+
+// Some useful static segments
+export const STATIC_0000_SEGMENT = new StaticMemorySegment({ byte: 0x00, word: 0x0000 });
+export const STATIC_FFFF_SEGMENT = new StaticMemorySegment({ byte: 0xFF, word: 0xFFFF });

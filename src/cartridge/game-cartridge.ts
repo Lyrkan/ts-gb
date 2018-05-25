@@ -1,5 +1,5 @@
 import { MemorySegment, IMemorySegment } from '../memory/memory-segment';
-import { StaticMemorySegment } from '../memory/static-memory-segment';
+import { STATIC_FFFF_SEGMENT } from '../memory/static-memory-segment';
 import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
 
@@ -49,7 +49,7 @@ export class GameCartridge {
     // This should never happen but make sure that we
     // have at least two rom banks...
     while (banks.length < 2) {
-      banks.push(new StaticMemorySegment({ byte: 0xFF, word: 0xFF }));
+      banks.push(STATIC_FFFF_SEGMENT);
     }
 
     // Load data
@@ -78,7 +78,7 @@ export class GameCartridge {
     // If we don't have any RAM bank, create a static one that
     // always returns 0xFF/0xFFFF
     if (banks.length === 0) {
-      banks.push(new StaticMemorySegment({ byte: 0xFF, word: 0xFF }));
+      banks.push(STATIC_FFFF_SEGMENT);
     }
 
     return banks;

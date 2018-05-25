@@ -141,17 +141,18 @@ describe('AddressBus', () => {
 
   describe('Reserved memory', () => {
     it('should not be able to use addresses from 0xFEA0 to 0xFEFF', () => {
-      expect(() => {
-        addressBus[0xFEA0]; // tslint:disable-line:no-unused-expression
-      }).to.throw('not usable');
+      addressBus[0xFEA0].byte = 0x12;
+      addressBus[0xFECD].byte = 0x34;
+      addressBus[0xFEFF].byte = 0x56;
 
-      expect(() => {
-        addressBus[0xFECD]; // tslint:disable-line:no-unused-expression
-      }).to.throw('not usable');
+      expect(addressBus[0xFEA0].byte).to.equal(0x00);
+      expect(addressBus[0xFEA0].word).to.equal(0x00);
 
-      expect(() => {
-        addressBus[0xFEFF]; // tslint:disable-line:no-unused-expression
-      }).to.throw('not usable');
+      expect(addressBus[0xFECD].byte).to.equal(0x00);
+      expect(addressBus[0xFECD].word).to.equal(0x00);
+
+      expect(addressBus[0xFEFF].byte).to.equal(0x00);
+      expect(addressBus[0xFEFF].word).to.equal(0x00);
     });
   });
 
