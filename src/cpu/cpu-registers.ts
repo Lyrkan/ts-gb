@@ -1,6 +1,31 @@
+/**
+ * Usage:
+ *
+ *   const registers = new CpuRegisters();
+ *
+ *   // Accessing registers
+ *   registers.A = 0xFF;
+ *   registers.F = 0xF0;
+ *   registers.BC = 0x1234;
+ *
+ *   // Accessing flags (stored into register F)
+ *   registers.flags.Z = 1;
+ *   registers.flags.N = 1;
+ *   registers.flags.H = 0;
+ *   registers.flags.C = 0;
+ *
+ *   // Empty all registers
+ *   registers.reset();
+ */
 export class CpuRegisters {
   private buffer: ArrayBuffer;
   private view: DataView;
+  private flagsAccessor: {
+    Z: number;
+    N: number;
+    H: number;
+    C: number;
+  };
 
   public constructor() {
     this.reset();
@@ -9,6 +34,41 @@ export class CpuRegisters {
   public reset(): void {
     this.buffer = new ArrayBuffer(96);
     this.view = new DataView(this.buffer);
+
+    const registers = this;
+    this.flagsAccessor = {
+      get Z() {
+        return (registers.F & (1 << 7)) >> 7;
+      },
+
+      set Z(value: number) {
+        registers.F = (registers.F & ~(0b1000 << 4)) | ((value & 1) << 7);
+      },
+
+      get N() {
+        return (registers.F & (1 << 6)) >> 6;
+      },
+
+      set N(value: number) {
+        registers.F = (registers.F & ~(0b0100 << 4)) | ((value & 1) << 6);
+      },
+
+      get H() {
+        return (registers.F & (1 << 5)) >> 5;
+      },
+
+      set H(value: number) {
+        registers.F = (registers.F & ~(0b0010 << 4)) | ((value & 1) << 5);
+      },
+
+      get C() {
+        return (registers.F & (1 << 4)) >> 4;
+      },
+
+      set C(value: number) {
+        registers.F = (registers.F & ~(0b0001 << 4)) | ((value & 1) << 4);
+      }
+    };
   }
 
   public get A(): number {
@@ -20,19 +80,27 @@ export class CpuRegisters {
   }
 
   public get F(): number {
-    return this.view.getUint8(1);
+    // The 4 least significant bits are always
+    // equal to 0 for the flag register
+    return this.view.getUint8(1) & ~0b1111;
   }
 
   public set F(value: number) {
-    this.view.setUint8(1, value);
+    // The 4 least significant bits are always
+    // equal to 0 for the flag register
+    this.view.setUint8(1, value & ~0b1111);
   }
 
   public get AF(): number {
-    return this.view.getUint16(0);
+    // The 4 least significant bits are always
+    // equal to 0 for the flag register
+    return this.view.getUint16(0) & ~0b1111;
   }
 
   public set AF(value: number) {
-    this.view.setUint16(0, value);
+    // The 4 least significant bits are always
+    // equal to 0 for the flag register
+    this.view.setUint16(0, value & ~0b1111);
   }
 
   public get B(): number {
@@ -121,5 +189,9 @@ export class CpuRegisters {
 
   public set PC(value: number) {
     this.view.setUint16(10, value);
+  }
+
+  public get flags() {
+    return this.flagsAccessor;
   }
 }
