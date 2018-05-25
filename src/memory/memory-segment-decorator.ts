@@ -21,7 +21,7 @@ import { IMemorySegment } from './memory-segment';
 export class MemorySegmentDecorator implements IMemorySegment {
   [index: number]: IMemoryAccessor;
 
-  public constructor(decorated: IMemorySegment, trap: IMemorySegmentTraps) {
+  public constructor(decorated: IMemorySegment, trap: MemorySegmentTrap) {
     return new Proxy(this, {
       get: (obj: this, prop: PropertyKey) => {
         const segment = trap(decorated, prop);
@@ -31,4 +31,4 @@ export class MemorySegmentDecorator implements IMemorySegment {
   }
 }
 
-type IMemorySegmentTraps = (obj: IMemorySegment, prop: PropertyKey) => IMemoryAccessor | null;
+type MemorySegmentTrap = (obj: IMemorySegment, prop: PropertyKey) => IMemoryAccessor | null;

@@ -13,9 +13,6 @@
  *   registers.flags.N = 1;
  *   registers.flags.H = 0;
  *   registers.flags.C = 0;
- *
- *   // Empty all registers
- *   registers.reset();
  */
 export class CpuRegisters {
   private buffer: ArrayBuffer;
@@ -28,10 +25,6 @@ export class CpuRegisters {
   };
 
   public constructor() {
-    this.reset();
-  }
-
-  public reset(): void {
     this.buffer = new ArrayBuffer(96);
     this.view = new DataView(this.buffer);
 

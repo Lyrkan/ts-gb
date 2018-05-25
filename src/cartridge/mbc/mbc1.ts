@@ -2,6 +2,7 @@ import { IGameCartridgeMBC, CARTRIDGE_ROM_BANK_LENGTH } from '../game-cartridge'
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
 import { isIntegerPropertyKey } from '../../memory/utils';
+import { MemoryAccessorDecorator } from '../../memory/memory-accessor-decorator';
 
 export class MBC1 implements IGameCartridgeMBC {
   private romBanks: IMemorySegment[];
@@ -69,20 +70,10 @@ export class MBC1 implements IGameCartridgeMBC {
           throw new TypeError(`Invalid address "${prop}"`);
         }
 
-        return {
-          // Get operations stay the same
-          get byte() { return obj[prop as any].byte; },
-          get word() { return obj[prop as any].word; },
-
-          // Set operations are trapped
-          set byte(value: number) {
-            romWriteTrap(index, offset, value);
-          },
-
-          set word(value: number) {
-            romWriteTrap(index, offset, value);
-          },
-        };
+        return new MemoryAccessorDecorator(obj[prop as any], {
+          setByte: (decorated, value) => { romWriteTrap(index, offset, value); },
+          setWord: (decorated, value) => { romWriteTrap(index, offset, value); },
+        });
       }
 
       return obj[prop as any];

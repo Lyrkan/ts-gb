@@ -19,15 +19,21 @@ export class CPU {
    */
   public constructor(addressBus: AddressBus) {
     this.addressBus = addressBus;
-    this.registers = new CpuRegisters();
-    this.skipCyles = 0;
+    this.reset();
   }
 
   /**
    * Reset all registers
    */
   public reset(): void {
-    this.registers.reset();
+    this.registers = new CpuRegisters();
+    this.skipCyles = 0;
+
+    // If there isn't any boot ROM, directly
+    // jump to 0x0100.
+    if (this.addressBus.hasBootRom) {
+      this.registers.PC = 0x0100;
+    }
   }
 
   /**

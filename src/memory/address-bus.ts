@@ -1,8 +1,10 @@
 import { MemorySegment, IMemorySegment } from './memory-segment';
-import { MemoryAccessor } from './memory-accessor';
+import { IMemoryAccessor } from './memory-accessor';
 import { GameCartridge } from '../cartridge/game-cartridge';
 import { isIntegerPropertyKey } from './utils';
 import { STATIC_0000_SEGMENT } from './static-memory-segment';
+import { MemorySegmentDecorator } from './memory-segment-decorator';
+import { MemoryAccessorDecorator } from './memory-accessor-decorator';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -25,7 +27,13 @@ export const IEREGISTER_LENGTH = 1;
  *   const wC001 = addressBus[0xC001].word;
  */
 export class AddressBus {
-  [index: number]: MemoryAccessor;
+  [index: number]: IMemoryAccessor;
+
+  // Segment that contains the boot ROM
+  // It can be accessed from 0x0000 to 0x00FE
+  // when the enableBootRom flag is set to true.
+  private bootRom?: IMemorySegment;
+  private bootRomEnabled: boolean;
 
   // Game cartridge
   // First ROM bank: 0x0000 to 0x3FFF
@@ -35,61 +43,77 @@ export class AddressBus {
 
   // Video RAM
   // 0x8000 to 0x9FFF
-  private videoRam: MemorySegment;
+  private videoRam: IMemorySegment;
 
   // Internal RAM
   // Real: 0xC000 to 0xDFFF
   // Echo: 0xE000 to 0xFDFF
-  private internalRam: MemorySegment;
+  private internalRam: IMemorySegment;
 
   // Sprite attribute table (OAM)
   // 0xFE00 to 0xFE9F
-  private oam: MemorySegment;
+  private oam: IMemorySegment;
 
   // I/O Registers
   // 0xFF00 to 0xFF7F
-  private ioRegisters: MemorySegment;
+  private ioRegisters: IMemorySegment;
 
   // High RAM
   // 0xFF80 to 0xFFFE
-  private hram: MemorySegment;
+  private hram: IMemorySegment;
 
   // Interrupts Enable Registers
   // 0xFFFF
-  private ieRegister: MemorySegment;
+  private ieRegister: IMemorySegment;
 
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor() {
-      this.reset();
+  public constructor(bootRom?: ArrayBuffer) {
+    // If a boot rom has been passed, create
+    // the memory segment that will hold it
+    if (bootRom) {
+      this.bootRom = new MemorySegment(bootRom.byteLength);
+      const bootRomView = new DataView(bootRom);
+      for (let i = 0; i < bootRom.byteLength; i++) {
+        this.bootRom[i].byte = bootRomView.getUint8(i);
+      }
+    }
 
-      return new Proxy(this, {
-        get: (obj: this, prop: PropertyKey) => {
-          if (isIntegerPropertyKey(prop)) {
-            const address = parseInt(prop as string, 10);
-            const { segment, offset } = this.getSegment(address);
-            return segment[address - offset];
-          }
+    this.reset();
 
-          return obj[prop as any];
-        },
-
-        set: (obj: this, prop: PropertyKey, value: any) => {
-          if (isIntegerPropertyKey(prop)) {
-            throw new Error('[[Set]] method is not allowed for AddressBus elements');
-          }
-
-          obj[prop as any] = value;
-          return true;
+    return new Proxy(this, {
+      get: (obj: this, prop: PropertyKey) => {
+        if (isIntegerPropertyKey(prop)) {
+          const address = parseInt(prop as string, 10);
+          const { segment, offset } = this.getSegment(address);
+          return segment[address - offset];
         }
-      });
+
+        return obj[prop as any];
+      },
+
+      set: (obj: this, prop: PropertyKey, value: any) => {
+        if (isIntegerPropertyKey(prop)) {
+          throw new Error('[[Set]] method is not allowed for AddressBus elements');
+        }
+
+        obj[prop as any] = value;
+        return true;
+      }
+    });
   }
 
   /**
    * Empty the whole memory.
    */
   public reset(): void {
+    // If we have a boot ROM use it, otherwise
+    // boot the system directly.
+    if (this.bootRom) {
+      this.bootRomEnabled = true;
+    }
+
     // Empty cartridge RAM if there is one
     if (this.gameCartridge) {
       this.gameCartridge.reset();
@@ -105,7 +129,51 @@ export class AddressBus {
     this.oam = new MemorySegment(OAM_LENGTH);
 
     // Empty I/O Registers (128B)
-    this.ioRegisters = new MemorySegment(IOREGISTERS_LENGTH);
+    this.ioRegisters = new MemorySegmentDecorator(
+      new MemorySegment(IOREGISTERS_LENGTH),
+      (obj, prop)  => {
+        // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
+        // Note that this is really inaccurate since it should
+        // normally take 160 * 4 + 4 cycles to complete.
+        if (prop === 0x0046.toString()) {
+          const copyData = (value: number) => {
+            const fromAddress = (value & 0b11) << 2;
+            for (let i = 0; i < OAM_LENGTH; i++) {
+              this[0xFE00 + i].byte = this[fromAddress + i].byte;
+            }
+          };
+
+          const setByte = (decorated: IMemoryAccessor, value: number) => {
+            copyData(value);
+            decorated.byte = value;
+          };
+
+          const setWord = (decorated: IMemoryAccessor, value: number) => {
+            copyData(value);
+            decorated.word = value;
+          };
+
+          return new MemoryAccessorDecorator(obj[prop as any], { setByte, setWord });
+        }
+
+        // Writes on 0x0050 (=0xFF50) disable the boot rom
+        if (prop === 0xFF50.toString()) {
+          const setByte = (decorated: IMemoryAccessor, value: number) => {
+            this.bootRomEnabled = false;
+            decorated.byte = value;
+          };
+
+          const setWord = (decorated: IMemoryAccessor, value: number) => {
+            this.bootRomEnabled = false;
+            decorated.word = value;
+          };
+
+          return new MemoryAccessorDecorator(obj[prop as any], { setByte, setWord });
+        }
+
+        return obj[prop as any];
+      }
+    );
 
     // Empty HRAM (127B)
     this.hram = new MemorySegment(HRAM_LENGTH);
@@ -119,8 +187,16 @@ export class AddressBus {
    *
    * @param banks Cartridge ROM banks
    */
-  public loadCartridge(gameCartridge: GameCartridge) {
+  public loadCartridge(gameCartridge: GameCartridge): void {
     this.gameCartridge = gameCartridge;
+  }
+
+  /**
+   * Check if there is a boot ROM associated
+   * to the address bus.
+   */
+  public hasBootRom(): boolean {
+    return Boolean(this.bootRom);
   }
 
   /**
@@ -140,6 +216,15 @@ export class AddressBus {
     if (address < 0x4000) {
       if (!this.gameCartridge) {
         throw new Error('Game cartridge is not available');
+      }
+
+      // If the system boot sequence isn't over yet
+      // return the boot ROM segment from 0x0000 to 0x00EF.
+      if (this.bootRom && this.bootRomEnabled && address < 0x0100) {
+        return {
+          segment: this.bootRom,
+          offset: 0
+        };
       }
 
       return {
