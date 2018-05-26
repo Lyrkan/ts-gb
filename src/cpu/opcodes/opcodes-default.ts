@@ -206,7 +206,12 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD HL,DE
   0x19: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, N, H, C } = ALU.addWords(registers.HL, registers.DE);
+
+    registers.HL = value;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
@@ -322,7 +327,12 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD HL,HL
   0x29: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, N, H, C } = ALU.addWords(registers.HL, registers.HL);
+
+    registers.HL = value;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
@@ -428,7 +438,12 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD HL,SP
   0x39: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, N, H, C } = ALU.addWords(registers.HL, registers.SP);
+
+    registers.HL = value;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
@@ -864,37 +879,73 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD A,B
   0x80: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.B);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADD A,C
   0x81: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.C);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADD A,D
   0x82: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.D);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADD A,E
   0x83: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.E);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADD A,H
   0x84: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.H);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADD A,L
   0x85: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.L);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
@@ -906,7 +957,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD A,A
   0x87: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.A);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
