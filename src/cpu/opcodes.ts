@@ -9,5 +9,16 @@ export const OPCODES: { [index: string]: IOpcodesMap } = {
 };
 
 export interface IOpcodesMap {
-  [index: number]: (registers: CpuRegisters, addressBus: AddressBus) => number;
+  [index: number]: (
+    registers: CpuRegisters,
+    addressBus: AddressBus,
+    cpuCallbacks?: ICPUCallbacks
+  ) => number;
+}
+
+export interface ICPUCallbacks {
+  stop: () => void;
+  halt: () => void;
+  enableInterrupts: () => void;
+  disableInterrupts: () => void;
 }

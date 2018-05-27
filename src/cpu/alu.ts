@@ -51,7 +51,55 @@ export const ALU = {
       value: (sum & 0xFFFF),
       N: 0,
       H: ((sum  & 0x1000) === 0x1000) ? 1 : 0,
-      C: (sum & (1 << 16)) >> 16,
+      C: (sum >> 16) & 1,
+    };
+  },
+
+  sub(a: number, n: number) {
+    const sub = a - n;
+
+    return {
+      value: (sub & 0xFFFF),
+      Z: (sub === 0) ? 1 : 0,
+      N: 1,
+      H: ((sub  & 0x1000) === 0x1000) ? 1 : 0,
+      C: (sub >> 8) & 1,
+    };
+  },
+
+  xor(a: number, n: number) {
+    const res = a ^ n;
+
+    return {
+      value: res,
+      Z: (res === 0) ? 1 : 0,
+      N: 0,
+      H: 0,
+      C: 0,
+    };
+  },
+
+  or(a: number, n: number) {
+    const res = a | n;
+
+    return {
+      value: res,
+      Z: (res === 0) ? 1 : 0,
+      N: 0,
+      H: 0,
+      C: 0,
+    };
+  },
+
+  and(a: number, n: number) {
+    const res = a & n;
+
+    return {
+      value: res,
+      Z: (res === 0) ? 1 : 0,
+      N: 0,
+      H: 1,
+      C: 0,
     };
   },
 };

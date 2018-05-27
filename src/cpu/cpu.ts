@@ -1,6 +1,6 @@
 import { AddressBus } from '../memory/address-bus';
 import { CpuRegisters } from './cpu-registers';
-import { OPCODES } from './opcodes';
+import { OPCODES, ICPUCallbacks } from './opcodes';
 
 export class CPU {
   // Registers
@@ -12,6 +12,20 @@ export class CPU {
   // How many cycles the CPU should skip
   private skipCyles: number;
 
+  // Callbacks that can be used by opcodes
+  private cpuCallbacks: ICPUCallbacks;
+
+  // Whether or not the processor is stopped.
+  // Should resume after a button is pressed.
+  private stopped: boolean;
+
+  // Whether or not the processor is halted.
+  // Should resume
+  private halted: boolean;
+
+  // Whether or not interrupts are enabled.
+  private interruptsEnabled: boolean;
+
   /**
    * Instanciate a new CPU.
    *
@@ -19,6 +33,13 @@ export class CPU {
    */
   public constructor(addressBus: AddressBus) {
     this.addressBus = addressBus;
+    this.cpuCallbacks = {
+      stop: () => { this.stopped = true; },
+      halt: () => { this.halted = true; },
+      enableInterrupts: () => { this.interruptsEnabled = true; },
+      disableInterrupts: () => { this.interruptsEnabled = false; },
+    };
+
     this.reset();
   }
 
@@ -28,6 +49,9 @@ export class CPU {
   public reset(): void {
     this.registers = new CpuRegisters();
     this.skipCyles = 0;
+    this.stopped = false;
+    this.halted = false;
+    this.interruptsEnabled = true;
 
     // If there isn't any boot ROM, directly
     // jump to 0x0100.
@@ -40,10 +64,20 @@ export class CPU {
    * Run a single CPU cycle.
    */
   public tick(): void {
+    // Do nothing if halted or stopped
+    if (this.halted || this.stopped) {
+      return;
+    }
+
     // Skip the current cycle if needed
     if (this.skipCyles > 0) {
       this.skipCyles--;
       return;
+    }
+
+    // Process interrupts
+    if (this.interruptsEnabled) {
+      // TODO
     }
 
     // By default we'll use this opcode map
@@ -75,6 +109,6 @@ export class CPU {
     }
 
     // Run the opcode
-    this.skipCyles = opcode(this.registers, this.addressBus) - 1;
+    this.skipCyles = opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
   }
 }
