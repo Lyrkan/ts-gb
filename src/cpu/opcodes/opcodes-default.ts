@@ -2,6 +2,7 @@ import { IOpcodesMap } from '../opcodes';
 import { CpuRegisters } from '../cpu-registers';
 import { AddressBus } from '../../memory/address-bus';
 import { ALU } from '../alu';
+import { uint8ToInt8 } from '../../memory/utils';
 
 export const OPCODES_DEFAULT: IOpcodesMap = {
   // NOP
@@ -23,7 +24,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // INC BC
-  0x03: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x03: (registers: CpuRegisters,  addressBus: AddressBus) => {
     registers.BC = ALU.incWord(registers.BC);
     return 8;
   },
@@ -59,7 +60,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // RLCA
   0x07: (registers: CpuRegisters, addressBus: AddressBus) => {
     const shifted = registers.A << 1;
-    const carry = (shifted & (1 << 8)) >> 8;
+    const carry = (shifted >> 8) & 1;
 
     registers.A = (shifted & 0xFF) | carry;
     registers.flags.Z = 0;
@@ -148,13 +149,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD DE,d16
   0x11: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.DE = addressBus[registers.PC].word;
+    registers.PC += 2;
     return 12;
   },
 
   // LD (DE),A
   0x12: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.DE].byte = registers.A;
     return 8;
   },
 
@@ -188,19 +190,28 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD D,d8
   0x16: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = addressBus[registers.PC++].byte;
     return 8;
   },
 
   // RLA
   0x17: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const shifted = registers.A << 1;
+    const carry = (shifted >> 8) & 1;
+
+    registers.A = shifted & 0xFF;
+    registers.flags.Z = 0;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = carry;
     return 4;
   },
 
   // JR r8
   0x18: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const offset = uint8ToInt8(addressBus[registers.PC++].byte);
+
+    registers.PC = registers.PC + offset;
     return 12;
   },
 
@@ -217,7 +228,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD A,(DE)
   0x1A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    this.registers.A = addressBus[this.registers.DE].byte;
     return 8;
   },
 
@@ -251,31 +262,45 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD E,d8
   0x1E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    this.registers.E = this.addressBus[this.PC++].byte;
     return 8;
   },
 
   // RRA
   0x1F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const carry = registers.A & 1;
+    const shifted = registers.A >> 1;
+
+    registers.A = (shifted & 0xFF);
+    registers.flags.Z = 0;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = carry;
     return 4;
   },
 
   // JR NZ,r8
   0x20: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 8; // 12 if action taken
+    if (registers.flags.Z) {
+      return 8;
+    }
+
+    const offset = uint8ToInt8(addressBus[registers.PC++].byte);
+
+    registers.PC = registers.PC + offset;
+    return 12;
   },
 
   // LD HL,d16
   0x21: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.HL = addressBus[registers.PC].word;
+    registers.PC += 2;
     return 12;
   },
 
   // LD (HL+),A
   0x22: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL++].byte = registers.A;
     return 8;
   },
 
@@ -309,7 +334,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD H,d8
   0x26: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = addressBus[registers.PC++].byte;
     return 8;
   },
 
@@ -321,8 +346,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JR Z,r8
   0x28: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 8; // 12 if action taken
+    if (!registers.flags.Z) {
+      return 8;
+    }
+
+    const offset = uint8ToInt8(addressBus[registers.PC++].byte);
+
+    registers.PC = registers.PC + offset;
+    return 12;
   },
 
   // ADD HL,HL
@@ -338,7 +369,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD A,(HL+)
   0x2A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = addressBus[registers.HL++].byte;
     return 8;
   },
 
@@ -372,7 +403,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD L,d8
   0x2E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = addressBus[registers.PC++].byte;
     return 8;
   },
 
@@ -384,19 +415,26 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JR NC,r8
   0x30: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 8; // 12 if action taken
+    if (registers.flags.C) {
+      return 8;
+    }
+
+    const offset = uint8ToInt8(addressBus[registers.PC++].byte);
+
+    registers.PC = registers.PC + offset;
+    return 12;
   },
 
   // LD SP,d16
   0x31: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.SP = addressBus[registers.PC].word;
+    registers.PC += 2;
     return 12;
   },
 
   // LD (HL-),A
   0x32: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL--].byte = registers.A;
     return 8;
   },
 
@@ -408,19 +446,31 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // INC (HL)
   0x34: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H } = ALU.incByte(addressBus[registers.HL].byte);
+
+    addressBus[registers.HL].byte = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+
     return 12;
   },
 
   // DEC (HL)
   0x35: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H } = ALU.decByte(addressBus[registers.HL].byte);
+
+    addressBus[registers.HL].byte = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+
     return 12;
   },
 
   // LD (HL),d8
   0x36: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = addressBus[registers.PC++].byte;
     return 12;
   },
 
@@ -432,8 +482,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JR C,r8
   0x38: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 8; // 12 if action taken
+    if (!registers.flags.C) {
+      return 8;
+    }
+
+    const offset = uint8ToInt8(addressBus[registers.PC++].byte);
+
+    registers.PC = registers.PC + offset;
+    return 12;
   },
 
   // ADD HL,SP
@@ -449,7 +505,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD A,(HL-)
   0x3A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = addressBus[registers.HL--].byte;
     return 8;
   },
 
@@ -483,7 +539,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD A,d8
   0x3E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = addressBus[registers.PC++].byte;
     return 8;
   },
 
@@ -495,325 +551,325 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD B,B
   0x40: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.B;
     return 4;
   },
 
   // LD B,C
   0x41: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.C;
     return 4;
   },
 
   // LD B,D
   0x42: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.D;
     return 4;
   },
 
   // LD B,E
   0x43: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.E;
     return 4;
   },
 
   // LD B,H
   0x44: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.H;
     return 4;
   },
 
   // LD B,L
   0x45: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.L;
     return 4;
   },
 
   // LD B,(HL)
   0x46: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD B,A
   0x47: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.B = registers.A;
     return 4;
   },
 
   // LD C,B
   0x48: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.B;
     return 4;
   },
 
   // LD C,C
   0x49: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.C;
     return 4;
   },
 
   // LD C,D
   0x4A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.D;
     return 4;
   },
 
   // LD C,E
   0x4B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.E;
     return 4;
   },
 
   // LD C,H
   0x4C: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.H;
     return 4;
   },
 
   // LD C,L
   0x4D: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.L;
     return 4;
   },
 
   // LD C,(HL)
   0x4E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD C,A
   0x4F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.C = registers.A;
     return 4;
   },
 
   // LD D,B
   0x50: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.B;
     return 4;
   },
 
   // LD D,C
   0x51: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.C;
     return 4;
   },
 
   // LD D,D
   0x52: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.D;
     return 4;
   },
 
   // LD D,E
   0x53: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.E;
     return 4;
   },
 
   // LD D,H
   0x54: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.H;
     return 4;
   },
 
   // LD D,L
   0x55: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.L;
     return 4;
   },
 
   // LD D,(HL)
   0x56: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD D,A
   0x57: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.D = registers.A;
     return 4;
   },
 
   // LD E,B
   0x58: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.B;
     return 4;
   },
 
   // LD E,C
   0x59: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.C;
     return 4;
   },
 
   // LD E,D
   0x5A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.D;
     return 4;
   },
 
   // LD E,E
   0x5B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.E;
     return 4;
   },
 
   // LD E,H
   0x5C: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.H;
     return 4;
   },
 
   // LD E,L
   0x5D: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.L;
     return 4;
   },
 
   // LD E,(HL)
   0x5E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD E,A
   0x5F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.E = registers.A;
     return 4;
   },
 
   // LD H,B
   0x60: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.B;
     return 4;
   },
 
   // LD H,C
   0x61: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.C;
     return 4;
   },
 
   // LD H,D
   0x62: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.D;
     return 4;
   },
 
   // LD H,E
   0x63: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.E;
     return 4;
   },
 
   // LD H,H
   0x64: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.H;
     return 4;
   },
 
   // LD H,L
   0x65: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.L;
     return 4;
   },
 
   // LD H,(HL)
   0x66: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD H,A
   0x67: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.H = registers.A;
     return 4;
   },
 
   // LD L,B
   0x68: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.B;
     return 4;
   },
 
   // LD L,C
   0x69: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.C;
     return 4;
   },
 
   // LD L,D
   0x6A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.D;
     return 4;
   },
 
   // LD L,E
   0x6B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.E;
     return 4;
   },
 
   // LD L,H
   0x6C: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.H;
     return 4;
   },
 
   // LD L,L
   0x6D: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.L;
     return 4;
   },
 
   // LD L,(HL)
   0x6E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD L,A
   0x6F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.L = registers.A;
     return 4;
   },
 
   // LD (HL),B
   0x70: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.B;
     return 8;
   },
 
   // LD (HL),C
   0x71: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.C;
     return 8;
   },
 
   // LD (HL),D
   0x72: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.D;
     return 8;
   },
 
   // LD (HL),E
   0x73: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.E;
     return 8;
   },
 
   // LD (HL),H
   0x74: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.H;
     return 8;
   },
 
   // LD (HL),L
   0x75: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.L;
     return 8;
   },
 
@@ -825,55 +881,55 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD (HL),A
   0x77: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[registers.HL].byte = registers.A;
     return 8;
   },
 
   // LD A,B
   0x78: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.B;
     return 4;
   },
 
   // LD A,C
   0x79: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.C;
     return 4;
   },
 
   // LD A,D
   0x7A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.D;
     return 4;
   },
 
   // LD A,E
   0x7B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.E;
     return 4;
   },
 
   // LD A,H
   0x7C: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.H;
     return 4;
   },
 
   // LD A,L
   0x7D: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.L;
     return 4;
   },
 
   // LD A,(HL)
   0x7E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = addressBus[registers.HL].byte;
     return 8;
   },
 
   // LD A,A
   0x7F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.A;
     return 4;
   },
 
@@ -951,7 +1007,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD A,(HL)
   0x86: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, addressBus[registers.HL].byte);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
@@ -1317,13 +1379,17 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JP NZ,a16
   0xC2: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 12; // 16 if action taken
+    if (registers.flags.Z) {
+      return 12;
+    }
+
+    registers.PC = addressBus[registers.PC].word;
+    return 16;
   },
 
   // JP a16
   0xC3: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.PC = addressBus[registers.PC].word;
     return 16;
   },
 
@@ -1341,7 +1407,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD A,d8
   0xC6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.addBytes(registers.A, addressBus[registers.PC++].byte);
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
@@ -1365,8 +1437,12 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JP Z,a16
   0xCA: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 12; // 16 if action taken
+    if (!registers.flags.Z) {
+      return 12;
+    }
+
+    registers.PC = addressBus[registers.PC].word;
+    return 16;
   },
 
   // PREFIX CB
@@ -1413,8 +1489,12 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JP NC,a16
   0xD2: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 12; // 16 if action taken
+    if (registers.flags.C) {
+      return 12;
+    }
+
+    registers.PC = addressBus[registers.PC].word;
+    return 16;
   },
 
   // Not implemented
@@ -1461,8 +1541,12 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // JP C,a16
   0xDA: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 12; // 16 if action taken
+    if (!registers.flags.C) {
+      return 12;
+    }
+
+    registers.PC = addressBus[registers.PC].word;
+    return 16;
   },
 
   // Not implemented
@@ -1509,7 +1593,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD (C),A
   0xE2: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[0xFF00 + registers.C].byte = registers.A;
     return 8;
   },
 
@@ -1557,7 +1641,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD (a16),A
   0xEA: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    addressBus[addressBus[registers.PC].word].byte = registers.A;
+    registers.PC += 2;
     return 16;
   },
 
@@ -1605,7 +1690,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD A,(C)
   0xF2: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = addressBus[0xFF00 + registers.C].byte;
     return 8;
   },
 
@@ -1647,13 +1732,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD SP,HL
   0xF9: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.SP = registers.HL;
     return 8;
   },
 
   // LD A,(a16)
   0xFA: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = addressBus[addressBus[registers.PC].word].byte;
+    registers.PC += 2;
     return 16;
   },
 

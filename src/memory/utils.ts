@@ -15,3 +15,14 @@ export function isIntegerPropertyKey(prop: PropertyKey): boolean {
 
   return false;
 }
+
+/**
+ * Convert an unsigned 8 bits integer to a
+ * signed one.
+ *
+ * @param value Unsigned 8 bits integer
+ */
+export function uint8ToInt8(value: number): number {
+  const sign = (value >> 7) & 1;
+  return sign ? -(~value & 127) - 1 : (value & 127);
+}
