@@ -7,7 +7,7 @@ import { uint8ToInt8 } from '../../memory/utils';
 export const OPCODES_DEFAULT: IOpcodesMap = {
   // NOP
   0x00: (registers: CpuRegisters, addressBus: AddressBus) => {
-    return 2;
+    return 4;
   },
 
   // LD BC,d16
@@ -17,7 +17,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     return 12;
   },
 
-  // LD (BC) A
+  // LD (BC),A
   0x02: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus[registers.BC].byte = registers.A;
     return 8;
@@ -143,7 +143,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // STOP 0
   0x10: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
-    this.registers.PC++;
+    registers.PC++;
     cpuCallbacks.stop();
     return 4;
   },
@@ -229,7 +229,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD A,(DE)
   0x1A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    this.registers.A = addressBus[this.registers.DE].byte;
+    registers.A = addressBus[registers.DE].byte;
     return 8;
   },
 
@@ -263,7 +263,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD E,d8
   0x1E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    this.registers.E = this.addressBus[this.PC++].byte;
+    registers.E = addressBus[registers.PC++].byte;
     return 8;
   },
 
@@ -283,6 +283,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JR NZ,r8
   0x20: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
+      registers.PC++;
       return 8;
     }
 
@@ -348,6 +349,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JR Z,r8
   0x28: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (!registers.flags.Z) {
+      registers.PC++;
       return 8;
     }
 
@@ -417,6 +419,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JR NC,r8
   0x30: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
+      registers.PC++;
       return 8;
     }
 
@@ -484,6 +487,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JR C,r8
   0x38: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
+      registers.PC++;
       return 8;
     }
 
@@ -1634,6 +1638,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JP NZ,a16
   0xC2: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1650,6 +1655,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // CALL NZ,a16
   0xC4: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1710,6 +1716,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JP Z,a16
   0xCA: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (!registers.flags.Z) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1726,6 +1733,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // CALL Z,a16
   0xCC: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1784,6 +1792,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JP NC,a16
   0xD2: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1791,15 +1800,10 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     return 16;
   },
 
-  // Not implemented
-  0xD3: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
   // CALL NC,a16
   0xD4: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1864,6 +1868,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // JP C,a16
   0xDA: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1871,15 +1876,10 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     return 16;
   },
 
-  // Not implemented
-  0xDB: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
   // CALL C,a16
   0xDC: (registers: CpuRegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
+      registers.PC += 2;
       return 12;
     }
 
@@ -1890,12 +1890,6 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     // Set PC to the given address
     registers.PC = addressBus[registers.PC].word;
     return 24;
-  },
-
-  // Not implemented
-  0xDD: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
   },
 
   // SBC A,d8
@@ -1929,18 +1923,6 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   0xE2: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus[0xFF00 + registers.C].byte = registers.A;
     return 8;
-  },
-
-  // Not implemented
-  0xE3: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
-  // Not implemented
-  0xE4: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
   },
 
   // PUSH HL
@@ -1997,24 +1979,6 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     return 16;
   },
 
-  // Not implemented
-  0xEB: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
-  // Not implemented
-  0xEC: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
-  // Not implemented
-  0xED: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
   // XOR d8
   0xEE: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(
@@ -2061,12 +2025,6 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   0xF3: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     cpuCallbacks.disableInterrupts();
     return 4;
-  },
-
-  // Not implemented
-  0xF4: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
   },
 
   // PUSH AF
@@ -2127,18 +2085,6 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   0xFB: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     cpuCallbacks.enableInterrupts();
     return 4;
-  },
-
-  // Not implemented
-  0xFC: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
-  },
-
-  // Not implemented
-  0xFD: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // NOP
-    return 0;
   },
 
   // CP d8

@@ -56,6 +56,7 @@ export class CPU {
     // If there isn't any boot ROM, directly
     // jump to 0x0100.
     if (this.addressBus.hasBootRom()) {
+      this.registers.SP = 0xFFFE;
       this.registers.PC = 0x0100;
     }
   }
@@ -99,10 +100,10 @@ export class CPU {
     const opcode = opcodesMap[opcodeIndex];
 
     if (!opcode) {
-      let errorMessage = `No opcode found for selector ${opcodeIndex}`;
+      let errorMessage = `No opcode found for selector 0x${opcodeIndex.toString(16).toUpperCase()}`;
 
       if (opcodePrefix) {
-        errorMessage += ` (prefix ${opcodePrefix})`;
+        errorMessage += ` (prefix 0x${opcodePrefix.toString(16).toUpperCase()})`;
       }
 
       throw new Error(errorMessage);

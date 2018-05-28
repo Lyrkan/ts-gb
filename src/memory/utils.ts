@@ -23,6 +23,7 @@ export function isIntegerPropertyKey(prop: PropertyKey): boolean {
  * @param value Unsigned 8 bits integer
  */
 export function uint8ToInt8(value: number): number {
-  const sign = (value >> 7) & 1;
-  return sign ? -(~value & 127) - 1 : (value & 127);
+  const maskedValue = (value & 0xFF);
+  const sign = (maskedValue >> 7) & 1;
+  return sign ? -(~maskedValue & 127) - 1 : (maskedValue & 127);
 }
