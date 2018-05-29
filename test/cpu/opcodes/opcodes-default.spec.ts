@@ -1,16 +1,23 @@
 import 'mocha';
+import * as sinon from 'sinon';
 import { expect } from 'chai';
 import { OPCODES_DEFAULT } from '../../../src/cpu/opcodes/opcodes-default';
 import { CpuRegisters } from '../../../src/cpu/cpu-registers';
 import { AddressBus } from '../../../src/memory/address-bus';
 import { GameCartridge } from '../../../src/cartridge/game-cartridge';
+import { ICPUCallbacks } from '../../../src/cpu/opcodes';
 
 describe('Opcodes - Default table', () => {
   let cpuRegisters: CpuRegisters;
+  let cpuCallbacks: ICPUCallbacks;
   let addressBus: AddressBus;
 
   const executeNextOpcode = (expectedCycles: number) => {
-    const cycles = OPCODES_DEFAULT[addressBus[cpuRegisters.PC++].byte](cpuRegisters, addressBus);
+    const cycles = OPCODES_DEFAULT[addressBus[cpuRegisters.PC++].byte](
+      cpuRegisters,
+      addressBus,
+      cpuCallbacks
+    );
     expect(cycles).to.equal(expectedCycles, 'Unexpected cycles count');
   };
 
@@ -36,6 +43,13 @@ describe('Opcodes - Default table', () => {
     cpuRegisters = new CpuRegisters();
     cpuRegisters.PC = 0x0000;
     cpuRegisters.SP = 0xFFFE;
+
+    cpuCallbacks = {
+      stop: () => { /* NOP */ },
+      disableInterrupts: () => { /* NOP */ },
+      enableInterrupts: () => { /* NOP */ },
+      halt: () => { /* NOP */ },
+    };
 
     addressBus = new AddressBus();
     addressBus.loadCartridge(new GameCartridge(new ArrayBuffer(32 * 1024)));
@@ -165,7 +179,24 @@ describe('Opcodes - Default table', () => {
   });
 
   it('0x07 - RLCA');
-  it('0x08 - LD (a16),SP');
+
+  it('0x08 - LD (a16),SP', () => {
+    addressBus[0x0000].byte = 0x08;
+    addressBus[0x0001].word = 0xC000;
+    addressBus[0x0003].byte = 0x08;
+    addressBus[0x0004].word = 0xC001;
+
+    cpuRegisters.SP = 0x1234;
+    executeNextOpcode(20);
+    expect(addressBus[0xC000].word).to.equal(0x1234);
+    checkRegisters({ PC: 0x0003 });
+
+    cpuRegisters.SP = 0x5678;
+    executeNextOpcode(20);
+    expect(addressBus[0xC001].word).to.equal(0x5678);
+    checkRegisters({ PC: 0x0006 });
+  });
+
   it('0x09 - ADD HL,BC');
 
   it('0x0A - LD A,(BC)', () => {
@@ -266,7 +297,15 @@ describe('Opcodes - Default table', () => {
   });
 
   it('0x0F - RRCA');
-  it('0x10 - STOP 0');
+
+  it('0x10 - STOP 0', () => {
+    addressBus[0x0000].byte = 0x10;
+
+    const spy = sinon.spy(cpuCallbacks, 'stop');
+    executeNextOpcode(4);
+    checkRegisters({ PC: 0x0002 });
+    expect(spy.calledOnce).to.equal(true);
+  });
 
   it('0x11 - LD DE,d16', () => {
     addressBus[0x0000].byte = 0x11;
@@ -1709,7 +1748,14 @@ describe('Opcodes - Default table', () => {
     checkRegisters({ PC: 0x0002 });
   });
 
-  it('0x76 - HALT');
+  it('0x76 - HALT', () => {
+    addressBus[0x0000].byte = 0x76;
+
+    const spy = sinon.spy(cpuCallbacks, 'halt');
+    executeNextOpcode(4);
+    checkRegisters({ PC: 0x0001 });
+    expect(spy.calledOnce).to.equal(true);
+  });
 
   it('0x77 - LD (HL),A', () => {
     addressBus[0x0000].byte = 0x77;
@@ -1866,30 +1912,645 @@ describe('Opcodes - Default table', () => {
   it('0x9D - SBC A,L');
   it('0x9E - SBC A,(HL)');
   it('0x9F - SBC A,A');
-  it('0xA0 - AND B');
-  it('0xA1 - AND C');
-  it('0xA2 - AND D');
-  it('0xA3 - AND E');
-  it('0xA4 - AND H');
-  it('0xA5 - AND L');
-  it('0xA6 - AND (HL)');
-  it('0xA7 - AND A');
-  it('0xA8 - XOR B');
-  it('0xA9 - XOR C');
-  it('0xAA - XOR D');
-  it('0xAB - XOR E');
-  it('0xAC - XOR H');
-  it('0xAD - XOR L');
-  it('0xAE - XOR (HL)');
-  it('0xAF - XOR A');
-  it('0xB0 - OR B');
-  it('0xB1 - OR C');
-  it('0xB2 - OR D');
-  it('0xB3 - OR E');
-  it('0xB4 - OR H');
-  it('0xB5 - OR L');
-  it('0xB6 - OR (HL)');
-  it('0xB7 - OR A');
+
+  it('0xA0 - AND B', () => {
+    addressBus[0x0000].byte = 0xA0;
+    addressBus[0x0001].byte = 0xA0;
+    addressBus[0x0002].byte = 0xA0;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.B = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.B = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.B = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA1 - AND C', () => {
+    addressBus[0x0000].byte = 0xA1;
+    addressBus[0x0001].byte = 0xA1;
+    addressBus[0x0002].byte = 0xA1;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.C = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.C = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.C = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA2 - AND D', () => {
+    addressBus[0x0000].byte = 0xA2;
+    addressBus[0x0001].byte = 0xA2;
+    addressBus[0x0002].byte = 0xA2;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.D = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.D = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.D = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA3 - AND E', () => {
+    addressBus[0x0000].byte = 0xA3;
+    addressBus[0x0001].byte = 0xA3;
+    addressBus[0x0002].byte = 0xA3;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.E = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.E = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.E = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA4 - AND H', () => {
+    addressBus[0x0000].byte = 0xA4;
+    addressBus[0x0001].byte = 0xA4;
+    addressBus[0x0002].byte = 0xA4;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.H = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.H = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.H = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA5 - AND L', () => {
+    addressBus[0x0000].byte = 0xA5;
+    addressBus[0x0001].byte = 0xA5;
+    addressBus[0x0002].byte = 0xA5;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.L = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.L = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.L = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA6 - AND (HL)', () => {
+    addressBus[0x0000].byte = 0xA6;
+    addressBus[0x0001].byte = 0xA6;
+    addressBus[0x0002].byte = 0xA6;
+
+    cpuRegisters.HL = 0xC000;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    addressBus[0xC000].byte = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    addressBus[0xC000].byte = 0x34;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x10, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    addressBus[0xC000].byte = 0x00;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA7 - AND A', () => {
+    addressBus[0x0000].byte = 0xA7;
+    addressBus[0x0001].byte = 0xA7;
+    addressBus[0x0002].byte = 0xA7;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x34, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
+  });
+
+  it('0xA8 - XOR B', () => {
+    addressBus[0x0000].byte = 0xA8;
+    addressBus[0x0001].byte = 0xA8;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.B = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0});
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.B = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xA9 - XOR C', () => {
+    addressBus[0x0000].byte = 0xA9;
+    addressBus[0x0001].byte = 0xA9;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.C = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.C = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xAA - XOR D', () => {
+    addressBus[0x0000].byte = 0xAA;
+    addressBus[0x0001].byte = 0xAA;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.D = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.D = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xAB - XOR E', () => {
+    addressBus[0x0000].byte = 0xAB;
+    addressBus[0x0001].byte = 0xAB;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.E = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.E = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xAC - XOR H', () => {
+    addressBus[0x0000].byte = 0xAC;
+    addressBus[0x0001].byte = 0xAC;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.H = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.H = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xAD - XOR L', () => {
+    addressBus[0x0000].byte = 0xAD;
+    addressBus[0x0001].byte = 0xAD;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.L = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.L = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xAE - XOR (HL)', () => {
+    addressBus[0x0000].byte = 0xAE;
+    addressBus[0x0001].byte = 0xAE;
+
+    cpuRegisters.HL = 0xC000;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    addressBus[0xC000].byte = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    addressBus[0xC000].byte = 0x34;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x26, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xAF - XOR A', () => {
+    addressBus[0x0000].byte = 0xAF;
+    addressBus[0x0001].byte = 0xAF;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0002 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB0 - OR B', () => {
+    addressBus[0x0000].byte = 0xB0;
+    addressBus[0x0001].byte = 0xB0;
+    addressBus[0x0002].byte = 0xB0;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.B = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.B = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.B = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB1 - OR C', () => {
+    addressBus[0x0000].byte = 0xB1;
+    addressBus[0x0001].byte = 0xB1;
+    addressBus[0x0002].byte = 0xB1;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.C = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.C = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.C = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB2 - OR D', () => {
+    addressBus[0x0000].byte = 0xB2;
+    addressBus[0x0001].byte = 0xB2;
+    addressBus[0x0002].byte = 0xB2;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.D = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.D = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.D = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB3 - OR E', () => {
+    addressBus[0x0000].byte = 0xB3;
+    addressBus[0x0001].byte = 0xB3;
+    addressBus[0x0002].byte = 0xB3;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.E = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.E = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.E = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB4 - OR H', () => {
+    addressBus[0x0000].byte = 0xB4;
+    addressBus[0x0001].byte = 0xB4;
+    addressBus[0x0002].byte = 0xB4;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.H = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.H = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.H = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB5 - OR L', () => {
+    addressBus[0x0000].byte = 0xB5;
+    addressBus[0x0001].byte = 0xB5;
+    addressBus[0x0002].byte = 0xB5;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.L = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    cpuRegisters.L = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    cpuRegisters.L = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB6 - OR (HL)', () => {
+    addressBus[0x0000].byte = 0xB6;
+    addressBus[0x0001].byte = 0xB6;
+    addressBus[0x0002].byte = 0xB6;
+
+    cpuRegisters.HL = 0xC000;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    addressBus[0xC000].byte = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    addressBus[0xC000].byte = 0x34;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x36, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    addressBus[0xC000].byte = 0x00;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xB7 - OR A', () => {
+    addressBus[0x0000].byte = 0xB7;
+    addressBus[0x0001].byte = 0xB7;
+    addressBus[0x0002].byte = 0xB7;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x12, PC: 0x0001 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x34;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x34, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    executeNextOpcode(4);
+    checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
   it('0xB8 - CP B');
   it('0xB9 - CP C');
   it('0xBA - CP D');
@@ -1898,8 +2559,37 @@ describe('Opcodes - Default table', () => {
   it('0xBD - CP L');
   it('0xBE - CP (HL)');
   it('0xBF - CP A');
-  it('0xC0 - RET NZ');
-  it('0xC1 - POP BC');
+
+  it('0xC0 - RET NZ', () => {
+    addressBus[0x0000].byte = 0xC0;
+    addressBus[0x0001].byte = 0xC0;
+
+    cpuRegisters.SP = 0xFFFC;
+    addressBus[0xFFFC].word = 0x1234;
+
+    cpuRegisters.flags.Z = 1;
+    executeNextOpcode(8);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+
+    cpuRegisters.flags.Z = 0;
+    executeNextOpcode(20);
+    checkRegisters({ SP: 0xFFFE, PC: 0x1234 });
+  });
+
+  it('0xC1 - POP BC', () => {
+    addressBus[0x0000].byte = 0xC1;
+    addressBus[0x0001].byte = 0xC1;
+
+    cpuRegisters.SP = 0xFFFA;
+    addressBus[0xFFFA].word = 0x1234;
+    addressBus[0xFFFC].word = 0x5678;
+
+    executeNextOpcode(12);
+    checkRegisters({ BC: 0x1234, SP: 0xFFFC, PC: 0x0001 });
+
+    executeNextOpcode(12);
+    checkRegisters({ BC: 0x5678, SP: 0xFFFE, PC: 0x0002 });
+  });
 
   it('0xC2 - JP NZ,a16', () => {
     addressBus[0x0000].byte = 0xC2;
@@ -1929,12 +2619,78 @@ describe('Opcodes - Default table', () => {
     checkRegisters({ PC: 0x0034 });
   });
 
-  it('0xC4 - CALL NZ,a16');
-  it('0xC5 - PUSH BC');
+  it('0xC4 - CALL NZ,a16', () => {
+    addressBus[0x1111].byte = 0xC4;
+    addressBus[0x1112].word = 0x1234;
+    addressBus[0x1114].byte = 0xC4;
+    addressBus[0x1115].word = 0x1345;
+
+    cpuRegisters.PC = 0x1111;
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.flags.Z = 1;
+    executeNextOpcode(12);
+    checkRegisters({ PC: 0x1114, SP: 0xFFFE });
+
+    cpuRegisters.flags.Z = 0;
+    executeNextOpcode(24);
+    checkRegisters({ PC: 0x1345, SP: 0xFFFC });
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x1117);
+  });
+
+  it('0xC5 - PUSH BC', () => {
+    addressBus[0x0000].byte = 0xC5;
+    addressBus[0x0001].byte = 0xC5;
+
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.BC = 0x1234;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+    addressBus[cpuRegisters.SP].word = 0x1234;
+
+    cpuRegisters.BC = 0x5678;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFA, PC: 0x0002 });
+    addressBus[cpuRegisters.SP].word = 0x5678;
+  });
+
   it('0xC6 - ADD A,d8');
-  it('0xC7 - RST 00H');
-  it('0xC8 - RET Z');
-  it('0xC9 - RET');
+
+  it('0xC7 - RST 00H', () => {
+    addressBus[0x0123].byte = 0xC7;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0000, SP: 0xFFFC });
+  });
+
+  it('0xC8 - RET Z', () => {
+    addressBus[0x0000].byte = 0xC8;
+    addressBus[0x0001].byte = 0xC8;
+
+    cpuRegisters.SP = 0xFFFC;
+    addressBus[0xFFFC].word = 0x1234;
+
+    cpuRegisters.flags.Z = 0;
+    executeNextOpcode(8);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+
+    cpuRegisters.flags.Z = 1;
+    executeNextOpcode(20);
+    checkRegisters({ SP: 0xFFFE, PC: 0x1234 });
+  });
+
+  it('0xC9 - RET', () => {
+    addressBus[0x0000].byte = 0xC9;
+
+    cpuRegisters.SP = 0xFFFC;
+    addressBus[0xFFFC].word = 0x1234;
+
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFE, PC: 0x1234 });
+  });
 
   it('0xCA - JP Z,a16', () => {
     addressBus[0x0000].byte = 0xCA;
@@ -1951,13 +2707,78 @@ describe('Opcodes - Default table', () => {
     checkRegisters({ PC: 0x0034 });
   });
 
-  it('0xCB - PREFIX CB');
-  it('0xCC - CALL Z,a16');
-  it('0xCD - CALL a16');
+  it('0xCC - CALL Z,a16', () => {
+    addressBus[0x1111].byte = 0xCC;
+    addressBus[0x1112].word = 0x1234;
+    addressBus[0x1114].byte = 0xCC;
+    addressBus[0x1115].word = 0x1345;
+
+    cpuRegisters.PC = 0x1111;
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.flags.Z = 0;
+    executeNextOpcode(12);
+    checkRegisters({ PC: 0x1114, SP: 0xFFFE });
+
+    cpuRegisters.flags.Z = 1;
+    executeNextOpcode(24);
+    checkRegisters({ PC: 0x1345, SP: 0xFFFC });
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x1117);
+  });
+
+  it('0xCD - CALL a16', () => {
+    addressBus[0x1111].byte = 0xCD;
+    addressBus[0x1112].word = 0x1234;
+
+    cpuRegisters.PC = 0x1111;
+    cpuRegisters.SP = 0xFFFE;
+
+    executeNextOpcode(24);
+    checkRegisters({ PC: 0x1234, SP: 0xFFFC });
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x1114);
+  });
+
   it('0xCE - ADC A,d8');
-  it('0xCF - RST 08H');
-  it('0xD0 - RET NC');
-  it('0xD1 - POP DE');
+
+  it('0xCF - RST 08H', () => {
+    addressBus[0x0123].byte = 0xCF;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0008, SP: 0xFFFC });
+  });
+
+  it('0xD0 - RET NC', () => {
+    addressBus[0x0000].byte = 0xD0;
+    addressBus[0x0001].byte = 0xD0;
+
+    cpuRegisters.SP = 0xFFFC;
+    addressBus[0xFFFC].word = 0x1234;
+
+    cpuRegisters.flags.C = 1;
+    executeNextOpcode(8);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(20);
+    checkRegisters({ SP: 0xFFFE, PC: 0x1234 });
+  });
+
+  it('0xD1 - POP DE', () => {
+    addressBus[0x0000].byte = 0xD1;
+    addressBus[0x0001].byte = 0xD1;
+
+    cpuRegisters.SP = 0xFFFA;
+    addressBus[0xFFFA].word = 0x1234;
+    addressBus[0xFFFC].word = 0x5678;
+
+    executeNextOpcode(12);
+    checkRegisters({ DE: 0x1234, SP: 0xFFFC, PC: 0x0001 });
+
+    executeNextOpcode(12);
+    checkRegisters({ DE: 0x5678, SP: 0xFFFE, PC: 0x0002 });
+  });
 
   it('0xD2 - JP NC,a16', () => {
     addressBus[0x0000].byte = 0xD2;
@@ -1974,12 +2795,80 @@ describe('Opcodes - Default table', () => {
     checkRegisters({ PC: 0x0034 });
   });
 
-  it('0xD4 - CALL NC,a16');
-  it('0xD5 - PUSH DE');
+  it('0xD4 - CALL NC,a16', () => {
+    addressBus[0x1111].byte = 0xD4;
+    addressBus[0x1112].word = 0x1234;
+    addressBus[0x1114].byte = 0xD4;
+    addressBus[0x1115].word = 0x1345;
+
+    cpuRegisters.PC = 0x1111;
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.flags.C = 1;
+    executeNextOpcode(12);
+    checkRegisters({ PC: 0x1114, SP: 0xFFFE });
+
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(24);
+    checkRegisters({ PC: 0x1345, SP: 0xFFFC });
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x1117);
+  });
+
+  it('0xD5 - PUSH DE', () => {
+    addressBus[0x0000].byte = 0xD5;
+    addressBus[0x0001].byte = 0xD5;
+
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.DE = 0x1234;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+    addressBus[cpuRegisters.SP].word = 0x1234;
+
+    cpuRegisters.DE = 0x5678;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFA, PC: 0x0002 });
+    addressBus[cpuRegisters.SP].word = 0x5678;
+  });
+
   it('0xD6 - SUB d8');
-  it('0xD7 - RST 10H');
-  it('0xD8 - RET C');
-  it('0xD9 - RETI');
+
+  it('0xD7 - RST 10H', () => {
+    addressBus[0x0123].byte = 0xD7;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0010, SP: 0xFFFC });
+  });
+
+  it('0xD8 - RET C', () => {
+    addressBus[0x0000].byte = 0xD8;
+    addressBus[0x0001].byte = 0xD8;
+
+    cpuRegisters.SP = 0xFFFC;
+    addressBus[0xFFFC].word = 0x1234;
+
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(8);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+
+    cpuRegisters.flags.C = 1;
+    executeNextOpcode(20);
+    checkRegisters({ SP: 0xFFFE, PC: 0x1234 });
+  });
+
+  it('0xD9 - RETI', () => {
+    addressBus[0x0000].byte = 0xD9;
+
+    cpuRegisters.SP = 0xFFFC;
+    addressBus[0xFFFC].word = 0x1234;
+
+    const spy = sinon.spy(cpuCallbacks, 'enableInterrupts');
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFE, PC: 0x1234 });
+    expect(spy.calledOnce).to.equal(true);
+  });
 
   it('0xDA - JP C,a16', () => {
     addressBus[0x0000].byte = 0xDA;
@@ -1996,15 +2885,98 @@ describe('Opcodes - Default table', () => {
     checkRegisters({ PC: 0x0034 });
   });
 
-  it('0xDC - CALL C,a16');
+  it('0xDC - CALL C,a16', () => {
+    addressBus[0x1111].byte = 0xDC;
+    addressBus[0x1112].word = 0x1234;
+    addressBus[0x1114].byte = 0xDC;
+    addressBus[0x1115].word = 0x1345;
+
+    cpuRegisters.PC = 0x1111;
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(12);
+    checkRegisters({ PC: 0x1114, SP: 0xFFFE });
+
+    cpuRegisters.flags.C = 1;
+    executeNextOpcode(24);
+    checkRegisters({ PC: 0x1345, SP: 0xFFFC });
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x1117);
+  });
+
   it('0xDE - SBC A,d8');
-  it('0xDF - RST 18H');
+
+  it('0xDF - RST 18H', () => {
+    addressBus[0x0123].byte = 0xDF;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0018, SP: 0xFFFC });
+  });
+
   it('0xE0 - LDH (a8),A');
-  it('0xE1 - POP HL');
-  it('0xE2 - LD (C),A');
-  it('0xE5 - PUSH HL');
+
+  it('0xE1 - POP HL', () => {
+    addressBus[0x0000].byte = 0xE1;
+    addressBus[0x0001].byte = 0xE1;
+
+    cpuRegisters.SP = 0xFFFA;
+    addressBus[0xFFFA].word = 0x1234;
+    addressBus[0xFFFC].word = 0x5678;
+
+    executeNextOpcode(12);
+    checkRegisters({ HL: 0x1234, SP: 0xFFFC, PC: 0x0001 });
+
+    executeNextOpcode(12);
+    checkRegisters({ HL: 0x5678, SP: 0xFFFE, PC: 0x0002 });
+  });
+
+  it('0xE2 - LD (C),A', () => {
+    addressBus[0x0000].byte = 0xE2;
+    addressBus[0x0001].byte = 0xE2;
+
+    cpuRegisters.C = 0x12;
+    cpuRegisters.A = 0x34;
+    executeNextOpcode(8);
+    expect(addressBus[0xFF12].byte).to.equal(0x34);
+    checkRegisters({ PC: 0x0001 });
+
+    cpuRegisters.C = 0x13;
+    cpuRegisters.A = 0x56;
+    executeNextOpcode(8);
+    expect(addressBus[0xFF13].byte).to.equal(0x56);
+    checkRegisters({ PC: 0x0002 });
+  });
+
+  it('0xE5 - PUSH HL', () => {
+    addressBus[0x0000].byte = 0xE5;
+    addressBus[0x0001].byte = 0xE5;
+
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.HL = 0x1234;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+    addressBus[cpuRegisters.SP].word = 0x1234;
+
+    cpuRegisters.HL = 0x5678;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFA, PC: 0x0002 });
+    addressBus[cpuRegisters.SP].word = 0x5678;
+  });
+
   it('0xE6 - AND d8');
-  it('0xE7 - RST 20H');
+
+  it('0xE7 - RST 20H', () => {
+    addressBus[0x0123].byte = 0xE7;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0020, SP: 0xFFFC });
+  });
+
   it('0xE8 - ADD SP,r8');
 
   it('0xE9 - JP (HL)', () => {
@@ -2021,20 +2993,197 @@ describe('Opcodes - Default table', () => {
     checkRegisters({ PC: 0x0034 });
   });
 
-  it('0xEA - LD (a16),A');
-  it('0xEE - XOR d8');
-  it('0xEF - RST 28H');
+  it('0xEA - LD (a16),A', () => {
+    addressBus[0x0000].byte = 0xEA;
+    addressBus[0x0001].word = 0xC000;
+    addressBus[0x0003].byte = 0xEA;
+    addressBus[0x0004].word = 0xC001;
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(16);
+    expect(addressBus[0xC000].byte).to.equal(0x12);
+    checkRegisters({ PC: 0x0003 });
+
+    cpuRegisters.A = 0x34;
+    executeNextOpcode(16);
+    expect(addressBus[0xC001].byte).to.equal(0x34);
+    checkRegisters({ PC: 0x0006 });
+  });
+
+  it('0xEE - XOR d8', () => {
+    addressBus[0x0000].byte = 0xEE;
+    addressBus[0x0001].byte = 0x12;
+    addressBus[0x0002].byte = 0xEE;
+    addressBus[0x0003].byte = 0x34;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x00, PC: 0x0002 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x26, PC: 0x0004 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xEF - RST 28H', () => {
+    addressBus[0x0123].byte = 0xEF;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0028, SP: 0xFFFC });
+  });
+
   it('0xF0 - LDH A,(a8)');
-  it('0xF1 - POP AF');
-  it('0xF2 - LD A,(C)');
-  it('0xF3 - DI');
-  it('0xF5 - PUSH AF');
-  it('0xF6 - OR d8');
-  it('0xF7 - RST 30H');
+
+  it('0xF1 - POP AF', () => {
+    addressBus[0x0000].byte = 0xF1;
+    addressBus[0x0001].byte = 0xF1;
+
+    cpuRegisters.SP = 0xFFFA;
+    addressBus[0xFFFA].word = 0x1234;
+    addressBus[0xFFFC].word = 0x5678;
+
+    executeNextOpcode(12);
+    checkRegisters({ AF: (0x1234 & ~0b1111), SP: 0xFFFC, PC: 0x0001 });
+
+    executeNextOpcode(12);
+    checkRegisters({ AF: (0x5678 & ~0b1111), SP: 0xFFFE, PC: 0x0002 });
+  });
+
+  it('0xF2 - LD A,(C)', () => {
+    addressBus[0x0000].byte = 0xF2;
+    addressBus[0x0001].byte = 0xF2;
+
+    cpuRegisters.C = 0x12;
+    addressBus[0xFF12].byte = 0x34;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x34, PC: 0x0001 });
+
+    cpuRegisters.C = 0x13;
+    addressBus[0xFF13].byte = 0x56;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x56, PC: 0x0002 });
+  });
+
+  it('0xF3 - DI', () => {
+    addressBus[0x0000].byte = 0xF3;
+
+    const spy = sinon.spy(cpuCallbacks, 'disableInterrupts');
+    executeNextOpcode(4);
+    checkRegisters({ PC: 0x0001 });
+    expect(spy.calledOnce).to.equal(true);
+  });
+
+  it('0xF5 - PUSH AF', () => {
+    addressBus[0x0000].byte = 0xF5;
+    addressBus[0x0001].byte = 0xF5;
+
+    cpuRegisters.SP = 0xFFFE;
+
+    cpuRegisters.AF = 0x1234;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFC, PC: 0x0001 });
+    addressBus[cpuRegisters.SP].word = 0x1234;
+
+    cpuRegisters.AF = 0x5678;
+    executeNextOpcode(16);
+    checkRegisters({ SP: 0xFFFA, PC: 0x0002 });
+    addressBus[cpuRegisters.SP].word = 0x5678;
+  });
+
+  it('0xF6 - OR d8', () => {
+    addressBus[0x0000].byte = 0xF6;
+    addressBus[0x0001].byte = 0x12;
+    addressBus[0x0002].byte = 0xF6;
+    addressBus[0x0003].byte = 0x34;
+    addressBus[0x0004].byte = 0xF6;
+    addressBus[0x0005].byte = 0x00;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x12, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x12;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x36, PC: 0x0004 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0x00;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0x00, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+  });
+
+  it('0xF7 - RST 30H', () => {
+    addressBus[0x0123].byte = 0xF7;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0030, SP: 0xFFFC });
+  });
+
   it('0xF8 - LD HL,SP+r8');
-  it('0xF9 - LD SP,HL');
-  it('0xFA - LD A,(a16)');
-  it('0xFB - EI');
+
+  it('0xF9 - LD SP,HL', () => {
+    addressBus[0x0000].byte = 0xF9;
+    addressBus[0x0001].byte = 0xF9;
+
+    cpuRegisters.HL = 0x1234;
+    executeNextOpcode(8);
+    checkRegisters({ SP: 0x1234, PC: 0x0001 });
+
+    cpuRegisters.HL = 0x5678;
+    executeNextOpcode(8);
+    checkRegisters({ HL: 0x5678, PC: 0x0002 });
+  });
+
+  it('0xFA - LD A,(a16)', () => {
+    addressBus[0x0000].byte = 0xFA;
+    addressBus[0x0001].word = 0xC000;
+    addressBus[0x0003].byte = 0xFA;
+    addressBus[0x0004].word = 0xC000;
+
+    addressBus[0xC000].byte = 0x12;
+    executeNextOpcode(16);
+    checkRegisters({ A: 0x12, PC: 0x0003 });
+
+    addressBus[0xC000].byte = 0x34;
+    executeNextOpcode(16);
+    checkRegisters({ A: 0x34, PC: 0x0006 });
+  });
+
+  it('0xFB - EI', () => {
+    addressBus[0x0000].byte = 0xFB;
+
+    const spy = sinon.spy(cpuCallbacks, 'enableInterrupts');
+    executeNextOpcode(4);
+    checkRegisters({ PC: 0x0001 });
+    expect(spy.calledOnce).to.equal(true);
+  });
+
   it('0xFE - CP d8');
-  it('0xFF - RST 38H');
+
+  it('0xFF - RST 38H', () => {
+    addressBus[0x0123].byte = 0xFF;
+    cpuRegisters.PC = 0x0123;
+
+    executeNextOpcode(16);
+    expect(addressBus[cpuRegisters.SP].word).to.equal(0x0124);
+    checkRegisters({ PC: 0x0038, SP: 0xFFFC });
+  });
 });

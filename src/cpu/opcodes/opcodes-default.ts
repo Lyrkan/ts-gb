@@ -1313,7 +1313,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 4;
+    return 8;
   },
 
   // AND A
@@ -1412,7 +1412,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 4;
+    return 8;
   },
 
   // XOR A
@@ -1623,15 +1623,15 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
       return 8;
     }
 
-    registers.SP += 2;
     registers.PC = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 20;
   },
 
   // POP BC
   0xC1: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP += 2;
     registers.BC = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 12;
   },
 
@@ -1660,8 +1660,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     }
 
     // Push return address to the stack
-    addressBus[registers.SP].word = addressBus[registers.PC + 2].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC + 2;
 
     // Set PC to the given address
     registers.PC = addressBus[registers.PC].word;
@@ -1670,8 +1670,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // PUSH BC
   0xC5: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = registers.BC;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.BC;
     return 16;
   },
 
@@ -1689,8 +1689,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 00H
   0xC7: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0000;
     return 16;
   },
@@ -1701,15 +1701,15 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
       return 8;
     }
 
-    registers.SP += 2;
     registers.PC = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 20;
   },
 
   // RET
   0xC9: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP += 2;
     registers.PC = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 16;
   },
 
@@ -1724,22 +1724,16 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     return 16;
   },
 
-  // PREFIX CB
-  0xCB: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
-    return 4;
-  },
-
   // CALL Z,a16
   0xCC: (registers: CpuRegisters, addressBus: AddressBus) => {
-    if (registers.flags.Z) {
+    if (!registers.flags.Z) {
       registers.PC += 2;
       return 12;
     }
 
     // Push return address to the stack
-    addressBus[registers.SP].word = addressBus[registers.PC + 2].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC + 2;
 
     // Set PC to the given address
     registers.PC = addressBus[registers.PC].word;
@@ -1749,8 +1743,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // CALL a16
   0xCD: (registers: CpuRegisters, addressBus: AddressBus) => {
     // Push return address to the stack
-    addressBus[registers.SP].word = addressBus[registers.PC + 2].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC + 2;
 
     // Set PC to the given address
     registers.PC = addressBus[registers.PC].word;
@@ -1765,8 +1759,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 08H
   0xCF: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0008;
     return 16;
   },
@@ -1777,15 +1771,15 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
       return 8;
     }
 
-    registers.SP += 2;
     registers.PC = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 20;
   },
 
   // POP DE
   0xD1: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP += 2;
     registers.DE = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 12;
   },
 
@@ -1808,8 +1802,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     }
 
     // Push return address to the stack
-    addressBus[registers.SP].word = addressBus[registers.PC + 2].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC + 2;
 
     // Set PC to the given address
     registers.PC = addressBus[registers.PC].word;
@@ -1818,8 +1812,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // PUSH DE
   0xD5: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = registers.DE;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.DE;
     return 16;
   },
 
@@ -1840,8 +1834,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 10H
   0xD7: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0010;
     return 16;
   },
@@ -1852,15 +1846,15 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
       return 8;
     }
 
-    registers.SP += 2;
     registers.PC = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 20;
   },
 
   // RETI
   0xD9: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
-    registers.SP += 2;
     registers.PC = addressBus[registers.SP].word;
+    registers.SP += 2;
     cpuCallbacks.enableInterrupts();
     return 16;
   },
@@ -1884,8 +1878,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     }
 
     // Push return address to the stack
-    addressBus[registers.SP].word = addressBus[registers.PC + 2].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC + 2;
 
     // Set PC to the given address
     registers.PC = addressBus[registers.PC].word;
@@ -1900,8 +1894,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 18H
   0xDF: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0018;
     return 16;
   },
@@ -1914,8 +1908,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // POP HL
   0xE1: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP += 2;
     registers.HL = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 12;
   },
 
@@ -1927,8 +1921,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // PUSH HL
   0xE5: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = registers.HL;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.HL;
     return 16;
   },
 
@@ -1949,8 +1943,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 20H
   0xE7: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0020;
     return 16;
   },
@@ -1996,8 +1990,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 28H
   0xEF: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0028;
     return 16;
   },
@@ -2010,8 +2004,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // POP AF
   0xF1: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP += 2;
     registers.AF = addressBus[registers.SP].word;
+    registers.SP += 2;
     return 12;
   },
 
@@ -2029,8 +2023,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // PUSH AF
   0xF5: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = registers.AF;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.AF;
     return 16;
   },
 
@@ -2051,8 +2045,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 30H
   0xF7: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0030;
     return 16;
   },
@@ -2103,8 +2097,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RST 38H
   0xFF: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus[registers.SP].word = addressBus[registers.PC].word;
     registers.SP -= 2;
+    addressBus[registers.SP].word = registers.PC;
     registers.PC = 0x0038;
     return 16;
   },

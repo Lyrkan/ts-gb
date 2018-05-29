@@ -36,6 +36,9 @@ describe('ALU', () => {
     expect(ALU.decWord(0x0000)).to.equal(0xFFFF);
   });
 
+  it('addBytes');
+  it('addWords');
+
   it('sub', () => {
     expect(ALU.sub(0xFF, 0x01)).to.deep.equal({ value: 0xFE, Z: 0, N: 1, H: 0, C: 0});
     expect(ALU.sub(0xFF, 0x02)).to.deep.equal({ value: 0xFD, Z: 0, N: 1, H: 0, C: 0 });

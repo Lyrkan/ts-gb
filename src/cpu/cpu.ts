@@ -91,6 +91,7 @@ export class CPU {
     if (opcodeIndex in OPCODES) {
       // Change the current opcode map
       opcodesMap = OPCODES[opcodeIndex];
+      this.skipCyles += 4;
 
       opcodePrefix = opcodeIndex;
       opcodeIndex = this.addressBus[this.registers.PC++].byte;
@@ -110,6 +111,6 @@ export class CPU {
     }
 
     // Run the opcode
-    this.skipCyles = opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
+    this.skipCyles += opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
   }
 }

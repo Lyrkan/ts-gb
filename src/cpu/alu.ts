@@ -47,7 +47,7 @@ export const ALU = {
 
   addWords(a: number, b: number) {
     const sum = a + b;
-    const halfCarry = ((a & 0xFF) + (b & 0xFF)) >> 8;
+    const halfCarry = ((a & 0xFFF) + (b & 0xFFF)) >> 12;
 
     return {
       value: (sum & 0xFFFF),
