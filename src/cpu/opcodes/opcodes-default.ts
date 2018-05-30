@@ -342,7 +342,16 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // DAA
   0x27: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, H, C } = ALU.daa(
+      registers.A,
+      registers.flags.H,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
@@ -412,7 +421,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // CPL
   0x2F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.A = registers.A ^ 0xFF;
     return 4;
   },
 
@@ -480,7 +489,9 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // SCF
   0x37: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.flags.C = 1;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 4;
   },
 
@@ -550,7 +561,9 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // CCF
   0x3F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    registers.flags.C = ~registers.flags.C;
+    registers.flags.H = ~registers.flags.H;
+    registers.flags.N = 0;
     return 4;
   },
 
@@ -1036,49 +1049,129 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADC A,B
   0x88: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.B,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADC A,C
   0x89: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.C,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADC A,D
   0x8A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.D,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADC A,E
   0x8B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.E,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADC A,H
   0x8C: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.H,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADC A,L
   0x8D: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.L,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // ADC A,(HL)
   0x8E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      addressBus[registers.HL].byte,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
   // ADC A,A
   0x8F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      registers.A,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
@@ -1183,49 +1276,129 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // SBC A,B
   0x98: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.B,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // SBC A,C
   0x99: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.C,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // SBC A,D
   0x9A: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.D,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // SBC A,E
   0x9B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.E,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // SBC A,H
   0x9C: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.H,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // SBC A,L
   0x9D: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.L,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
   // SBC A,(HL)
   0x9E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      addressBus[registers.HL].byte,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
   // SBC A,A
   0x9F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      registers.A,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 4;
   },
 
@@ -1753,7 +1926,17 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADC A,d8
   0xCE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.adc(
+      registers.A,
+      addressBus[registers.PC++].byte,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 
@@ -1888,7 +2071,17 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // SBC A,d8
   0xDE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    // TODO
+    const { value, Z, N, H, C } = ALU.sbc(
+      registers.A,
+      addressBus[registers.PC++].byte,
+      registers.flags.C
+    );
+
+    registers.A = value;
+    registers.flags.Z = Z;
+    registers.flags.N = N;
+    registers.flags.H = H;
+    registers.flags.C = C;
     return 8;
   },
 

@@ -33,7 +33,7 @@ export const ALU = {
 
   addBytes(a: number, b: number) {
     const newValue = a + b;
-    const maskedValue = newValue & 0xFFFF;
+    const maskedValue = newValue & 0xFF;
     const halfCarry = ((a & 0xF) + (b & 0xF)) >> 4;
 
     return {
@@ -105,4 +105,52 @@ export const ALU = {
       C: 0,
     };
   },
+
+  adc(a: number, b: number, carry: number) {
+    const sum = a + b + carry;
+    const maskedValue = sum & 0xFF;
+    const halfCarry = ((a & 0xF) + (b & 0xF) + carry) >> 4;
+
+    return {
+      value: maskedValue,
+      Z: (maskedValue === 0) ? 1 : 0,
+      N: 0,
+      H: halfCarry,
+      C: (sum !== maskedValue) ? 1 : 0,
+    };
+  },
+
+  sbc(a: number, b: number, carry: number) {
+    const sub = a - b - carry;
+    const halfCarry = (((a & 0xF) - (b & 0xF) - carry) >> 4) & 1;
+
+    return {
+      value: (sub & 0xFF),
+      Z: (sub === 0) ? 1 : 0,
+      N: 1,
+      H: halfCarry,
+      C: (sub >> 8) & 1,
+    };
+  },
+
+  daa(a: number, h: number, c: number) {
+    let res = a;
+    let setC = false;
+
+    if (h || ((a & 0xF) > 0x9)) {
+      res = (a + 0x06) & 0xFF;
+      setC = true;
+    }
+
+    if (c || (((res >> 4) & 0xF) > 0x9)) {
+      res = (res + 0x60) & 0xFF;
+    }
+
+    return {
+      value: res,
+      Z: (res === 0) ? 1 : 0,
+      H: 0,
+      C: setC ? 1 : 0,
+    };
+  }
 };

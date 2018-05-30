@@ -9,6 +9,9 @@ export class CPU {
   // Memory
   private addressBus: AddressBus;
 
+  // Whether or not this is the first cycle
+  private firstCycle: boolean;
+
   // How many cycles the CPU should skip
   private skipCyles: number;
 
@@ -50,23 +53,28 @@ export class CPU {
   public reset(): void {
     this.registers = new CpuRegisters();
     this.skipCyles = 0;
+    this.firstCycle = true;
     this.stopped = false;
     this.halted = false;
     this.haltedLastCycle = false;
     this.interruptsEnabled = true;
-
-    // If there isn't any boot ROM, directly
-    // jump to 0x0100.
-    if (this.addressBus.hasBootRom()) {
-      this.registers.SP = 0xFFFE;
-      this.registers.PC = 0x0100;
-    }
   }
 
   /**
    * Run a single CPU cycle.
    */
   public tick(): void {
+    if (this.firstCycle) {
+      // If there isn't any boot ROM, directly
+      // jump to 0x0100.
+      if (!this.addressBus.hasBootRom()) {
+        this.registers.SP = 0xFFFE;
+        this.registers.PC = 0x0100;
+      }
+
+      this.firstCycle = false;
+    }
+
     // Skip the current cycle if needed
     if (this.skipCyles > 0) {
       this.skipCyles--;
@@ -99,55 +107,37 @@ export class CPU {
       this.haltedLastCycle = false;
     }
 
-    // If there are pending interrupts and interrupts
-    // are globally enabled, disable further interrupt
-    // and execute one of the pending interrupts.
-    if (this.interruptsEnabled && ((this.addressBus[0xFF0F].byte && 0x1F) > 0)) {
-      this.interruptsEnabled = false;
-      this.executeInterrupts();
-    }
+    // Execute pending interrupts (if enabled)
+    this.executeInterrupts();
 
     // Execute the next OPCode
     this.executeOpcode();
   }
 
   private executeInterrupts(): void {
-    const ieRegister = this.addressBus[0xFFFF].byte;
-    const interruptFlags = this.addressBus[0xFF0F].byte;
+    // Check if there are pending interrupts and
+    // interrupts are globally enabled.
+    if (this.interruptsEnabled && ((this.addressBus[0xFF0F].byte && 0x1F) > 0)) {
+      // Disable further interrupts.
+      this.interruptsEnabled = false;
 
-    // V-Blank
-    if ((ieRegister & 1) && (interruptFlags & 1)) {
-      this.registers.PC = 0x0040;
-      this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~1;
-      return;
-    }
+      // Check each interrupt state
+      const ieRegister = this.addressBus[0xFFFF].byte;
+      const interruptFlags = this.addressBus[0xFF0F].byte;
+      for (let bit = 0; bit < 5; bit++) {
+        if ((ieRegister & (1 << bit)) && (interruptFlags & (1 << bit))) {
+          // Push PC into stack
+          this.registers.SP -= 2;
+          this.addressBus[this.registers.SP].word = this.registers.PC + 2;
 
-    // LCD STAT
-    if ((ieRegister & 2) && (interruptFlags & 2)) {
-      this.registers.PC = 0x0048;
-      this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~2;
-      return;
-    }
+          // Jump to the interrupt address
+          this.registers.PC = 0x0040 + (8 * bit);
 
-    // Timer
-    if ((ieRegister & 4) && (interruptFlags & 4)) {
-      this.registers.PC = 0x0050;
-      this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~4;
-      return;
-    }
-
-    // Serial
-    if ((ieRegister & 8) && (interruptFlags & 8)) {
-      this.registers.PC = 0x0058;
-      this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~8;
-      return;
-    }
-
-    // Joypad
-    if ((ieRegister & 16) && (interruptFlags & 16)) {
-      this.registers.PC = 0x0060;
-      this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~16;
-      return;
+          // Disable this interrupt
+          this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~(1 << bit);
+          return;
+        }
+      }
     }
   }
 
