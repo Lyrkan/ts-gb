@@ -12,11 +12,11 @@ describe('ALU', () => {
   });
 
   it('incWord', () => {
-    expect(ALU.incWord(0x0001)).to.equal(0x0002);
-    expect(ALU.incWord(0x0002)).to.equal(0x0003);
-    expect(ALU.incWord(0x00FF)).to.equal(0x0100);
-    expect(ALU.incWord(0xFFF0)).to.equal(0xFFF1);
-    expect(ALU.incWord(0xFFFF)).to.equal(0x0000);
+    expect(ALU.incWord(0x0001).value).to.equal(0x0002);
+    expect(ALU.incWord(0x0002).value).to.equal(0x0003);
+    expect(ALU.incWord(0x00FF).value).to.equal(0x0100);
+    expect(ALU.incWord(0xFFF0).value).to.equal(0xFFF1);
+    expect(ALU.incWord(0xFFFF).value).to.equal(0x0000);
   });
 
   it('decByte', () => {
@@ -28,12 +28,12 @@ describe('ALU', () => {
   });
 
   it('decWord', () => {
-    expect(ALU.decWord(0xFFFF)).to.equal(0xFFFE);
-    expect(ALU.decWord(0xFFF0)).to.equal(0xFFEF);
-    expect(ALU.decWord(0x00FF)).to.equal(0x00FE);
-    expect(ALU.decWord(0x0002)).to.equal(0x0001);
-    expect(ALU.decWord(0x0001)).to.equal(0x0000);
-    expect(ALU.decWord(0x0000)).to.equal(0xFFFF);
+    expect(ALU.decWord(0xFFFF).value).to.equal(0xFFFE);
+    expect(ALU.decWord(0xFFF0).value).to.equal(0xFFEF);
+    expect(ALU.decWord(0x00FF).value).to.equal(0x00FE);
+    expect(ALU.decWord(0x0002).value).to.equal(0x0001);
+    expect(ALU.decWord(0x0001).value).to.equal(0x0000);
+    expect(ALU.decWord(0x0000).value).to.equal(0xFFFF);
   });
 
   it('addBytes');
@@ -76,4 +76,19 @@ describe('ALU', () => {
     expect(ALU.and(0xAA, 0xAA)).to.deep.equal({ value: 0xAA, Z: 0, N: 0, H: 1, C: 0 });
     expect(ALU.and(0xAA, 0x55)).to.deep.equal({ value: 0x00, Z: 1, N: 0, H: 1, C: 0 });
   });
+
+  it('adc');
+  it('sbc');
+  it('daa');
+  it('rlc');
+  it('rrc');
+  it('rl');
+  it('rr');
+  it('sla');
+  it('srl');
+  it('sra');
+  it('swap');
+  it('bit');
+  it('res');
+  it('set');
 });

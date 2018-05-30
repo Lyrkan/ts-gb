@@ -25,7 +25,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // INC BC
   0x03: (registers: CpuRegisters,  addressBus: AddressBus) => {
-    registers.BC = ALU.incWord(registers.BC);
+    registers.BC = ALU.incWord(registers.BC).value;
     return 8;
   },
 
@@ -96,7 +96,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // DEC BC
   0x0B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.BC = ALU.decWord(registers.BC);
+    registers.BC = ALU.decWord(registers.BC).value;
     return 8;
   },
 
@@ -163,7 +163,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // INC DE
   0x13: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.DE = ALU.incWord(registers.DE);
+    registers.DE = ALU.incWord(registers.DE).value;
     return 8;
   },
 
@@ -235,7 +235,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // DEC DE
   0x1B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.DE = ALU.decWord(registers.DE);
+    registers.DE = ALU.decWord(registers.DE).value;
     return 8;
   },
 
@@ -308,7 +308,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // INC HL
   0x23: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.HL = ALU.incWord(registers.HL);
+    registers.HL = ALU.incWord(registers.HL).value;
     return 8;
   },
 
@@ -387,7 +387,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // DEC HL
   0x2B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.HL = ALU.decWord(registers.HL);
+    registers.HL = ALU.decWord(registers.HL).value;
     return 8;
   },
 
@@ -453,7 +453,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // INC SP
   0x33: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP = ALU.incWord(registers.SP);
+    registers.SP = ALU.incWord(registers.SP).value;
     return 8;
   },
 
@@ -527,7 +527,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // DEC SP
   0x3B: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.SP = ALU.decWord(registers.SP);
+    registers.SP = ALU.decWord(registers.SP).value;
     return 8;
   },
 
