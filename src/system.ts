@@ -13,6 +13,11 @@ export class System {
     this.cpu = new CPU(this.memory);
   }
 
+  /**
+   * Load an optional boot ROM.
+   *
+   * @param path Bootstrap ROM path
+   */
   public loadBootRom(path: string): void {
     const fileBuffer: Buffer = fs.readFileSync(path);
     const arrayBuffer = fileBuffer.buffer.slice(
@@ -26,6 +31,11 @@ export class System {
     this.reset();
   }
 
+  /**
+   * Load a game ROM.
+   *
+   * @param path Game ROM path
+   */
   public loadGame(path: string): void {
     const fileBuffer: Buffer = fs.readFileSync(path);
     const arrayBuffer = fileBuffer.buffer.slice(
@@ -40,11 +50,17 @@ export class System {
     this.reset();
   }
 
+  /**
+   * Reset all components.
+   */
   public reset(): void {
     this.cpu.reset();
     this.memory.reset();
   }
 
+  /**
+   * Run a single CPU cycle.
+   */
   public tick(): void {
     this.cpu.tick();
   }

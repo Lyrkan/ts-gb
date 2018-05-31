@@ -143,11 +143,11 @@ export const ALU = {
 
     if (h || ((a & 0xF) > 0x9)) {
       res = (a + 0x06) & 0xFF;
-      setC = true;
     }
 
-    if (c || (((res >> 4) & 0xF) > 0x9)) {
+    if (c || (((a >> 4) & 0xF) > 0x9)) {
       res = (res + 0x60) & 0xFF;
+      setC = true;
     }
 
     return {
@@ -159,7 +159,7 @@ export const ALU = {
   },
 
   rlc(a: number) {
-    const carry = a >> 8;
+    const carry = a >> 7;
     const res = ((a << 1) | carry) & 0xFF;
     return {
       value: res,
@@ -189,7 +189,7 @@ export const ALU = {
       Z: (res === 0) ? 1 : 0,
       N: 0,
       H: 0,
-      C: a >> 8,
+      C: a >> 7,
     };
   },
 
@@ -211,7 +211,7 @@ export const ALU = {
       Z: (res === 0) ? 1 : 0,
       N: 0,
       H: 0,
-      C: a >> 8,
+      C: a >> 7,
     };
   },
 
@@ -227,7 +227,7 @@ export const ALU = {
   },
 
   sra(a: number) {
-    const res = ((a >> 1) | (a >> 7)) & 0xFF;
+    const res = ((a >> 1) | (a & 0x80)) & 0xFF;
     return {
       value: res,
       Z: (res === 0) ? 1 : 0,
@@ -247,7 +247,7 @@ export const ALU = {
 
   bit(bit: number, a: number) {
     return {
-      Z: (a >> bit) & 1,
+      Z: (~a >> bit) & 1,
       N: 0,
       H: 1,
     };
@@ -261,7 +261,7 @@ export const ALU = {
 
   set(bit: number, a: number) {
     return {
-      value: a & (1 << bit)
+      value: a | (1 << bit)
     };
   },
 };

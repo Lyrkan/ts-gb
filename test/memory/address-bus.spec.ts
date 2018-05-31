@@ -12,9 +12,61 @@ describe('AddressBus', () => {
   });
 
   describe('Bootstrap ROM', () => {
-    it('should be able to load a boot ROM');
-    it('should use the boot ROM if enabled');
-    it('should disable the boot ROM if a write occurs on 0xFF50');
+    beforeEach(() => {
+      const cartridge = new GameCartridge(new ArrayBuffer(32 * 1024));
+      addressBus.loadCartridge(cartridge);
+    });
+
+    it('should be able to load a boot ROM', () => {
+      // Should not have any boot rom loaded by default
+      expect(addressBus.hasBootRom()).to.equal(false);
+
+      // Load an empty boot rom
+      addressBus.loadBootRom(new ArrayBuffer(256));
+      expect(addressBus.hasBootRom()).to.equal(true);
+    });
+
+    it('should use the boot ROM if enabled', () => {
+      const bootRomBuffer = new ArrayBuffer(256);
+      const bootRomView = new DataView(bootRomBuffer);
+      bootRomView.setUint8(0x00, 0x12);
+      bootRomView.setUint8(0x01, 0x34);
+      bootRomView.setUint8(0xFE, 0x56);
+      bootRomView.setUint8(0XFF, 0x78);
+
+      addressBus.loadBootRom(bootRomBuffer);
+
+      // Not effective until address bus reset
+      expect(addressBus[0x0000].byte).to.equal(0x00);
+      expect(addressBus[0x0000].byte).to.equal(0x00);
+      expect(addressBus[0x00FE].byte).to.equal(0x00);
+      expect(addressBus[0x00FF].byte).to.equal(0x00);
+
+      addressBus.reset();
+
+      expect(addressBus[0x0000].byte).to.equal(0x12);
+      expect(addressBus[0x0001].byte).to.equal(0x34);
+      expect(addressBus[0x00FE].byte).to.equal(0x56);
+      expect(addressBus[0x00FF].byte).to.equal(0x78);
+    });
+
+    it('should disable the boot ROM if a write occurs on 0xFF50', () => {
+      const bootRomBuffer = new ArrayBuffer(256);
+      const bootRomView = new DataView(bootRomBuffer);
+      bootRomView.setUint8(0x00, 0x12);
+      bootRomView.setUint8(0x01, 0x34);
+
+      addressBus.loadBootRom(bootRomBuffer);
+      addressBus.reset();
+
+      expect(addressBus[0x0000].byte).to.equal(0x12);
+      expect(addressBus[0x0001].byte).to.equal(0x34);
+
+      addressBus[0xFF50].byte = 0x01;
+
+      expect(addressBus[0x0000].byte).to.equal(0x00);
+      expect(addressBus[0x0001].byte).to.equal(0x00);
+    });
   });
 
   describe('Cartridge', () => {
@@ -33,8 +85,6 @@ describe('AddressBus', () => {
 
       addressBus.loadCartridge(cartridge);
     });
-
-    it('should be able to load a cartridge');
 
     it('should be able to access cartridge static ROM bank', () => {
       addressBus[0x0000]; // tslint:disable-line:no-unused-expression

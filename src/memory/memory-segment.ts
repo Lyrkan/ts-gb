@@ -32,7 +32,7 @@ export class MemorySegment implements IMemorySegment {
           const offset = parseInt(prop as string, 10);
 
           if (offset < 0 || offset >= this.data.byteLength) {
-            throw new TypeError(`Invalid address "${prop}"`);
+            throw new TypeError(`Invalid address "0x${offset.toString(16).toUpperCase()}"`);
           }
 
           return new MemoryAccessor(this.view, offset);

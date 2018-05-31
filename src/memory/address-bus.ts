@@ -147,7 +147,7 @@ export class AddressBus {
         }
 
         // Writes on 0x0050 (=0xFF50) disable the boot rom
-        if (prop === 0xFF50.toString()) {
+        if (prop === 0x0050.toString()) {
           const setByte = (decorated: IMemoryAccessor, value: number) => {
             this.bootRomEnabled = false;
             decorated.byte = value;
@@ -215,7 +215,8 @@ export class AddressBus {
   private getSegment(address: number): {segment: IMemorySegment, offset: number} {
     if (address < 0) {
       throw new RangeError(
-        `Invalid address ${address}: Memory addresses must be superior or equal to 0x0000`
+        // tslint:disable-next-line:max-line-length
+        `Invalid address 0x${address.toString(16).toUpperCase()}: Memory addresses must be superior or equal to 0x0000`
       );
     }
 
@@ -328,6 +329,9 @@ export class AddressBus {
       };
     }
 
-    throw new RangeError(`Invalid address ${address}: Memory addresses must not exceed 0xFFFF`);
+    throw new RangeError(
+      // tslint:disable-next-line:max-line-length
+      `Invalid address 0x${address.toString(16).toUpperCase()}: Memory addresses must not exceed 0xFFFF`
+    );
   }
 }

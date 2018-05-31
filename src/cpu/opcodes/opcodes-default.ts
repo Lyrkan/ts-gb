@@ -352,7 +352,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.C = C;
-    return 8;
+    return 4;
   },
 
   // JR Z,r8
@@ -491,7 +491,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   0x37: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.flags.C = 1;
     registers.flags.H = 0;
-    registers.flags.C = 0;
+    registers.flags.N = 0;
     return 4;
   },
 
@@ -562,7 +562,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // CCF
   0x3F: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.flags.C = ~registers.flags.C;
-    registers.flags.H = ~registers.flags.H;
+    registers.flags.H = 0;
     registers.flags.N = 0;
     return 4;
   },
@@ -1032,7 +1032,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     registers.flags.N = N;
     registers.flags.H = H;
     registers.flags.C = C;
-    return 4;
+    return 8;
   },
 
   // ADD A,A
@@ -1776,7 +1776,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     registers.flags.N = N;
     registers.flags.H = H;
     registers.flags.C = C;
-    return 4;
+    return 8;
   },
 
   // CP A
