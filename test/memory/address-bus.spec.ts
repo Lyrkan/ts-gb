@@ -11,6 +11,12 @@ describe('AddressBus', () => {
     addressBus = new AddressBus();
   });
 
+  describe('Bootstrap ROM', () => {
+    it('should be able to load a boot ROM');
+    it('should use the boot ROM if enabled');
+    it('should disable the boot ROM if a write occurs on 0xFF50');
+  });
+
   describe('Cartridge', () => {
     let staticRomBankSpy: any;
     let switchableRomBankSpy: any;
@@ -27,6 +33,8 @@ describe('AddressBus', () => {
 
       addressBus.loadCartridge(cartridge);
     });
+
+    it('should be able to load a cartridge');
 
     it('should be able to access cartridge static ROM bank', () => {
       addressBus[0x0000]; // tslint:disable-line:no-unused-expression
@@ -66,8 +74,8 @@ describe('AddressBus', () => {
       addressBus[0x9FFF].byte = 0x9A;
 
       expect(addressBus[0x8000].byte).to.equal(0x12);
-      expect(addressBus[0x8ABC].byte).to.equal(0x56);
-      expect(addressBus[0x8ABD].byte).to.equal(0x78);
+      expect(addressBus[0x8ABC].byte).to.equal(0x78);
+      expect(addressBus[0x8ABD].byte).to.equal(0x56);
       expect(addressBus[0x8ABC].word).to.equal(0x5678);
       expect(addressBus[0x9FFF].byte).to.equal(0x9A);
     });
@@ -80,8 +88,8 @@ describe('AddressBus', () => {
       addressBus[0xDFFF].byte = 0x9A;
 
       expect(addressBus[0xC000].byte).to.equal(0x12);
-      expect(addressBus[0xCDD2].byte).to.equal(0x56);
-      expect(addressBus[0xCDD3].byte).to.equal(0x78);
+      expect(addressBus[0xCDD2].byte).to.equal(0x78);
+      expect(addressBus[0xCDD3].byte).to.equal(0x56);
       expect(addressBus[0xCDD2].word).to.equal(0x5678);
       expect(addressBus[0xDFFF].byte).to.equal(0x9A);
     });
@@ -94,8 +102,8 @@ describe('AddressBus', () => {
       addressBus[0xFDFF].byte = 0x9A;
 
       expect(addressBus[0xE000].byte).to.equal(0x12);
-      expect(addressBus[0xEDD2].byte).to.equal(0x56);
-      expect(addressBus[0xEDD3].byte).to.equal(0x78);
+      expect(addressBus[0xEDD2].byte).to.equal(0x78);
+      expect(addressBus[0xEDD3].byte).to.equal(0x56);
       expect(addressBus[0xeDD2].word).to.equal(0x5678);
       expect(addressBus[0xFDFF].byte).to.equal(0x9A);
     });
@@ -106,8 +114,8 @@ describe('AddressBus', () => {
       addressBus[0xDDFF].byte = 0x9A;
 
       expect(addressBus[0xE000].byte).to.equal(0x12);
-      expect(addressBus[0xEDD2].byte).to.equal(0x56);
-      expect(addressBus[0xEDD3].byte).to.equal(0x78);
+      expect(addressBus[0xEDD2].byte).to.equal(0x78);
+      expect(addressBus[0xEDD3].byte).to.equal(0x56);
       expect(addressBus[0xeDD2].word).to.equal(0x5678);
       expect(addressBus[0xFDFF].byte).to.equal(0x9A);
     });
@@ -118,8 +126,8 @@ describe('AddressBus', () => {
       addressBus[0xFDFF].byte = 0x9A;
 
       expect(addressBus[0xC000].byte).to.equal(0x12);
-      expect(addressBus[0xCDD2].byte).to.equal(0x56);
-      expect(addressBus[0xCDD3].byte).to.equal(0x78);
+      expect(addressBus[0xCDD2].byte).to.equal(0x78);
+      expect(addressBus[0xCDD3].byte).to.equal(0x56);
       expect(addressBus[0xCDD2].word).to.equal(0x5678);
       expect(addressBus[0xDDFF].byte).to.equal(0x9A);
     });
@@ -132,8 +140,8 @@ describe('AddressBus', () => {
       addressBus[0xFE9F].byte = 0x9A;
 
       expect(addressBus[0xFE00].byte).to.equal(0x12);
-      expect(addressBus[0xFE34].byte).to.equal(0x56);
-      expect(addressBus[0xFE35].byte).to.equal(0x78);
+      expect(addressBus[0xFE34].byte).to.equal(0x78);
+      expect(addressBus[0xFE35].byte).to.equal(0x56);
       expect(addressBus[0xFE34].word).to.equal(0x5678);
       expect(addressBus[0xFE9F].byte).to.equal(0x9A);
     });
@@ -163,8 +171,8 @@ describe('AddressBus', () => {
       addressBus[0xFF7F].byte = 0x9A;
 
       expect(addressBus[0xFF00].byte).to.equal(0x12);
-      expect(addressBus[0xFF12].byte).to.equal(0x56);
-      expect(addressBus[0xFF13].byte).to.equal(0x78);
+      expect(addressBus[0xFF12].byte).to.equal(0x78);
+      expect(addressBus[0xFF13].byte).to.equal(0x56);
       expect(addressBus[0xFF12].word).to.equal(0x5678);
       expect(addressBus[0xFF7F].byte).to.equal(0x9A);
     });
@@ -177,8 +185,8 @@ describe('AddressBus', () => {
       addressBus[0xFFFE].byte = 0x9A;
 
       expect(addressBus[0xFF80].byte).to.equal(0x12);
-      expect(addressBus[0xFFAB].byte).to.equal(0x56);
-      expect(addressBus[0xFFAC].byte).to.equal(0x78);
+      expect(addressBus[0xFFAB].byte).to.equal(0x78);
+      expect(addressBus[0xFFAC].byte).to.equal(0x56);
       expect(addressBus[0xFFAB].word).to.equal(0x5678);
       expect(addressBus[0xFFFE].byte).to.equal(0x9A);
     });

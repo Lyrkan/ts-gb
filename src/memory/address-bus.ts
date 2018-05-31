@@ -69,17 +69,7 @@ export class AddressBus {
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor(bootRom?: ArrayBuffer) {
-    // If a boot rom has been passed, create
-    // the memory segment that will hold it
-    if (bootRom) {
-      this.bootRom = new MemorySegment(bootRom.byteLength);
-      const bootRomView = new DataView(bootRom);
-      for (let i = 0; i < bootRom.byteLength; i++) {
-        this.bootRom[i].byte = bootRomView.getUint8(i);
-      }
-    }
-
+  public constructor() {
     this.reset();
 
     return new Proxy(this, {
@@ -183,7 +173,24 @@ export class AddressBus {
   }
 
   /**
+   * Load boostrap ROM.
+   * Note that this will NOT reset the address bus.
+   *
+   * @param bootRom Boot ROM content
+   */
+  public loadBootRom(bootRom: ArrayBuffer): void {
+    // If a boot rom has been passed, create
+    // the memory segment that will hold it
+    this.bootRom = new MemorySegment(bootRom.byteLength);
+    const bootRomView = new DataView(bootRom);
+    for (let i = 0; i < bootRom.byteLength; i++) {
+      this.bootRom[i].byte = bootRomView.getUint8(i);
+    }
+  }
+
+  /**
    * Load the given cartridge ROM banks into memory.
+   * Note that this will NOT reset the address bus.
    *
    * @param banks Cartridge ROM banks
    */

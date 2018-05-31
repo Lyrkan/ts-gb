@@ -34,11 +34,11 @@ export class MemoryAccessor implements IMemoryAccessor {
   }
 
   public get word() {
-    return this.view.getUint16(this.offset);
+    return this.view.getUint16(this.offset, true);
   }
 
   public set word(value: number) {
-    this.view.setUint16(this.offset, value);
+    this.view.setUint16(this.offset, value, true);
   }
 }
 

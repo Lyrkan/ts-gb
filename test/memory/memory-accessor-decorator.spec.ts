@@ -35,11 +35,11 @@ describe('MemoryAccessorDecorator', () => {
 
     decoratedAccessor.byte = 0xFF;
     expect(decoratedAccessor.byte).to.equal(0x12);
-    expect(decoratedAccessor.word).to.equal(0x1200);
+    expect(decoratedAccessor.word).to.equal(0x0012);
 
     decoratedAccessor.byte = 0x34;
     expect(decoratedAccessor.byte).to.equal(0x34);
-    expect(decoratedAccessor.word).to.equal(0x3400);
+    expect(decoratedAccessor.word).to.equal(0x0034);
   });
 
   it('should allow to change .word get behavior', () => {
@@ -50,7 +50,7 @@ describe('MemoryAccessorDecorator', () => {
     expect(decoratedAccessor.word).to.equal(0xFFFF);
 
     decoratedAccessor.word = 0x3456;
-    expect(decoratedAccessor.byte).to.equal(0x34);
+    expect(decoratedAccessor.byte).to.equal(0x56);
     expect(decoratedAccessor.word).to.equal(0xFFFF);
   });
 
@@ -64,11 +64,11 @@ describe('MemoryAccessorDecorator', () => {
     expect(decoratedAccessor.word).to.equal(0x0000);
 
     decoratedAccessor.word = 0xFFFF;
-    expect(decoratedAccessor.byte).to.equal(0x12);
+    expect(decoratedAccessor.byte).to.equal(0x34);
     expect(decoratedAccessor.word).to.equal(0x1234);
 
     decoratedAccessor.word = 0x3456;
-    expect(decoratedAccessor.byte).to.equal(0x34);
+    expect(decoratedAccessor.byte).to.equal(0x56);
     expect(decoratedAccessor.word).to.equal(0x3456);
   });
 });

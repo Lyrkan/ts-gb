@@ -50,14 +50,14 @@ describe('MemoryAccessor', () => {
       memoryAccessors[0].word = 0x1234;
       memoryAccessors[2].word = 0x4321;
 
-      expect(dataView.getUint16(0)).to.equal(0x1234);
-      expect(dataView.getUint16(2)).to.equal(0x4321);
+      expect(dataView.getUint16(0, true)).to.equal(0x1234);
+      expect(dataView.getUint16(2, true)).to.equal(0x4321);
     });
 
     it('should allow to read a word', () => {
-      expect(memoryAccessors[0].word).to.equal(0x0001);
-      expect(memoryAccessors[1].word).to.equal(0x0102);
-      expect(memoryAccessors[2].word).to.equal(0x0203);
+      expect(memoryAccessors[0].word).to.equal(0x0100);
+      expect(memoryAccessors[1].word).to.equal(0x0201);
+      expect(memoryAccessors[2].word).to.equal(0x0302);
     });
   });
 

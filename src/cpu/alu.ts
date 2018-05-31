@@ -241,7 +241,7 @@ export const ALU = {
     const res = ((a & 0xF) << 4) | (a >> 4);
     return {
       value: res,
-      Z: (res === 0)
+      Z: (res === 0) ? 1 : 0,
     };
   },
 
