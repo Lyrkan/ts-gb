@@ -60,7 +60,7 @@ export class GameCartridge {
           break;
         }
 
-        banks[i][j].byte = dataView.getUint8((i * CARTRIDGE_ROM_BANK_LENGTH) + j);
+        banks[i].get(j).byte = dataView.getUint8((i * CARTRIDGE_ROM_BANK_LENGTH) + j);
       }
     }
 

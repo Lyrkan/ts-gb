@@ -1,7 +1,6 @@
 import { MemorySegment, IMemorySegment } from './memory-segment';
 import { IMemoryAccessor } from './memory-accessor';
 import { GameCartridge } from '../cartridge/game-cartridge';
-import { isIntegerPropertyKey } from './utils';
 import { STATIC_0000_SEGMENT } from './static-memory-segment';
 import { MemorySegmentDecorator } from './memory-segment-decorator';
 import { MemoryAccessorDecorator } from './memory-accessor-decorator';
@@ -27,8 +26,6 @@ export const IEREGISTER_LENGTH = 1;
  *   const wC001 = addressBus[0xC001].word;
  */
 export class AddressBus {
-  [index: number]: IMemoryAccessor;
-
   // Segment that contains the boot ROM
   // It can be accessed from 0x0000 to 0x00FE
   // when the enableBootRom flag is set to true.
@@ -71,27 +68,11 @@ export class AddressBus {
    */
   public constructor() {
     this.reset();
+  }
 
-    return new Proxy(this, {
-      get: (obj: this, prop: PropertyKey) => {
-        if (isIntegerPropertyKey(prop)) {
-          const address = parseInt(prop as string, 10);
-          const { segment, offset } = this.getSegment(address);
-          return segment[address - offset];
-        }
-
-        return obj[prop as any];
-      },
-
-      set: (obj: this, prop: PropertyKey, value: any) => {
-        if (isIntegerPropertyKey(prop)) {
-          throw new Error('[[Set]] method is not allowed for AddressBus elements');
-        }
-
-        obj[prop as any] = value;
-        return true;
-      }
-    });
+  public get(address: number): IMemoryAccessor {
+    const { segment, offset } = this.getSegment(address);
+    return segment.get(address - offset);
   }
 
   /**
@@ -121,15 +102,15 @@ export class AddressBus {
     // Empty I/O Registers (128B)
     this.ioRegisters = new MemorySegmentDecorator(
       new MemorySegment(IOREGISTERS_LENGTH),
-      (obj, prop)  => {
+      (obj, offset)  => {
         // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
         // Note that this is really inaccurate since it should
         // normally take 160 * 4 + 4 cycles to complete.
-        if (prop === 0x0046.toString()) {
+        if (offset === 0x0046) {
           const copyData = (value: number) => {
             const fromAddress = (value & 0b11) << 2;
             for (let i = 0; i < OAM_LENGTH; i++) {
-              this[0xFE00 + i].byte = this[fromAddress + i].byte;
+              this.get(0xFE00 + i).byte = this.get(fromAddress + i).byte;
             }
           };
 
@@ -143,11 +124,11 @@ export class AddressBus {
             decorated.word = value;
           };
 
-          return new MemoryAccessorDecorator(obj[prop as any], { setByte, setWord });
+          return new MemoryAccessorDecorator(obj.get(0x0046), { setByte, setWord });
         }
 
         // Writes on 0x0050 (=0xFF50) disable the boot rom
-        if (prop === 0x0050.toString()) {
+        if (offset === 0x0050) {
           const setByte = (decorated: IMemoryAccessor, value: number) => {
             this.bootRomEnabled = false;
             decorated.byte = value;
@@ -158,10 +139,10 @@ export class AddressBus {
             decorated.word = value;
           };
 
-          return new MemoryAccessorDecorator(obj[prop as any], { setByte, setWord });
+          return new MemoryAccessorDecorator(obj.get(0x0050), { setByte, setWord });
         }
 
-        return obj[prop as any];
+        return null;
       }
     );
 
@@ -184,7 +165,7 @@ export class AddressBus {
     this.bootRom = new MemorySegment(bootRom.byteLength);
     const bootRomView = new DataView(bootRom);
     for (let i = 0; i < bootRom.byteLength; i++) {
-      this.bootRom[i].byte = bootRomView.getUint8(i);
+      this.bootRom.get(i).byte = bootRomView.getUint8(i);
     }
   }
 

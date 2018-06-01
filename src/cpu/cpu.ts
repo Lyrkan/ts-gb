@@ -128,24 +128,24 @@ export class CPU {
   private executeInterrupts(): void {
     // Check if there are pending interrupts and
     // interrupts are globally enabled.
-    if (this.interruptsEnabled && ((this.addressBus[0xFF0F].byte && 0x1F) > 0)) {
+    if (this.interruptsEnabled && ((this.addressBus.get(0xFF0F).byte && 0x1F) > 0)) {
       // Disable further interrupts.
       this.interruptsEnabled = false;
 
       // Check each interrupt state
-      const ieRegister = this.addressBus[0xFFFF].byte;
-      const interruptFlags = this.addressBus[0xFF0F].byte;
+      const ieRegister = this.addressBus.get(0xFFFF).byte;
+      const interruptFlags = this.addressBus.get(0xFF0F).byte;
       for (let bit = 0; bit < 5; bit++) {
         if ((ieRegister & (1 << bit)) && (interruptFlags & (1 << bit))) {
           // Push PC into stack
           this.registers.SP -= 2;
-          this.addressBus[this.registers.SP].word = this.registers.PC + 2;
+          this.addressBus.get(this.registers.SP).word = this.registers.PC + 2;
 
           // Jump to the interrupt address
           this.registers.PC = 0x0040 + (8 * bit);
 
           // Disable this interrupt
-          this.addressBus[0xFF0F].byte = this.addressBus[0xFF0F].byte & ~(1 << bit);
+          this.addressBus.get(0xFF0F).byte = this.addressBus.get(0xFF0F).byte & ~(1 << bit);
           return;
         }
       }
@@ -158,7 +158,7 @@ export class CPU {
 
     // Check if the PC targets a prefixed opcode
     let opcodePrefix: number|null = null;
-    let opcodeIndex = this.addressBus[this.registers.PC++].byte;
+    let opcodeIndex = this.addressBus.get(this.registers.PC++).byte;
 
     // HALT bug
     if (this.haltedLastCycle) {
@@ -171,7 +171,7 @@ export class CPU {
       this.skipCyles += 4;
 
       opcodePrefix = opcodeIndex;
-      opcodeIndex = this.addressBus[this.registers.PC++].byte;
+      opcodeIndex = this.addressBus.get(this.registers.PC++).byte;
     }
 
     // Retrieve the actual opcode to check

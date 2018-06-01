@@ -1,5 +1,4 @@
 import { MemoryAccessor, IMemoryAccessor } from './memory-accessor';
-import { isIntegerPropertyKey } from './utils';
 
 /**
  * Usage:
@@ -17,42 +16,23 @@ import { isIntegerPropertyKey } from './utils';
  *   const w2 = segment[2].word;
  */
 export class MemorySegment implements IMemorySegment {
-  [index: number]: MemoryAccessor;
-
   private data: ArrayBuffer;
   private view: DataView;
 
   public constructor(byteLength: number) {
     this.data = new ArrayBuffer(byteLength);
     this.view = new DataView(this.data);
+  }
 
-    return new Proxy(this, {
-      get: (obj: this, prop: PropertyKey) => {
-        if (isIntegerPropertyKey(prop)) {
-          const offset = parseInt(prop as string, 10);
+  public get(offset: number) {
+    if (offset < 0 || offset >= this.data.byteLength) {
+      throw new RangeError(`Invalid address "0x${offset.toString(16).toUpperCase()}"`);
+    }
 
-          if (offset < 0 || offset >= this.data.byteLength) {
-            throw new TypeError(`Invalid address "0x${offset.toString(16).toUpperCase()}"`);
-          }
-
-          return new MemoryAccessor(this.view, offset);
-        }
-
-        return obj[prop as any];
-      },
-
-      set: (obj: this, prop: PropertyKey, value: any) => {
-        if (isIntegerPropertyKey(prop)) {
-          throw new Error('[[Set]] method is not allowed for MemorySegment elements');
-        }
-
-        obj[prop as any] = value;
-        return true;
-      }
-    });
+    return new MemoryAccessor(this.view, offset);
   }
 }
 
 export interface IMemorySegment {
-  [index: number]: IMemoryAccessor;
+  get(offset: number): IMemoryAccessor;
 }

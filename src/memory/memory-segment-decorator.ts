@@ -19,16 +19,17 @@ import { IMemorySegment } from './memory-segment';
  *   decoratedSegment[0x00FF].byte;
  */
 export class MemorySegmentDecorator implements IMemorySegment {
-  [index: number]: IMemoryAccessor;
+  private decorated: IMemorySegment;
+  private trap: MemorySegmentTrap;
 
   public constructor(decorated: IMemorySegment, trap: MemorySegmentTrap) {
-    return new Proxy(this, {
-      get: (obj: this, prop: PropertyKey) => {
-        const segment = trap(decorated, prop);
-        return segment || decorated[prop as any];
-      }
-    });
+    this.decorated = decorated;
+    this.trap = trap;
+  }
+
+  public get(offset: number) {
+    return this.trap(this.decorated, offset) || this.decorated.get(offset);
   }
 }
 
-type MemorySegmentTrap = (obj: IMemorySegment, prop: PropertyKey) => IMemoryAccessor | null;
+type MemorySegmentTrap = (obj: IMemorySegment, offset: number) => IMemoryAccessor | null;

@@ -10,8 +10,8 @@ describe('Opcodes - 0xCB table', () => {
   let addressBus: AddressBus;
 
   const executeNextOpcode = (expectedCycles: number) => {
-    expect(addressBus[cpuRegisters.PC++].byte).to.equal(0xCB, '0xCB prefix not found');
-    const cycles = OPCODES_0XCB[addressBus[cpuRegisters.PC++].byte](cpuRegisters, addressBus);
+    expect(addressBus.get(cpuRegisters.PC++).byte).to.equal(0xCB, '0xCB prefix not found');
+    const cycles = OPCODES_0XCB[addressBus.get(cpuRegisters.PC++).byte](cpuRegisters, addressBus);
     expect(cycles).to.equal(expectedCycles, 'Unexpected cycles count');
   };
 
@@ -43,10 +43,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x00 - RLC B', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x00;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x00;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x00;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x00;
 
     cpuRegisters.B = 0b10101010;
     executeNextOpcode(8);
@@ -60,10 +60,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x01 - RLC C', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x01;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x01;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x01;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x01;
 
     cpuRegisters.C = 0b10101010;
     executeNextOpcode(8);
@@ -77,10 +77,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x02 - RLC D', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x02;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x02;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x02;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x02;
 
     cpuRegisters.D = 0b10101010;
     executeNextOpcode(8);
@@ -94,10 +94,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x03 - RLC E', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x03;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x03;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x03;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x03;
 
     cpuRegisters.E = 0b10101010;
     executeNextOpcode(8);
@@ -111,10 +111,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x04 - RLC H', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x04;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x04;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x04;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x04;
 
     cpuRegisters.H = 0b10101010;
     executeNextOpcode(8);
@@ -128,10 +128,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x05 - RLC L', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x05;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x05;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x05;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x05;
 
     cpuRegisters.L = 0b10101010;
     executeNextOpcode(8);
@@ -145,31 +145,31 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x06 - RLC (HL)', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x06;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x06;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x06;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x06;
 
     cpuRegisters.HL = 0xC000;
 
-    addressBus[0xC000].byte = 0b10101010;
+    addressBus.get(0xC000).byte = 0b10101010;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
-    expect(addressBus[0xC000].byte).to.equal(0b01010101);
+    expect(addressBus.get(0xC000).byte).to.equal(0b01010101);
 
-    addressBus[0xC000].byte = 0b10000000;
+    addressBus.get(0xC000).byte = 0b10000000;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
-    expect(addressBus[0xC000].byte).to.equal(0b00000001);
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000001);
   });
 
   it('0x07 - RLC A', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x07;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x07;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x07;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x07;
 
     cpuRegisters.A = 0b10101010;
     executeNextOpcode(8);
@@ -183,10 +183,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x08 - RRC B', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x08;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x08;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x08;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x08;
 
     cpuRegisters.B = 0b10101010;
     executeNextOpcode(8);
@@ -200,10 +200,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x09 - RRC C', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x09;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x09;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x09;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x09;
 
     cpuRegisters.C = 0b10101010;
     executeNextOpcode(8);
@@ -217,10 +217,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x0A - RRC D', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x0A;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x0A;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x0A;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x0A;
 
     cpuRegisters.D = 0b10101010;
     executeNextOpcode(8);
@@ -234,10 +234,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x0B - RRC E', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x0B;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x0B;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x0B;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x0B;
 
     cpuRegisters.E = 0b10101010;
     executeNextOpcode(8);
@@ -251,10 +251,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x0C - RRC H', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x0C;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x0C;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x0C;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x0C;
 
     cpuRegisters.H = 0b10101010;
     executeNextOpcode(8);
@@ -268,10 +268,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x0D - RRC L', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x0D;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x0D;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x0D;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x0D;
 
     cpuRegisters.L = 0b10101010;
     executeNextOpcode(8);
@@ -285,31 +285,31 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x0E - RRC (HL)', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x0E;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x0E;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x0E;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x0E;
 
     cpuRegisters.HL = 0xC000;
 
-    addressBus[0xC000].byte = 0b10101010;
+    addressBus.get(0xC000).byte = 0b10101010;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
-    expect(addressBus[0xC000].byte).to.equal(0b01010101);
+    expect(addressBus.get(0xC000).byte).to.equal(0b01010101);
 
-    addressBus[0xC000].byte = 0b10000000;
+    addressBus.get(0xC000).byte = 0b10000000;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
-    expect(addressBus[0xC000].byte).to.equal(0b01000000);
+    expect(addressBus.get(0xC000).byte).to.equal(0b01000000);
   });
 
   it('0x0F - RRC A', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x0F;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x0F;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x0F;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x0F;
 
     cpuRegisters.A = 0b10101010;
     executeNextOpcode(8);
@@ -323,10 +323,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x10 - RL B', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x10;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x10;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x10;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x10;
 
     cpuRegisters.B = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -342,10 +342,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x11 - RL C', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x11;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x11;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x11;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x11;
 
     cpuRegisters.C = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -361,10 +361,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x12 - RL D', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x12;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x12;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x12;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x12;
 
     cpuRegisters.D = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -380,10 +380,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x13 - RL E', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x13;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x13;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x13;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x13;
 
     cpuRegisters.E = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -399,10 +399,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x14 - RL H', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x14;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x14;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x14;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x14;
 
     cpuRegisters.H = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -418,10 +418,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x15 - RL L', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x15;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x15;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x15;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x15;
 
     cpuRegisters.L = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -437,33 +437,33 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x16 - RL (HL)', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x16;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x16;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x16;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x16;
 
     cpuRegisters.HL = 0xC000;
 
-    addressBus[0xC000].byte = 0b10101010;
+    addressBus.get(0xC000).byte = 0b10101010;
     cpuRegisters.flags.C = 0;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
-    expect(addressBus[0xC000].byte).to.equal(0b01010100);
+    expect(addressBus.get(0xC000).byte).to.equal(0b01010100);
 
-    addressBus[0xC000].byte = 0b10101010;
+    addressBus.get(0xC000).byte = 0b10101010;
     cpuRegisters.flags.C = 1;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
-    expect(addressBus[0xC000].byte).to.equal(0b01010101);
+    expect(addressBus.get(0xC000).byte).to.equal(0b01010101);
   });
 
   it('0x17 - RL A', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x17;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x17;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x17;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x17;
 
     cpuRegisters.A = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -479,10 +479,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x18 - RR B', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x18;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x18;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x18;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x18;
 
     cpuRegisters.B = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -498,10 +498,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x19 - RR C', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x19;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x19;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x19;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x19;
 
     cpuRegisters.C = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -517,10 +517,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x1A - RR D', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x1A;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x1A;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x1A;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x1A;
 
     cpuRegisters.D = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -536,10 +536,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x1B - RR E', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x1B;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x1B;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x1B;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x1B;
 
     cpuRegisters.E = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -555,10 +555,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x1C - RR H', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x1C;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x1C;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x1C;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x1C;
 
     cpuRegisters.H = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -574,10 +574,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x1D - RR L', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x1D;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x1D;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x1D;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x1D;
 
     cpuRegisters.L = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -593,33 +593,33 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x1E - RR (HL)', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x1E;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x1E;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x1E;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x1E;
 
     cpuRegisters.HL = 0xC000;
 
-    addressBus[cpuRegisters.HL].byte = 0b10101010;
+    addressBus.get(cpuRegisters.HL).byte = 0b10101010;
     cpuRegisters.flags.C = 0;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
-    expect(addressBus[cpuRegisters.HL].byte).to.equal(0b01010101);
+    expect(addressBus.get(cpuRegisters.HL).byte).to.equal(0b01010101);
 
-    addressBus[cpuRegisters.HL].byte = 0b10101010;
+    addressBus.get(cpuRegisters.HL).byte = 0b10101010;
     cpuRegisters.flags.C = 1;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
-    expect(addressBus[cpuRegisters.HL].byte).to.equal(0b11010101);
+    expect(addressBus.get(cpuRegisters.HL).byte).to.equal(0b11010101);
   });
 
   it('0x1F - RR A', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x1F;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x1F;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x1F;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x1F;
 
     cpuRegisters.A = 0b10101010;
     cpuRegisters.flags.C = 0;
@@ -635,10 +635,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x20 - SLA B', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x20;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x20;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x20;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x20;
 
     cpuRegisters.B = 0b10000001;
     executeNextOpcode(8);
@@ -652,10 +652,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x21 - SLA C', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x21;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x21;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x21;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x21;
 
     cpuRegisters.C = 0b10000001;
     executeNextOpcode(8);
@@ -669,10 +669,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x22 - SLA D', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x22;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x22;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x22;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x22;
 
     cpuRegisters.D = 0b10000001;
     executeNextOpcode(8);
@@ -686,10 +686,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x23 - SLA E', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x23;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x23;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x23;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x23;
 
     cpuRegisters.E = 0b10000001;
     executeNextOpcode(8);
@@ -703,10 +703,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x24 - SLA H', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x24;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x24;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x24;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x24;
 
     cpuRegisters.H = 0b10000001;
     executeNextOpcode(8);
@@ -720,10 +720,10 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x25 - SLA L', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x25;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x25;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x25;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x25;
 
     cpuRegisters.L = 0b10000001;
     executeNextOpcode(8);
@@ -737,31 +737,31 @@ describe('Opcodes - 0xCB table', () => {
   });
 
   it('0x26 - SLA (HL)', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x26;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x26;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x26;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x26;
 
     cpuRegisters.HL = 0xC000;
 
-    addressBus[0xC000].byte = 0b10000001;
+    addressBus.get(0xC000).byte = 0b10000001;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
-    expect(addressBus[0xC000].byte).to.equal(0b00000010);
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000010);
 
-    addressBus[0xC000].byte = 0b01010101;
+    addressBus.get(0xC000).byte = 0b01010101;
     executeNextOpcode(16);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
-    expect(addressBus[0xC000].byte).to.equal(0b10101010);
+    expect(addressBus.get(0xC000).byte).to.equal(0b10101010);
   });
 
   it('0x27 - SLA A', () => {
-    addressBus[0x0000].byte = 0xCB;
-    addressBus[0x0001].byte = 0x27;
-    addressBus[0x0002].byte = 0xCB;
-    addressBus[0x0003].byte = 0x27;
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x27;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x27;
 
     cpuRegisters.A = 0b10000001;
     executeNextOpcode(8);

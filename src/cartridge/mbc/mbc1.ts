@@ -1,7 +1,6 @@
 import { IGameCartridgeMBC, CARTRIDGE_ROM_BANK_LENGTH } from '../game-cartridge';
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
-import { isIntegerPropertyKey } from '../../memory/utils';
 import { MemoryAccessorDecorator } from '../../memory/memory-accessor-decorator';
 
 export class MBC1 implements IGameCartridgeMBC {
@@ -62,32 +61,27 @@ export class MBC1 implements IGameCartridgeMBC {
       }
     };
 
-    this.romBanks = romBanks.map((bank, index) => new MemorySegmentDecorator(bank, (obj, prop) => {
-      if (isIntegerPropertyKey(prop)) {
-        const offset = parseInt(prop as string, 10);
-
+    this.romBanks = romBanks.map((bank, index) => new MemorySegmentDecorator(
+      bank,
+      (obj, offset: number) => {
         if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
-          throw new TypeError(`Invalid address "${prop}"`);
+          throw new RangeError(`Invalid address "${offset}"`);
         }
 
-        return new MemoryAccessorDecorator(obj[prop as any], {
+        return new MemoryAccessorDecorator(obj.get(offset), {
           setByte: (decorated, value) => { romWriteTrap(index, offset, value); },
           setWord: (decorated, value) => { romWriteTrap(index, offset, value); },
         });
+      })
+    );
+
+    this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, (obj, offset: number) => {
+      // If RAM is not enabled return a static accessor
+      if (!this.enabledRam) {
+        return { byte: 0xFF, word: 0xFFFF };
       }
 
-      return obj[prop as any];
-    }));
-
-    this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, (obj, prop) => {
-      if (isIntegerPropertyKey(prop)) {
-        // If RAM is not enabled return a static accessor
-        if (!this.enabledRam) {
-          return { byte: 0xFF, word: 0xFFFF };
-        }
-      }
-
-      return obj[prop as any];
+      return obj.get(offset);
     }));
   }
 

@@ -1,6 +1,4 @@
 import { IMemorySegment } from './memory-segment';
-import { IMemoryAccessor } from './memory-accessor';
-import { isIntegerPropertyKey } from './utils';
 
 /**
  * Usage:
@@ -18,25 +16,17 @@ import { isIntegerPropertyKey } from './utils';
  *   const w2 = segment[2].word; // 0x1234
  */
 export class StaticMemorySegment implements IMemorySegment {
-  [index: number]: IMemoryAccessor;
+  private readonly filledWith: { byte: number, word: number };
 
   public constructor(filledWith: {byte: number, word: number}) {
-    return new Proxy(this, {
-      get: (obj: this, prop: PropertyKey) => {
-        if (isIntegerPropertyKey(prop)) {
-          return {
-            byte: filledWith.byte & 0xFF,
-            word: filledWith.word & 0xFFFF,
-          };
-        }
+    this.filledWith = {
+      byte: filledWith.byte & 0xFF,
+      word: filledWith.word & 0xFFFF,
+    };
+  }
 
-        return obj[prop as any];
-      },
-
-      set: (obj: this, prop: PropertyKey, value: any) => {
-        return false;
-      }
-    });
+  public get(offset: number) {
+    return { ...this.filledWith };
   }
 }
 

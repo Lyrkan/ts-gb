@@ -12,24 +12,16 @@ describe('MemorySegment', () => {
 
   describe('Memory access', () => {
     it('should return a MemoryAccessor when using array notation', () => {
-      expect(memorySegment[0]).to.be.an.instanceof(MemoryAccessor);
-      expect(memorySegment[1]).to.be.an.instanceof(MemoryAccessor);
-      expect(memorySegment[2]).to.be.an.instanceof(MemoryAccessor);
-      expect(memorySegment[3]).to.be.an.instanceof(MemoryAccessor);
+      expect(memorySegment.get(0)).to.be.an.instanceof(MemoryAccessor);
+      expect(memorySegment.get(1)).to.be.an.instanceof(MemoryAccessor);
+      expect(memorySegment.get(2)).to.be.an.instanceof(MemoryAccessor);
+      expect(memorySegment.get(3)).to.be.an.instanceof(MemoryAccessor);
     });
   });
 
   describe('Errors handling', () => {
     it('should not allow to access an invalid address', () => {
-      expect(() => {
-        memorySegment[-1]; // tslint:disable-line:no-unused-expression
-      }).to.throw('Invalid address');
-    });
-
-    it('should not allow to directly set values', () => {
-      expect(() => {
-        (memorySegment[0] as any) = 1;
-      }).to.throw('not allowed');
+      expect(() => { memorySegment.get(-1); }).to.throw('Invalid address');
     });
   });
 });
