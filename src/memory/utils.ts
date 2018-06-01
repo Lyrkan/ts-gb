@@ -10,7 +10,21 @@ export function isIntegerPropertyKey(prop: PropertyKey): boolean {
   }
 
   if (typeof prop === 'string') {
-    return /^-?\d+$/.test(prop);
+    for (let i = 0; i < prop.length; i++) {
+      const charCode = prop.charCodeAt(i);
+      // Allow negative integers
+      if ((charCode === 45) && (i === 0)) {
+        continue;
+      }
+
+      if ((charCode > 47) && (charCode < 58)) {
+        continue;
+      }
+
+      return false;
+    }
+
+    return true;
   }
 
   return false;

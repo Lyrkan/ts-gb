@@ -1,6 +1,7 @@
 import { AddressBus } from '../memory/address-bus';
 import { CpuRegisters } from './cpu-registers';
 import { OPCODES, ICPUCallbacks } from './opcodes';
+import { CpuTimer } from './cpu-timer';
 
 export class CPU {
   // Registers
@@ -30,6 +31,9 @@ export class CPU {
   // Whether or not interrupts are enabled.
   private interruptsEnabled: boolean;
 
+  // Timer management
+  private timer: CpuTimer;
+
   /**
    * Instanciate a new CPU.
    *
@@ -37,6 +41,7 @@ export class CPU {
    */
   public constructor(addressBus: AddressBus) {
     this.addressBus = addressBus;
+    this.timer = new CpuTimer(this.addressBus);
     this.cpuCallbacks = {
       stop: () => { this.stopped = true; },
       halt: () => { this.halted = true; },
@@ -52,6 +57,7 @@ export class CPU {
    */
   public reset(): void {
     this.registers = new CpuRegisters();
+    this.timer.reset();
     this.skipCyles = 0;
     this.firstCycle = true;
     this.stopped = false;
@@ -76,8 +82,10 @@ export class CPU {
     }
 
     // Skip the current cycle if needed
+    // (but still update the timer)
     if (this.skipCyles > 0) {
       this.skipCyles--;
+      this.timer.tick();
       return;
     }
 
@@ -112,6 +120,9 @@ export class CPU {
 
     // Execute the next OPCode
     this.executeOpcode();
+
+    // Update the timer
+    this.timer.tick();
   }
 
   private executeInterrupts(): void {
