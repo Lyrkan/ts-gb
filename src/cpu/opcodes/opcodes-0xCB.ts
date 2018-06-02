@@ -1558,7 +1558,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 2,D
   0x92: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.B = ALU.res(2, registers.B).value;
+    registers.D = ALU.res(2, registers.D).value;
     return 8;
   },
 

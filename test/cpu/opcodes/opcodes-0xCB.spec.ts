@@ -2314,132 +2314,1987 @@ describe('Opcodes - 0xCB table', () => {
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
   });
 
-  it('0x80 - RES 0,B');
-  it('0x81 - RES 0,C');
-  it('0x82 - RES 0,D');
-  it('0x83 - RES 0,E');
-  it('0x84 - RES 0,H');
-  it('0x85 - RES 0,L');
-  it('0x86 - RES 0,(HL)');
-  it('0x87 - RES 0,A');
-  it('0x88 - RES 1,B');
-  it('0x89 - RES 1,C');
-  it('0x8A - RES 1,D');
-  it('0x8B - RES 1,E');
-  it('0x8C - RES 1,H');
-  it('0x8D - RES 1,L');
-  it('0x8E - RES 1,(HL)');
-  it('0x8F - RES 1,A');
-  it('0x90 - RES 2,B');
-  it('0x91 - RES 2,C');
-  it('0x92 - RES 2,D');
-  it('0x93 - RES 2,E');
-  it('0x94 - RES 2,H');
-  it('0x95 - RES 2,L');
-  it('0x96 - RES 2,(HL)');
-  it('0x97 - RES 2,A');
-  it('0x98 - RES 3,B');
-  it('0x99 - RES 3,C');
-  it('0x9A - RES 3,D');
-  it('0x9B - RES 3,E');
-  it('0x9C - RES 3,H');
-  it('0x9D - RES 3,L');
-  it('0x9E - RES 3,(HL)');
-  it('0x9F - RES 3,A');
-  it('0xA0 - RES 4,B');
-  it('0xA1 - RES 4,C');
-  it('0xA2 - RES 4,D');
-  it('0xA3 - RES 4,E');
-  it('0xA4 - RES 4,H');
-  it('0xA5 - RES 4,L');
-  it('0xA6 - RES 4,(HL)');
-  it('0xA7 - RES 4,A');
-  it('0xA8 - RES 5,B');
-  it('0xA9 - RES 5,C');
-  it('0xAA - RES 5,D');
-  it('0xAB - RES 5,E');
-  it('0xAC - RES 5,H');
-  it('0xAD - RES 5,L');
-  it('0xAE - RES 5,(HL)');
-  it('0xAF - RES 5,A');
-  it('0xB0 - RES 6,B');
-  it('0xB1 - RES 6,C');
-  it('0xB2 - RES 6,D');
-  it('0xB3 - RES 6,E');
-  it('0xB4 - RES 6,H');
-  it('0xB5 - RES 6,L');
-  it('0xB6 - RES 6,(HL)');
-  it('0xB7 - RES 6,A');
-  it('0xB8 - RES 7,B');
-  it('0xB9 - RES 7,C');
-  it('0xBA - RES 7,D');
-  it('0xBB - RES 7,E');
-  it('0xBC - RES 7,H');
-  it('0xBD - RES 7,L');
-  it('0xBE - RES 7,(HL)');
-  it('0xBF - RES 7,A');
-  it('0xC0 - SET 0,B');
-  it('0xC1 - SET 0,C');
-  it('0xC2 - SET 0,D');
-  it('0xC3 - SET 0,E');
-  it('0xC4 - SET 0,H');
-  it('0xC5 - SET 0,L');
-  it('0xC6 - SET 0,(HL)');
-  it('0xC7 - SET 0,A');
-  it('0xC8 - SET 1,B');
-  it('0xC9 - SET 1,C');
-  it('0xCA - SET 1,D');
-  it('0xCB - SET 1,E');
-  it('0xCC - SET 1,H');
-  it('0xCD - SET 1,L');
-  it('0xCE - SET 1,(HL)');
-  it('0xCF - SET 1,A');
-  it('0xD0 - SET 2,B');
-  it('0xD1 - SET 2,C');
-  it('0xD2 - SET 2,D');
-  it('0xD3 - SET 2,E');
-  it('0xD4 - SET 2,H');
-  it('0xD5 - SET 2,L');
-  it('0xD6 - SET 2,(HL)');
-  it('0xD7 - SET 2,A');
-  it('0xD8 - SET 3,B');
-  it('0xD9 - SET 3,C');
-  it('0xDA - SET 3,D');
-  it('0xDB - SET 3,E');
-  it('0xDC - SET 3,H');
-  it('0xDD - SET 3,L');
-  it('0xDE - SET 3,(HL)');
-  it('0xDF - SET 3,A');
-  it('0xE0 - SET 4,B');
-  it('0xE1 - SET 4,C');
-  it('0xE2 - SET 4,D');
-  it('0xE3 - SET 4,E');
-  it('0xE4 - SET 4,H');
-  it('0xE5 - SET 4,L');
-  it('0xE6 - SET 4,(HL)');
-  it('0xE7 - SET 4,A');
-  it('0xE8 - SET 5,B');
-  it('0xE9 - SET 5,C');
-  it('0xEA - SET 5,D');
-  it('0xEB - SET 5,E');
-  it('0xEC - SET 5,H');
-  it('0xED - SET 5,L');
-  it('0xEE - SET 5,(HL)');
-  it('0xEF - SET 5,A');
-  it('0xF0 - SET 6,B');
-  it('0xF1 - SET 6,C');
-  it('0xF2 - SET 6,D');
-  it('0xF3 - SET 6,E');
-  it('0xF4 - SET 6,H');
-  it('0xF5 - SET 6,L');
-  it('0xF6 - SET 6,(HL)');
-  it('0xF7 - SET 6,A');
-  it('0xF8 - SET 7,B');
-  it('0xF9 - SET 7,C');
-  it('0xFA - SET 7,D');
-  it('0xFB - SET 7,E');
-  it('0xFC - SET 7,H');
-  it('0xFD - SET 7,L');
-  it('0xFE - SET 7,(HL)');
-  it('0xFF - SET 7,A');
+  it('0x80 - RES 0,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x80;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x80;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x81 - RES 0,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x81;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x81;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x82 - RES 0,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x82;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x82;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x83 - RES 0,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x83;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x83;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x84 - RES 0,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x84;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x84;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x85 - RES 0,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x85;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x85;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x86 - RES 0,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x86;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x86;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111110);
+  });
+
+  it('0x87 - RES 0,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x87;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x87;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111110, PC: 0x0004 });
+  });
+
+  it('0x88 - RES 1,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x88;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x88;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x89 - RES 1,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x89;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x89;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x8A - RES 1,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x8A;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x8A;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x8B - RES 1,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x8B;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x8B;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x8C - RES 1,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x8C;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x8C;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x8D - RES 1,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x8D;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x8D;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x8E - RES 1,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x8E;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x8E;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111101);
+  });
+
+  it('0x8F - RES 1,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x8F;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x8F;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111101, PC: 0x0004 });
+  });
+
+  it('0x90 - RES 2,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x90;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x90;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x91 - RES 2,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x91;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x91;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x92 - RES 2,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x92;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x92;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x93 - RES 2,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x93;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x93;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x94 - RES 2,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x94;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x94;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x95 - RES 2,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x95;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x95;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x96 - RES 2,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x96;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x96;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111011);
+  });
+
+  it('0x97 - RES 2,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x97;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x97;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111011, PC: 0x0004 });
+  });
+
+  it('0x98 - RES 3,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x98;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x98;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0x99 - RES 3,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x99;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x99;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0x9A - RES 3,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x9A;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x9A;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0x9B - RES 3,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x9B;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x9B;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0x9C - RES 3,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x9C;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x9C;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0x9D - RES 3,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x9D;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x9D;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0x9E - RES 3,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x9E;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x9E;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11110111);
+  });
+
+  it('0x9F - RES 3,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0x9F;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0x9F;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11110111, PC: 0x0004 });
+  });
+
+  it('0xA0 - RES 4,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA0;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA0;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA1 - RES 4,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA1;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA1;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA2 - RES 4,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA2;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA2;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA3 - RES 4,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA3;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA3;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA4 - RES 4,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA4;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA4;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA5 - RES 4,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA5;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA5;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA6 - RES 4,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA6;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA6;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11101111);
+  });
+
+  it('0xA7 - RES 4,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA7;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA7;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11101111, PC: 0x0004 });
+  });
+
+  it('0xA8 - RES 5,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA8;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA8;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xA9 - RES 5,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xA9;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xA9;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xAA - RES 5,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xAA;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xAA;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xAB - RES 5,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xAB;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xAB;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xAC - RES 5,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xAC;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xAC;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xAD - RES 5,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xAD;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xAD;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xAE - RES 5,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xAE;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xAE;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11011111);
+  });
+
+  it('0xAF - RES 5,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xAF;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xAF;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11011111, PC: 0x0004 });
+  });
+
+  it('0xB0 - RES 6,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB0;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB0;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB1 - RES 6,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB1;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB1;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB2 - RES 6,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB2;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB2;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB3 - RES 6,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB3;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB3;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB4 - RES 6,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB4;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB4;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB5 - RES 6,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB5;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB5;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB6 - RES 6,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB6;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB6;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b10111111);
+  });
+
+  it('0xB7 - RES 6,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB7;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB7;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b10111111, PC: 0x0004 });
+  });
+
+  it('0xB8 - RES 7,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB8;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB8;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xB9 - RES 7,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xB9;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xB9;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xBA - RES 7,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xBA;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xBA;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xBB - RES 7,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xBB;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xBB;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xBC - RES 7,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xBC;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xBC;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xBD - RES 7,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xBD;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xBD;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xBE - RES 7,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xBE;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xBE;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b01111111);
+  });
+
+  it('0xBF - RES 7,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xBF;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xBF;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b01111111, PC: 0x0004 });
+  });
+
+  it('0xC0 - SET 0,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC0;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC0;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC1 - SET 0,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC1;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC1;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC2 - SET 0,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC2;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC2;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC3 - SET 0,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC3;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC3;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC4 - SET 0,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC4;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC4;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC5 - SET 0,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC5;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC5;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC6 - SET 0,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC6;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC6;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000001);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xC7 - SET 0,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC7;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC7;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000001, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC8 - SET 1,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC8;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC8;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xC9 - SET 1,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xC9;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xC9;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xCA - SET 1,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xCA;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xCA;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xCB - SET 1,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xCB;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xCB;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xCC - SET 1,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xCC;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xCC;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xCD - SET 1,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xCD;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xCD;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xCE - SET 1,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xCE;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xCE;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000010);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xCF - SET 1,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xCF;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xCF;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000010, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD0 - SET 2,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD0;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD0;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD1 - SET 2,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD1;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD1;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD2 - SET 2,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD2;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD2;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD3 - SET 2,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD3;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD3;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD4 - SET 2,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD4;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD4;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD5 - SET 2,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD5;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD5;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD6 - SET 2,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD6;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD6;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000100);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xD7 - SET 2,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD7;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD7;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00000100, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD8 - SET 3,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD8;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD8;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xD9 - SET 3,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xD9;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xD9;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xDA - SET 3,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xDA;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xDA;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xDB - SET 3,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xDB;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xDB;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xDC - SET 3,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xDC;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xDC;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xDD - SET 3,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xDD;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xDD;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xDE - SET 3,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xDE;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xDE;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00001000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xDF - SET 3,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xDF;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xDF;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00001000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE0 - SET 4,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE0;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE0;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE1 - SET 4,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE1;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE1;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE2 - SET 4,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE2;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE2;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE3 - SET 4,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE3;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE3;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE4 - SET 4,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE4;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE4;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE5 - SET 4,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE5;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE5;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE6 - SET 4,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE6;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE6;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00010000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xE7 - SET 4,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE7;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE7;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00010000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE8 - SET 5,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE8;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE8;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xE9 - SET 5,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xE9;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xE9;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xEA - SET 5,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xEA;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xEA;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xEB - SET 5,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xEB;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xEB;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xEC - SET 5,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xEC;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xEC;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xED - SET 5,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xED;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xED;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xEE - SET 5,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xEE;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xEE;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00100000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xEF - SET 5,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xEF;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xEF;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b00100000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF0 - SET 6,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF0;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF0;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF1 - SET 6,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF1;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF1;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF2 - SET 6,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF2;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF2;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF3 - SET 6,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF3;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF3;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF4 - SET 6,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF4;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF4;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF5 - SET 6,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF5;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF5;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF6 - SET 6,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF6;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF6;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b01000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xF7 - SET 6,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF7;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF7;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b01000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF8 - SET 7,B', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF8;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF8;
+
+    cpuRegisters.B = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.B = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ B: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xF9 - SET 7,C', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xF9;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xF9;
+
+    cpuRegisters.C = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.C = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ C: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xFA - SET 7,D', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xFA;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xFA;
+
+    cpuRegisters.D = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.D = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ D: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xFB - SET 7,E', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xFB;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xFB;
+
+    cpuRegisters.E = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.E = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ E: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xFC - SET 7,H', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xFC;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xFC;
+
+    cpuRegisters.H = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.H = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ H: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xFD - SET 7,L', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xFD;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xFD;
+
+    cpuRegisters.L = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.L = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ L: 0b11111111, PC: 0x0004 });
+  });
+
+  it('0xFE - SET 7,(HL)', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xFE;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xFE;
+
+    cpuRegisters.HL = 0xC000;
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0002 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b10000000);
+
+    addressBus.get(0xC000).byte = 0b11111111;
+    executeNextOpcode(16);
+    checkRegisters({ PC: 0x0004 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b11111111);
+  });
+
+  it('0xFF - SET 7,A', () => {
+    addressBus.get(0x0000).byte = 0xCB;
+    addressBus.get(0x0001).byte = 0xFF;
+    addressBus.get(0x0002).byte = 0xCB;
+    addressBus.get(0x0003).byte = 0xFF;
+
+    cpuRegisters.A = 0b00000000;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b10000000, PC: 0x0002 });
+
+    cpuRegisters.A = 0b11111111;
+    executeNextOpcode(8);
+    checkRegisters({ A: 0b11111111, PC: 0x0004 });
+  });
 });
