@@ -10,7 +10,7 @@
     "nsp": "nsp check",
     "precommit": "yarn run lint",
     "prepush": "yarn run nsp && yarn run lint && yarn run test",
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && electron dist/electron/main.js",
     "test": "mocha -r ts-node/register \"./test/**/*.spec.ts\""
   },
   "devDependencies": {
@@ -19,6 +19,7 @@
     "@types/node": "^10.1.2",
     "@types/sinon": "^5.0.0",
     "chai": "^4.1.2",
+    "electron": "^2.0.2",
     "husky": "^0.14.3",
     "mocha": "^5.1.1",
     "nsp": "^3.2.1",

@@ -1,7 +1,8 @@
 import { AddressBus } from '../memory/address-bus';
+import { PPU } from './ppu';
 
-const SCREEN_WIDTH = 160;
-const SCREEN_HEIGHT = 144;
+export const SCREEN_WIDTH = 160;
+export const SCREEN_HEIGHT = 144;
 
 export class Display {
   private addressBus: AddressBus;
@@ -24,6 +25,7 @@ export class Display {
     this.currentBuffer = 0;
     this.currentMode = GPU_MODE.OAM_SEARCH;
     this.currentLine = 0;
+    this.clock = 0;
   }
 
   public getFrontBuffer(): Uint8Array {
@@ -45,12 +47,12 @@ export class Display {
     if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER)
       && (this.clock >= (this.currentLine + 63))) {
       this.setMode(GPU_MODE.HBLANK);
+      PPU.renderLine(this.addressBus, this.getBackBuffer(), this.currentLine);
     }
 
     // HBLANK in progress
     if ((this.currentMode === GPU_MODE.HBLANK)
       && (this.clock === (this.currentLine + 114))) {
-      this.renderLine();
       this.currentLine++;
 
       if (this.currentLine < SCREEN_HEIGHT) {
@@ -81,10 +83,6 @@ export class Display {
 
     // Switch the current buffer
     this.currentBuffer = ~this.currentBuffer & 1;
-  }
-
-  private renderLine(): void {
-    // TODO
   }
 
   private setMode(mode: GPU_MODE) {

@@ -4,6 +4,7 @@ import { GameCartridge } from '../cartridge/game-cartridge';
 import { STATIC_0000_SEGMENT } from './static-memory-segment';
 import { MemorySegmentDecorator } from './memory-segment-decorator';
 import { MemoryAccessorDecorator } from './memory-accessor-decorator';
+import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -177,6 +178,17 @@ export class AddressBus {
    */
   public loadCartridge(gameCartridge: GameCartridge): void {
     this.gameCartridge = gameCartridge;
+  }
+
+  /**
+   * Return some info about the currently loaded cartridge.
+   */
+  public getCartridgeInfo(): IGameCartridgeInfo {
+    if (!this.gameCartridge) {
+      throw new Error('Game cartridge is not available');
+    }
+
+    return this.gameCartridge.cartridgeInfo;
   }
 
   /**
