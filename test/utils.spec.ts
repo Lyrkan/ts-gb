@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import * as Utils from '../../src/memory/utils';
+import * as Utils from '../src/utils';
 
 describe('Utils', () => {
   it('uint8ToInt8', () => {

@@ -2,7 +2,7 @@ import { IOpcodesMap, ICPUCallbacks } from '../opcodes';
 import { CpuRegisters } from '../cpu-registers';
 import { AddressBus } from '../../memory/address-bus';
 import { ALU } from '../alu';
-import { uint8ToInt8 } from '../../memory/utils';
+import { uint8ToInt8 } from '../../utils';
 
 export const OPCODES_DEFAULT: IOpcodesMap = {
   // NOP
