@@ -2,6 +2,7 @@ import { MemorySegment, IMemorySegment } from '../memory/memory-segment';
 import { STATIC_FFFF_SEGMENT } from '../memory/static-memory-segment';
 import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
+import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
 
 export class GameCartridge {
   public static readCartridgeInfo(data: ArrayBuffer): IGameCartridgeInfo {
@@ -145,40 +146,10 @@ export class GameCartridge {
   }
 }
 
-enum MBC_TYPE {
-  NONE = 'NONE',
-  MBC1 = 'MBC1',
-  MBC2 = 'MBC2',
-  MBC3 = 'MBC3',
-  MBC5 = 'MBC5',
-}
-
 export const CARTRIDGE_ROM_BANK_LENGTH = 16 * 1024;
 export const CARTRIDGE_RAM_BANK_LENGTH = 8 * 1024;
 
-const CARTRIDGE_INFO_MAP: { [index: number]: IPartialCartridgeInfo } = {
-  0x00: { mbcType: MBC_TYPE.NONE, hasRam: false, hasTimer: false, hasRumble: false },
-  0x01: { mbcType: MBC_TYPE.MBC1, hasRam: false, hasTimer: false, hasRumble: false },
-  0x02: { mbcType: MBC_TYPE.MBC1, hasRam: true, hasTimer: false, hasRumble: false },
-  0x03: { mbcType: MBC_TYPE.MBC1, hasRam: true, hasTimer: false, hasRumble: false },
-  0x05: { mbcType: MBC_TYPE.MBC2, hasRam: false, hasTimer: false, hasRumble: false },
-  0x06: { mbcType: MBC_TYPE.MBC2, hasRam: true, hasTimer: false, hasRumble: false },
-  0x08: { mbcType: MBC_TYPE.NONE, hasRam: true, hasTimer: false, hasRumble: false },
-  0x09: { mbcType: MBC_TYPE.NONE, hasRam: true, hasTimer: false, hasRumble: false },
-  0x0F: { mbcType: MBC_TYPE.MBC3, hasRam: false, hasTimer: true, hasRumble: false },
-  0x10: { mbcType: MBC_TYPE.MBC3, hasRam: true, hasTimer: true, hasRumble: false },
-  0x11: { mbcType: MBC_TYPE.MBC3, hasRam: false, hasTimer: false, hasRumble: false },
-  0x12: { mbcType: MBC_TYPE.MBC3, hasRam: true, hasTimer: false, hasRumble: false },
-  0x13: { mbcType: MBC_TYPE.MBC3, hasRam: true, hasTimer: false, hasRumble: false },
-  0x19: { mbcType: MBC_TYPE.MBC5, hasRam: false, hasTimer: false, hasRumble: false },
-  0x1A: { mbcType: MBC_TYPE.MBC5, hasRam: true, hasTimer: false, hasRumble: false },
-  0x1B: { mbcType: MBC_TYPE.MBC5, hasRam: true, hasTimer: false, hasRumble: false },
-  0x1C: { mbcType: MBC_TYPE.MBC5, hasRam: false, hasTimer: false, hasRumble: false },
-  0x1D: { mbcType: MBC_TYPE.MBC5, hasRam: false, hasTimer: false, hasRumble: true },
-  0x1E: { mbcType: MBC_TYPE.MBC5, hasRam: false, hasTimer: false, hasRumble: true },
-};
-
-const CARTRIDGE_RAM_MAP: { [index: number]: number } = {
+export const CARTRIDGE_RAM_MAP: { [index: number]: number } = {
   0x00: 0, // No RAM
   0x01: 1024 * 2, // 2KB
   0x02: 1024 * 8, // 8KB
@@ -186,19 +157,6 @@ const CARTRIDGE_RAM_MAP: { [index: number]: number } = {
   0x04: 1024 * 128, // 128KB
   0x05: 1024 * 64, // 64KB
 };
-
-interface IPartialCartridgeInfo {
-  mbcType: MBC_TYPE;
-  hasRam: boolean;
-  hasTimer: boolean;
-  hasRumble: boolean;
-}
-
-interface IGameCartridgeInfo extends IPartialCartridgeInfo {
-  gameTitle: string;
-  romSize: number;
-  ramSize: number;
-}
 
 export interface IGameCartridgeMBC {
   staticRomBank: IMemorySegment;

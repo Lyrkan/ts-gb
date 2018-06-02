@@ -2,6 +2,7 @@ import { AddressBus } from '../memory/address-bus';
 import { CpuRegisters } from './cpu-registers';
 import { OPCODES, ICPUCallbacks } from './opcodes';
 import { CpuTimer } from './cpu-timer';
+import { Display } from '../display/display';
 
 export class CPU {
   // Registers
@@ -9,6 +10,9 @@ export class CPU {
 
   // Memory
   private addressBus: AddressBus;
+
+  // Display
+  private display: Display;
 
   // Whether or not this is the first cycle
   private firstCycle: boolean;
@@ -39,8 +43,9 @@ export class CPU {
    *
    * @param addressBus Mapped memory (ROM, RAM, VRAM, IO, ...)
    */
-  public constructor(addressBus: AddressBus) {
+  public constructor(addressBus: AddressBus, display: Display) {
     this.addressBus = addressBus;
+    this.display = display;
     this.timer = new CpuTimer(this.addressBus);
     this.cpuCallbacks = {
       stop: () => { this.stopped = true; },
@@ -86,6 +91,7 @@ export class CPU {
     if (this.skipCyles > 0) {
       this.skipCyles--;
       this.timer.tick();
+      this.display.tick();
       return;
     }
 
@@ -121,8 +127,9 @@ export class CPU {
     // Execute the next OPCode
     this.executeOpcode();
 
-    // Update the timer
+    // Update the timer and display clock
     this.timer.tick();
+    this.display.tick();
   }
 
   private executeInterrupts(): void {

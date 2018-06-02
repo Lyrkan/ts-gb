@@ -1,16 +1,17 @@
 import { CPU } from './cpu/cpu';
 import { AddressBus } from './memory/address-bus';
 import { GameCartridge } from './cartridge/game-cartridge';
-
-const fs = require('fs');
+import { Display } from './display/display';
 
 export class System {
-  private cpu: CPU;
-  private memory: AddressBus;
+  public readonly cpu: CPU;
+  public readonly memory: AddressBus;
+  public readonly display: Display;
 
   public constructor() {
     this.memory = new AddressBus();
-    this.cpu = new CPU(this.memory);
+    this.display = new Display(this.memory);
+    this.cpu = new CPU(this.memory, this.display);
   }
 
   /**
@@ -18,14 +19,8 @@ export class System {
    *
    * @param path Bootstrap ROM path
    */
-  public loadBootRom(path: string): void {
-    const fileBuffer: Buffer = fs.readFileSync(path);
-    const arrayBuffer = fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength
-    );
-
-    this.memory.loadBootRom(arrayBuffer);
+  public loadBootRom(buffer: ArrayBuffer): void {
+    this.memory.loadBootRom(buffer);
 
     // Reset everything
     this.reset();
@@ -36,14 +31,8 @@ export class System {
    *
    * @param path Game ROM path
    */
-  public loadGame(path: string): void {
-    const fileBuffer: Buffer = fs.readFileSync(path);
-    const arrayBuffer = fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength
-    );
-
-    const cartridge = new GameCartridge(arrayBuffer);
+  public loadGame(buffer: ArrayBuffer): void {
+    const cartridge = new GameCartridge(buffer);
     this.memory.loadCartridge(cartridge);
 
     // Reset everything
@@ -56,6 +45,7 @@ export class System {
   public reset(): void {
     this.cpu.reset();
     this.memory.reset();
+    this.display.reset();
   }
 
   /**
