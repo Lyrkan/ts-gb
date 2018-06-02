@@ -13,7 +13,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RLC C
@@ -25,7 +25,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RLC D
@@ -37,7 +37,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RLC E
@@ -49,7 +49,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RLC H
@@ -61,7 +61,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RLC L
@@ -73,7 +73,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RLC (HL)
@@ -87,7 +87,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // RLC A
@@ -99,7 +99,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC B
@@ -111,7 +111,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC C
@@ -123,7 +123,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC D
@@ -135,7 +135,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC E
@@ -147,7 +147,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC H
@@ -159,7 +159,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC L
@@ -171,7 +171,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RRC (HL)
@@ -185,7 +185,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // RRC A
@@ -197,7 +197,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL B
@@ -212,7 +212,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL C
@@ -227,7 +227,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL D
@@ -242,7 +242,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL E
@@ -257,7 +257,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL H
@@ -272,7 +272,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL L
@@ -287,7 +287,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RL (HL)
@@ -302,7 +302,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // RL A
@@ -317,7 +317,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR B
@@ -332,7 +332,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR C
@@ -347,7 +347,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR D
@@ -362,7 +362,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR E
@@ -377,7 +377,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR H
@@ -392,7 +392,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR L
@@ -407,7 +407,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // RR (HL)
@@ -422,7 +422,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // RR A
@@ -437,7 +437,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA B
@@ -449,7 +449,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA C
@@ -461,7 +461,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA D
@@ -473,7 +473,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA E
@@ -485,7 +485,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA H
@@ -497,7 +497,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA L
@@ -509,7 +509,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SLA (HL)
@@ -523,7 +523,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // SLA A
@@ -535,7 +535,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA B
@@ -547,7 +547,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA C
@@ -559,7 +559,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA D
@@ -571,7 +571,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA E
@@ -583,7 +583,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA H
@@ -595,7 +595,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA L
@@ -607,7 +607,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRA (HL)
@@ -621,7 +621,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // SRA A
@@ -633,7 +633,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SWAP B
@@ -642,7 +642,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.B = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SWAP C
@@ -651,7 +651,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.C = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SWAP D
@@ -660,7 +660,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.D = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SWAP E
@@ -669,7 +669,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.E = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SWAP H
@@ -678,7 +678,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.H = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SWAP L
@@ -687,7 +687,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.L = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SWAP (HL)
@@ -698,7 +698,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     addressBus.get(registers.HL).byte = value;
     registers.flags.Z = Z;
-    return 16;
+    return 4;
   },
 
   // SWAP A
@@ -707,7 +707,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.A = value;
     registers.flags.Z = Z;
-    return 8;
+    return 2;
   },
 
   // SRL B
@@ -719,7 +719,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRL C
@@ -731,7 +731,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRL D
@@ -743,7 +743,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRL E
@@ -755,7 +755,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRL H
@@ -767,7 +767,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRL L
@@ -779,7 +779,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // SRL (HL)
@@ -793,7 +793,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 16;
+    return 4;
   },
 
   // SRL A
@@ -805,7 +805,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.H = H;
     registers.flags.N = N;
     registers.flags.C = C;
-    return 8;
+    return 2;
   },
 
   // BIT 0,B
@@ -815,7 +815,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 0,C
@@ -825,7 +825,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 0,D
@@ -835,7 +835,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 0,E
@@ -845,7 +845,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 0,H
@@ -855,7 +855,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 0,L
@@ -865,7 +865,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 0,(HL)
@@ -875,7 +875,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 0,A
@@ -885,7 +885,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,B
@@ -895,7 +895,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,C
@@ -905,7 +905,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,D
@@ -915,7 +915,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,E
@@ -925,7 +925,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,H
@@ -935,7 +935,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,L
@@ -945,7 +945,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 1,(HL)
@@ -955,7 +955,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 1,A
@@ -965,7 +965,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,B
@@ -975,7 +975,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,C
@@ -985,7 +985,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,D
@@ -995,7 +995,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,E
@@ -1005,7 +1005,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,H
@@ -1015,7 +1015,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,L
@@ -1025,7 +1025,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 2,(HL)
@@ -1035,7 +1035,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 2,A
@@ -1045,7 +1045,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,B
@@ -1055,7 +1055,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,C
@@ -1065,7 +1065,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,D
@@ -1075,7 +1075,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,E
@@ -1085,7 +1085,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,H
@@ -1095,7 +1095,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,L
@@ -1105,7 +1105,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 3,(HL)
@@ -1115,7 +1115,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 3,A
@@ -1125,7 +1125,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,B
@@ -1135,7 +1135,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,C
@@ -1145,7 +1145,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,D
@@ -1155,7 +1155,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,E
@@ -1165,7 +1165,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,H
@@ -1175,7 +1175,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,L
@@ -1185,7 +1185,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 4,(HL)
@@ -1195,7 +1195,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 4,A
@@ -1205,7 +1205,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,B
@@ -1215,7 +1215,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,C
@@ -1225,7 +1225,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,D
@@ -1235,7 +1235,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,E
@@ -1245,7 +1245,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,H
@@ -1255,7 +1255,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,L
@@ -1265,7 +1265,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 5,(HL)
@@ -1275,7 +1275,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 5,A
@@ -1285,7 +1285,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,B
@@ -1295,7 +1295,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,C
@@ -1305,7 +1305,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,D
@@ -1315,7 +1315,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,E
@@ -1325,7 +1325,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,H
@@ -1335,7 +1335,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,L
@@ -1345,7 +1345,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 6,(HL)
@@ -1355,7 +1355,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 6,A
@@ -1365,7 +1365,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,B
@@ -1375,7 +1375,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,C
@@ -1385,7 +1385,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,D
@@ -1395,7 +1395,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,E
@@ -1405,7 +1405,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,H
@@ -1415,7 +1415,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,L
@@ -1425,7 +1425,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // BIT 7,(HL)
@@ -1435,7 +1435,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 16;
+    return 4;
   },
 
   // BIT 7,A
@@ -1445,774 +1445,774 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 8;
+    return 2;
   },
 
   // RES 0,B
   0x80: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(0, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 0,C
   0x81: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(0, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 0,D
   0x82: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(0, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 0,E
   0x83: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(0, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 0,H
   0x84: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(0, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 0,L
   0x85: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(0, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 0,(HL)
   0x86: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(0, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 0,A
   0x87: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(0, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,B
   0x88: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(1, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,C
   0x89: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(1, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,D
   0x8A: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(1, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,E
   0x8B: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(1, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,H
   0x8C: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(1, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,L
   0x8D: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(1, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 1,(HL)
   0x8E: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(1, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 1,A
   0x8F: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(1, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,B
   0x90: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(2, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,C
   0x91: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(2, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,D
   0x92: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(2, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,E
   0x93: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(2, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,H
   0x94: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(2, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,L
   0x95: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(2, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 2,(HL)
   0x96: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(2, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 2,A
   0x97: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(2, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,B
   0x98: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(3, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,C
   0x99: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(3, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,D
   0x9A: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(3, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,E
   0x9B: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(3, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,H
   0x9C: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(3, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,L
   0x9D: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(3, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 3,(HL)
   0x9E: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(3, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 3,A
   0x9F: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(3, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,B
   0xA0: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(4, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,C
   0xA1: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(4, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,D
   0xA2: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(4, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,E
   0xA3: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(4, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,H
   0xA4: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(4, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,L
   0xA5: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(4, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 4,(HL)
   0xA6: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(4, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 4,A
   0xA7: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(4, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,B
   0xA8: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(5, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,C
   0xA9: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(5, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,D
   0xAA: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(5, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,E
   0xAB: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(5, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,H
   0xAC: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(5, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,L
   0xAD: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(5, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 5,(HL)
   0xAE: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(5, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 5,A
   0xAF: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(5, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,B
   0xB0: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(6, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,C
   0xB1: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(6, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,D
   0xB2: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(6, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,E
   0xB3: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(6, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,H
   0xB4: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(6, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,L
   0xB5: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(6, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 6,(HL)
   0xB6: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(6, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 6,A
   0xB7: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(6, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,B
   0xB8: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.res(7, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,C
   0xB9: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.res(7, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,D
   0xBA: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.res(7, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,E
   0xBB: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.res(7, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,H
   0xBC: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.res(7, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,L
   0xBD: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.res(7, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // RES 7,(HL)
   0xBE: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.res(7, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // RES 7,A
   0xBF: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.res(7, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,B
   0xC0: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(0, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,C
   0xC1: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(0, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,D
   0xC2: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(0, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,E
   0xC3: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(0, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,H
   0xC4: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(0, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,L
   0xC5: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(0, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 0,(HL)
   0xC6: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(0, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 0,A
   0xC7: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(0, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,B
   0xC8: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(1, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,C
   0xC9: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(1, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,D
   0xCA: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(1, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,E
   0xCB: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(1, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,H
   0xCC: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(1, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,L
   0xCD: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(1, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 1,(HL)
   0xCE: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(1, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 1,A
   0xCF: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(1, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,B
   0xD0: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(2, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,C
   0xD1: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(2, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,D
   0xD2: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(2, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,E
   0xD3: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(2, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,H
   0xD4: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(2, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,L
   0xD5: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(2, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 2,(HL)
   0xD6: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(2, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 2,A
   0xD7: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(2, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,B
   0xD8: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(3, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,C
   0xD9: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(3, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,D
   0xDA: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(3, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,E
   0xDB: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(3, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,H
   0xDC: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(3, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,L
   0xDD: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(3, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 3,(HL)
   0xDE: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(3, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 3,A
   0xDF: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(3, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,B
   0xE0: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(4, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,C
   0xE1: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(4, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,D
   0xE2: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(4, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,E
   0xE3: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(4, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,H
   0xE4: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(4, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,L
   0xE5: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(4, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 4,(HL)
   0xE6: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(4, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 4,A
   0xE7: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(4, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,B
   0xE8: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(5, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,C
   0xE9: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(5, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,D
   0xEA: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(5, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,E
   0xEB: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(5, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,H
   0xEC: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(5, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,L
   0xED: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(5, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 5,(HL)
   0xEE: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(5, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 5,A
   0xEF: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(5, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,B
   0xF0: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(6, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,C
   0xF1: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(6, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,D
   0xF2: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(6, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,E
   0xF3: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(6, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,H
   0xF4: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(6, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,L
   0xF5: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(6, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 6,(HL)
   0xF6: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(6, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 6,A
   0xF7: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(6, registers.A).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,B
   0xF8: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.B = ALU.set(7, registers.B).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,C
   0xF9: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.C = ALU.set(7, registers.C).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,D
   0xFA: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.D = ALU.set(7, registers.D).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,E
   0xFB: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.E = ALU.set(7, registers.E).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,H
   0xFC: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.H = ALU.set(7, registers.H).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,L
   0xFD: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.L = ALU.set(7, registers.L).value;
-    return 8;
+    return 2;
   },
 
   // SET 7,(HL)
   0xFE: (registers: CpuRegisters, addressBus: AddressBus) => {
     addressBus.get(registers.HL).byte = ALU.set(7, addressBus.get(registers.HL).byte).value;
-    return 16;
+    return 4;
   },
 
   // SET 7,A
   0xFF: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = ALU.set(7, registers.A).value;
-    return 8;
+    return 2;
   },
 };

@@ -37,19 +37,19 @@ export class Display {
   public tick(): void {
     // Scanline (access to OAM) in progress
     if ((this.currentMode === GPU_MODE.OAM_SEARCH)
-      && (this.clock >= (this.currentLine + 80))) {
+      && (this.clock >= (this.currentLine + 20))) {
       this.setMode(GPU_MODE.PIXEL_TRANSFER);
     }
 
     // Scanline (access to VRM) in progress
     if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER)
-      && (this.clock >= (this.currentLine + 252))) {
+      && (this.clock >= (this.currentLine + 63))) {
       this.setMode(GPU_MODE.HBLANK);
     }
 
     // HBLANK in progress
     if ((this.currentMode === GPU_MODE.HBLANK)
-      && (this.clock === (this.currentLine + 456))) {
+      && (this.clock === (this.currentLine + 114))) {
       this.renderLine();
       this.currentLine++;
 
@@ -63,7 +63,7 @@ export class Display {
     }
 
     // Check for the end of VBLANK
-    if (this.clock >= 70224) {
+    if (this.clock >= 17556) {
       this.clock = 0;
       this.currentLine = 0;
       this.setMode(GPU_MODE.OAM_SEARCH);

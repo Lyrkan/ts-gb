@@ -11,17 +11,17 @@ export class CpuTimer {
 
   public tick(): void {
     // Increment ticks count
-    // There is no need to keep track over 1024
-    this.ticksCount = (this.ticksCount + 1) & 0x400;
+    // There is no need to keep track over 255
+    this.ticksCount = (this.ticksCount + 1) & 0xFF;
 
     // We don't need to check anything if the current
-    // count isn't a multiple of 16.
-    if ((this.ticksCount % 16) !== 0) {
+    // count isn't a multiple of 4.
+    if ((this.ticksCount % 4) !== 0) {
       return;
     }
 
-    // Divider counts up at 16384Hz (= every 256 ticks)
-    if ((this.ticksCount % 256) === 0) {
+    // Divider counts up at 16384Hz (= every 64 ticks)
+    if ((this.ticksCount % 64) === 0) {
       this.incrementDivider();
     }
 
@@ -34,17 +34,17 @@ export class CpuTimer {
       let shouldIncrementCounter = false;
 
       switch (speed) {
-        case 0: // 4096Hz (= every 1024 ticks)
-          shouldIncrementCounter = (this.ticksCount % 1024) === 0;
+        case 0: // 4096Hz (= every 256 ticks)
+          shouldIncrementCounter = this.ticksCount === 0;
           break;
-        case 1: // 262144Hz (= every 16 ticks, already checked before)
+        case 1: // 262144Hz (= every 4 ticks, already checked before)
           shouldIncrementCounter = true;
           break;
-        case 2: // 65536Hz (= every 64 ticks)
-          shouldIncrementCounter = (this.ticksCount % 64) === 0;
+        case 2: // 65536Hz (= every 16 ticks)
+          shouldIncrementCounter = (this.ticksCount % 16) === 0;
           break;
-        case 3: // 16384Hz (= every 256 ticks)
-          shouldIncrementCounter = (this.ticksCount % 256) === 0;
+        case 3: // 16384Hz (= every 64 ticks)
+          shouldIncrementCounter = (this.ticksCount % 64) === 0;
           break;
       }
 

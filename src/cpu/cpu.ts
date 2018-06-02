@@ -175,7 +175,7 @@ export class CPU {
     if (opcodeIndex in OPCODES) {
       // Change the current opcode map
       opcodesMap = OPCODES[opcodeIndex];
-      this.skipCyles += 4;
+      this.skipCyles += 1;
 
       opcodePrefix = opcodeIndex;
       opcodeIndex = this.addressBus.get(this.registers.PC++).byte;
