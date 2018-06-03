@@ -2157,9 +2157,9 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
     return 4;
   },
 
-  // JP (HL)
+  // JP HL
   0xE9: (registers: CpuRegisters, addressBus: AddressBus) => {
-    registers.PC = addressBus.get(registers.HL).word;
+    registers.PC = registers.HL;
     return 1;
   },
 

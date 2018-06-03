@@ -31,7 +31,7 @@ let gameRomLoaded = false;
 let emulationPaused = false;
 
 // Events handling
-const WINDOW_EVENTS: { [name: string]: (event: any, data: any) => void } = {
+const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
   loadBootRom: (event: any, filename: string) => {
     console.log(`Loading bootstrap ROM: ${filename}`);
     const fileBuffer = fs.readFileSync(filename);
@@ -85,6 +85,7 @@ const WINDOW_EVENTS: { [name: string]: (event: any, data: any) => void } = {
       D=0x${registers.D.toString(16)}, E=0x${registers.E.toString(16)},
       H=0x${registers.H.toString(16)}, L=0x${registers.L.toString(16)},
       PC=0x${registers.PC.toString(16)}, SP=0x${registers.SP.toString(16)}
+      Z=${registers.flags.Z}, N=${registers.flags.N}, H=${registers.flags.H}, C=${registers.flags.C}
     `);
   },
 
@@ -96,6 +97,7 @@ const WINDOW_EVENTS: { [name: string]: (event: any, data: any) => void } = {
     const oldPC = system.cpu.getRegisters().PC;
     system.tick();
     console.log(`PC: 0x${oldPC.toString(16)} => 0x${system.cpu.getRegisters().PC.toString(16)}`);
+    WINDOW_EVENTS.dumpRegisters();
   }
 };
 
@@ -133,15 +135,11 @@ const gameLoop = (loopTime: number) => {
     const ticks = (CPU_CLOCK_FREQUENCY * deltaTime) / 1000;
     for (let i = 0; i < ticks; i++) {
       system.tick();
-      /*
-      if (system.cpu.getRegisters().PC === 0xa3) {
-        console.log('Breakpoint 0xa3');
-        emulationPaused = true;
-        break;
-      }*/
       tps++;
     }
+  }
 
+  if (gameRomLoaded) {
     // Draw buffer
     const buffer = system.display.getFrontBuffer();
 

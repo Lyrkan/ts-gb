@@ -4049,18 +4049,17 @@ describe('Opcodes - Default table', () => {
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
   });
 
-  it('0xE9 - JP (HL)', () => {
+  it('0xE9 - JP HL', () => {
     addressBus.get(0x0000).byte = 0xE9;
     addressBus.get(0x0012).byte = 0xE9;
-    cpuRegisters.HL = 0xC000;
 
-    addressBus.get(0xC000).word = 0x0012;
+    cpuRegisters.HL = 0x0012;
     executeNextOpcode(1);
     checkRegisters({ PC: 0x0012 });
 
-    addressBus.get(0xC000).word = 0x0034;
+    cpuRegisters.HL = 0xC123;
     executeNextOpcode(1);
-    checkRegisters({ PC: 0x0034 });
+    checkRegisters({ PC: 0xC123 });
   });
 
   it('0xEA - LD (a16),A', () => {
