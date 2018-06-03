@@ -197,14 +197,16 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RLA
   0x17: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const shifted = registers.A << 1;
-    const carry = (shifted >> 8) & 1;
+    const { value, C } = ALU.rl(
+      registers.A,
+      registers.flags.C
+    );
 
-    registers.A = shifted & 0xFF;
+    registers.A = value;
     registers.flags.Z = 0;
     registers.flags.N = 0;
     registers.flags.H = 0;
-    registers.flags.C = carry;
+    registers.flags.C = C;
     return 1;
   },
 
@@ -269,14 +271,16 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // RRA
   0x1F: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const carry = registers.A & 1;
-    const shifted = registers.A >> 1;
+    const { value, C } = ALU.rr(
+      registers.A,
+      registers.flags.C
+    );
 
-    registers.A = (shifted & 0xFF);
+    registers.A = value;
     registers.flags.Z = 0;
     registers.flags.N = 0;
     registers.flags.H = 0;
-    registers.flags.C = carry;
+    registers.flags.C = C;
     return 1;
   },
 

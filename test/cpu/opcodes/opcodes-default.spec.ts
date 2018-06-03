@@ -460,15 +460,31 @@ describe('Opcodes - Default table', () => {
   it('0x17 - RLA', () => {
     addressBus.get(0x0000).byte = 0x17;
     addressBus.get(0x0001).byte = 0x17;
+    addressBus.get(0x0002).byte = 0x17;
+    addressBus.get(0x0003).byte = 0x17;
 
     cpuRegisters.A = 0b01110101;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0b11101010, PC: 0x0001 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
-    cpuRegisters.A = 0b10111010;
+    cpuRegisters.A = 0b01110101;
+    cpuRegisters.flags.C = 1;
     executeNextOpcode(1);
-    checkRegisters({ A: 0b01110100, PC: 0x0002 });
+    checkRegisters({ A: 0b11101011, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0b10111010;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(1);
+    checkRegisters({ A: 0b01110100, PC: 0x0003 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
+
+    cpuRegisters.A = 0b10111010;
+    cpuRegisters.flags.C = 1;
+    executeNextOpcode(1);
+    checkRegisters({ A: 0b01110101, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
   });
 
@@ -607,15 +623,31 @@ describe('Opcodes - Default table', () => {
   it('0x1F - RRA', () => {
     addressBus.get(0x0000).byte = 0x1F;
     addressBus.get(0x0001).byte = 0x1F;
+    addressBus.get(0x0002).byte = 0x1F;
+    addressBus.get(0x0003).byte = 0x1F;
 
     cpuRegisters.A = 0b01110101;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0b00111010, PC: 0x0001 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
 
-    cpuRegisters.A = 0b10111010;
+    cpuRegisters.A = 0b01110101;
+    cpuRegisters.flags.C = 1;
     executeNextOpcode(1);
-    checkRegisters({ A: 0b01011101, PC: 0x0002 });
+    checkRegisters({ A: 0b10111010, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
+
+    cpuRegisters.A = 0b10111010;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(1);
+    checkRegisters({ A: 0b01011101, PC: 0x0003 });
+    checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0b10111010;
+    cpuRegisters.flags.C = 1;
+    executeNextOpcode(1);
+    checkRegisters({ A: 0b11011101, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
   });
 
