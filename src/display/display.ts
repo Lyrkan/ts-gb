@@ -37,29 +37,31 @@ export class Display {
   }
 
   public tick(): void {
+    const hblankOffset = (this.currentLine * 114);
+
+    // Update current line every 114 ticks
+    if ((this.clock > 0) && ((this.clock % 114) === 0)) {
+      this.currentLine = (this.currentLine + 1) % 154;
+      this.updateLy();
+    }
+
     // Scanline (access to OAM) in progress
-    if ((this.currentMode === GPU_MODE.OAM_SEARCH)
-      && (this.clock >= (this.currentLine + 20))) {
+    if ((this.currentMode === GPU_MODE.OAM_SEARCH) && (this.clock >= (hblankOffset +  20))) {
       this.setMode(GPU_MODE.PIXEL_TRANSFER);
     }
 
     // Scanline (access to VRM) in progress
-    if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER)
-      && (this.clock >= (this.currentLine + 63))) {
+    if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER) && (this.clock >= (hblankOffset + 63))) {
       this.setMode(GPU_MODE.HBLANK);
       PPU.renderLine(this.addressBus, this.getBackBuffer(), this.currentLine);
     }
 
     // HBLANK in progress
-    if ((this.currentMode === GPU_MODE.HBLANK)
-      && (this.clock === (this.currentLine + 114))) {
-      this.currentLine++;
-
+    if ((this.currentMode === GPU_MODE.HBLANK) && (this.clock === (hblankOffset + 114))) {
       if (this.currentLine < SCREEN_HEIGHT) {
         this.setMode(GPU_MODE.OAM_SEARCH);
-        this.updateLy();
       } else {
-        // Last line, swtich to VBLANK
+        // Last line, switch to VBLANK
         this.setMode(GPU_MODE.VBLANK);
       }
     }
@@ -67,14 +69,11 @@ export class Display {
     // Check for the end of VBLANK
     if (this.clock >= 17556) {
       this.clock = 0;
-      this.currentLine = 0;
       this.setMode(GPU_MODE.OAM_SEARCH);
       this.switchBuffers();
-      this.updateLy();
-      return;
+    } else {
+      this.clock++;
     }
-
-    this.clock++;
   }
 
   private switchBuffers(): void {
