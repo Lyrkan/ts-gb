@@ -2,7 +2,7 @@
 import { ipcRenderer } from 'electron';
 import { System } from '../system';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../display/display';
-import { CPU_CLOCK_FREQUENCY, COLOR_PALETTE, WINDOW_SCALING, COLOR_SCREEN } from './constants';
+import { CPU_CLOCK_FREQUENCY, COLOR_PALETTE, WINDOW_SCALING, COLOR_OFF_SCREEN } from './constants';
 
 const fs = require('fs');
 
@@ -23,7 +23,7 @@ canvas.style.height = `${SCREEN_HEIGHT * WINDOW_SCALING}px` ;
 canvasContext.canvas.width = SCREEN_WIDTH * WINDOW_SCALING;
 canvasContext.canvas.height = SCREEN_HEIGHT * WINDOW_SCALING;
 canvasContext.imageSmoothingEnabled = false;
-canvasContext.fillStyle = COLOR_SCREEN;
+canvasContext.fillStyle = COLOR_OFF_SCREEN;
 canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WINDOW_SCALING);
 
 // Status flags
@@ -31,51 +31,89 @@ let gameRomLoaded = false;
 let emulationPaused = false;
 
 // Events handling
-ipcRenderer.on('loadBootRom', (event: any, filename: string) => {
-  console.log(`Loading bootstrap ROM: ${filename}`);
-  const fileBuffer = fs.readFileSync(filename);
-  if (fileBuffer) {
-    const arrayBuffer = fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength
-    );
+const WINDOW_EVENTS: { [name: string]: (event: any, data: any) => void } = {
+  loadBootRom: (event: any, filename: string) => {
+    console.log(`Loading bootstrap ROM: ${filename}`);
+    const fileBuffer = fs.readFileSync(filename);
+    if (fileBuffer) {
+      const arrayBuffer = fileBuffer.buffer.slice(
+        fileBuffer.byteOffset,
+        fileBuffer.byteOffset + fileBuffer.byteLength
+      );
 
-    system.loadBootRom(arrayBuffer);
+      system.loadBootRom(arrayBuffer);
+    }
+  },
+
+  loadGame: (event: any, filename: any) => {
+    console.log(`Loading game: ${filename}`);
+    const fileBuffer = fs.readFileSync(filename);
+    if (fileBuffer) {
+      const arrayBuffer = fileBuffer.buffer.slice(
+        fileBuffer.byteOffset,
+        fileBuffer.byteOffset + fileBuffer.byteLength
+      );
+
+      system.loadGame(arrayBuffer);
+      gameRomLoaded = true;
+
+      const cartridgeInfo = system.memory.getCartridgeInfo();
+      console.log(`Loaded game: ${cartridgeInfo.gameTitle}`);
+    }
+  },
+
+  pauseEmulation: () => {
+    console.log('Pausing emulation');
+    emulationPaused = true;
+  },
+
+  resumeEmulation: () => {
+    console.log('Resuming emulation');
+    emulationPaused = false;
+  },
+
+  restartEmulation: () => {
+    console.log('Restarting emulation');
+    system.reset();
+  },
+
+  dumpRegisters: () => {
+    const registers = system.cpu.getRegisters();
+    console.log(`
+      A=0x${registers.A.toString(16)}, F=0x${registers.F.toString(16)},
+      B=0x${registers.B.toString(16)}, C=0x${registers.C.toString(16)},
+      D=0x${registers.D.toString(16)}, E=0x${registers.E.toString(16)},
+      H=0x${registers.H.toString(16)}, L=0x${registers.L.toString(16)},
+      PC=0x${registers.PC.toString(16)}, SP=0x${registers.SP.toString(16)}
+    `);
+  },
+
+  dumpVram: () => {
+    console.log(new Uint8Array(system.memory.getVideoRamSegment().data));
+  },
+
+  runSingleTick: () => {
+    const oldPC = system.cpu.getRegisters().PC;
+    system.tick();
+    console.log(`PC: 0x${oldPC.toString(16)} => 0x${system.cpu.getRegisters().PC.toString(16)}`);
   }
-});
+};
 
-ipcRenderer.on('loadGame', (event: any, filename: any) => {
-  console.log(`Loading game: ${filename}`);
-  const fileBuffer = fs.readFileSync(filename);
-  if (fileBuffer) {
-    const arrayBuffer = fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength
-    );
-
-    system.loadGame(arrayBuffer);
-    gameRomLoaded = true;
-
-    const cartridgeInfo = system.memory.getCartridgeInfo();
-    console.log(`Loaded game: ${cartridgeInfo.gameTitle}`);
+for (const event in WINDOW_EVENTS) {
+  if (WINDOW_EVENTS.hasOwnProperty(event)) {
+    ipcRenderer.on(event, WINDOW_EVENTS[event]);
   }
-});
-
-ipcRenderer.on('pauseEmulation', () => {
-  console.log('Pausing emulation');
-  emulationPaused = true;
-});
-
-ipcRenderer.on('resumeEmulation', () => {
-  console.log('Resuming emulation');
-  emulationPaused = false;
-});
+}
 
 // Stats
 let fps: number = 0;
 let tps: number = 0;
 const printFps = () => {
-  console.log(`Frame/s: ${fps}, CPU frequency: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz`);
+  const fpsCounterElement = document.getElementById('fps-counter');
+  if (fpsCounterElement) {
+    fpsCounterElement.innerText = `FPS: ${fps}, CPU: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz`;
+  }
+
   fps = 0;
   tps = 0;
 };
@@ -83,18 +121,24 @@ setInterval(printFps, 1000);
 
 // Game loop
 let lastLoopTime: number|null = null;
-const gameLoop = (time: number) => {
+const gameLoop = (loopTime: number) => {
   let deltaTime: number|null = null;
   if (lastLoopTime != null) {
-    deltaTime = time - lastLoopTime;
+    deltaTime = loopTime - lastLoopTime;
   }
 
-  if (deltaTime && gameRomLoaded && !emulationPaused) {
+  if (!emulationPaused && gameRomLoaded && deltaTime) {
     // Run as many CPU ticks as needed based on the time
     // the previous frame took to process.
     const ticks = (CPU_CLOCK_FREQUENCY * deltaTime) / 1000;
     for (let i = 0; i < ticks; i++) {
       system.tick();
+      /*
+      if (system.cpu.getRegisters().PC === 0xa3) {
+        console.log('Breakpoint 0xa3');
+        emulationPaused = true;
+        break;
+      }*/
       tps++;
     }
 
@@ -132,7 +176,7 @@ const gameLoop = (time: number) => {
 
   // Prepare for new frame
   fps++;
-  lastLoopTime = time;
+  lastLoopTime = loopTime;
   requestAnimationFrame(gameLoop);
 };
 

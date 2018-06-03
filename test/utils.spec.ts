@@ -16,4 +16,16 @@ describe('Utils', () => {
     expect(Utils.uint8ToInt8(245)).to.equal(-11);
     expect(Utils.uint8ToInt8(255)).to.equal(-1);
   });
+
+  it('checkBit', () => {
+    expect(Utils.checkBit(0, 0b00000000)).to.equal(false);
+    expect(Utils.checkBit(0, 0b00000001)).to.equal(true);
+    expect(Utils.checkBit(0, 0b00000010)).to.equal(false);
+    expect(Utils.checkBit(0, 0b00000100)).to.equal(false);
+    expect(Utils.checkBit(2, 0b00000100)).to.equal(true);
+    expect(Utils.checkBit(3, 0b01010100)).to.equal(false);
+    expect(Utils.checkBit(4, 0b01010100)).to.equal(true);
+    expect(Utils.checkBit(7, 0b01010100)).to.equal(false);
+    expect(Utils.checkBit(7, 0b11010100)).to.equal(true);
+  });
 });

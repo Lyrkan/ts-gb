@@ -30,7 +30,7 @@ export class AddressBus {
   // Segment that contains the boot ROM
   // It can be accessed from 0x0000 to 0x00FE
   // when the enableBootRom flag is set to true.
-  private bootRom?: IMemorySegment;
+  private bootRom?: MemorySegment;
   private bootRomEnabled: boolean;
 
   // Game cartridge
@@ -41,28 +41,28 @@ export class AddressBus {
 
   // Video RAM
   // 0x8000 to 0x9FFF
-  private videoRam: IMemorySegment;
+  private videoRam: MemorySegment;
 
   // Internal RAM
   // Real: 0xC000 to 0xDFFF
   // Echo: 0xE000 to 0xFDFF
-  private internalRam: IMemorySegment;
+  private internalRam: MemorySegment;
 
   // Sprite attribute table (OAM)
   // 0xFE00 to 0xFE9F
-  private oam: IMemorySegment;
+  private oam: MemorySegment;
 
   // I/O Registers
   // 0xFF00 to 0xFF7F
-  private ioRegisters: IMemorySegment;
+  private ioRegisters: MemorySegmentDecorator;
 
   // High RAM
   // 0xFF80 to 0xFFFE
-  private hram: IMemorySegment;
+  private hram: MemorySegment;
 
   // Interrupts Enable Registers
   // 0xFFFF
-  private ieRegister: IMemorySegment;
+  private ieRegister: MemorySegment;
 
   /**
    * Initialize a new empty memory layout.
@@ -71,6 +71,11 @@ export class AddressBus {
     this.reset();
   }
 
+  /**
+   * Get the accessor associated to the given address.
+   *
+   * @param address Address of the accessor
+   */
   public get(address: number): IMemoryAccessor {
     const { segment, offset } = this.getSegment(address);
     return segment.get(address - offset);
@@ -197,6 +202,15 @@ export class AddressBus {
    */
   public hasBootRom(): boolean {
     return Boolean(this.bootRom);
+  }
+
+  /**
+   * Return the memory segment associated to the
+   * video RAM. It avoids creating a lot of accessors
+   * during rendering.
+   */
+  public getVideoRamSegment(): MemorySegment {
+    return this.videoRam;
   }
 
   /**

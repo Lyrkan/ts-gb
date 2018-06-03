@@ -52,6 +52,36 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
             window.webContents.send('resumeEmulation');
           }
         },
+        {
+          label: 'Restart emulation',
+          click: () => {
+            window.webContents.send('restartEmulation');
+          }
+        },
+      ]
+    },
+    {
+      label: 'Debug',
+      submenu: [
+        {
+          label: 'Dump registers',
+          click: () => {
+            window.webContents.send('dumpRegisters');
+          }
+        },
+        {
+          label: 'Dump VRAM',
+          click: () => {
+            window.webContents.send('dumpVram');
+          }
+        },
+        {
+          label: 'Run single tick',
+          accelerator: 'CmdOrCtrl+Enter',
+          click: () => {
+            window.webContents.send('runSingleTick');
+          }
+        }
       ]
     }
   ];

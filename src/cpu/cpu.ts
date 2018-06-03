@@ -3,6 +3,7 @@ import { CpuRegisters } from './cpu-registers';
 import { OPCODES, ICPUCallbacks } from './opcodes';
 import { CpuTimer } from './cpu-timer';
 import { Display } from '../display/display';
+import { checkBit } from '../utils';
 
 export class CPU {
   // Registers
@@ -132,6 +133,13 @@ export class CPU {
     this.display.tick();
   }
 
+  /**
+   * Retrieve CPU registers.
+   */
+  public getRegisters(): CpuRegisters {
+    return this.registers;
+  }
+
   private executeInterrupts(): void {
     // Check if there are pending interrupts and
     // interrupts are globally enabled.
@@ -143,7 +151,7 @@ export class CPU {
       const ieRegister = this.addressBus.get(0xFFFF).byte;
       const interruptFlags = this.addressBus.get(0xFF0F).byte;
       for (let bit = 0; bit < 5; bit++) {
-        if ((ieRegister & (1 << bit)) && (interruptFlags & (1 << bit))) {
+        if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
           // Push PC into stack
           this.registers.SP -= 2;
           this.addressBus.get(this.registers.SP).word = this.registers.PC + 2;

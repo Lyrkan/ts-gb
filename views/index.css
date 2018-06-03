@@ -13,4 +13,13 @@ body {
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
+  z-index: 1;
+}
+
+#fps-counter {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 11px;
+  z-index: 2;
 }

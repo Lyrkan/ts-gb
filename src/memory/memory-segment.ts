@@ -16,8 +16,8 @@ import { MemoryAccessor, IMemoryAccessor } from './memory-accessor';
  *   const w2 = segment[2].word;
  */
 export class MemorySegment implements IMemorySegment {
-  private data: ArrayBuffer;
-  private view: DataView;
+  public readonly data: ArrayBuffer;
+  public readonly view: DataView;
 
   public constructor(byteLength: number) {
     this.data = new ArrayBuffer(byteLength);

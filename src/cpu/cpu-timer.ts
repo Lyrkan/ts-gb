@@ -1,4 +1,5 @@
 import { AddressBus } from '../memory/address-bus';
+import { checkBit } from '../utils';
 
 export class CpuTimer {
   private addressBus: AddressBus;
@@ -26,7 +27,7 @@ export class CpuTimer {
     }
 
     const control = this.addressBus.get(0xFF07).byte;
-    const running = (control & 0b100) !== 0;
+    const running = checkBit(2, control);
 
     if (running) {
       const speed = control & 0b11;
