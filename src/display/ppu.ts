@@ -123,8 +123,8 @@ export const PPU = {
             tileStartOffset += 0x1000;
           }
 
-          const tileLine = (lcdPositions.backgroundScrollY + line) % 8;
-          const tileColumn = (lcdPositions.backgroundScrollX + i) % 8;
+          const tileLine = (lcdPositions.windowPositionY + line) % 8;
+          const tileColumn = (lcdPositions.windowPositionX + i) % 8;
           const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
           const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
 
