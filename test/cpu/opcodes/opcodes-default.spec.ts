@@ -962,16 +962,31 @@ describe('Opcodes - Default table', () => {
     addressBus.get(0x0002).byte = 0x2F;
 
     cpuRegisters.A = 0x00;
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
     executeNextOpcode(1);
     checkRegisters({ A: 0xFF, PC: 0x0001 });
+    checkFlags({ Z: 1, N: 1, H: 1, C: 1 });
 
     cpuRegisters.A = 0xF0;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0x0F, PC: 0x0002 });
+    checkFlags({ Z: 0, N: 1, H: 1, C: 0 });
 
     cpuRegisters.A = 0xFF;
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0x00, PC: 0x0003 });
+    checkFlags({ Z: 1, N: 1, H: 1, C: 0 });
   });
 
   it('0x30 - JR NC,r8', () => {

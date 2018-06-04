@@ -427,6 +427,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // CPL
   0x2F: (registers: CpuRegisters, addressBus: AddressBus) => {
     registers.A = registers.A ^ 0xFF;
+    registers.flags.N = 1;
+    registers.flags.H = 1;
     return 1;
   },
 

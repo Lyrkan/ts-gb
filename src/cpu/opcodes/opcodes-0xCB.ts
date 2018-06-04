@@ -642,6 +642,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.B = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 
@@ -651,6 +654,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.C = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 
@@ -660,6 +666,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.D = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 
@@ -669,6 +678,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.E = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 
@@ -678,6 +690,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.H = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 
@@ -687,6 +702,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.L = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 
@@ -698,6 +716,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     addressBus.get(registers.HL).byte = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 4;
   },
 
@@ -707,6 +728,9 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
     registers.A = value;
     registers.flags.Z = Z;
+    registers.flags.N = 0;
+    registers.flags.H = 0;
+    registers.flags.C = 0;
     return 2;
   },
 

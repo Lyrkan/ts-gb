@@ -919,16 +919,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x30;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x30;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x30;
 
     cpuRegisters.B = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ B: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.B = 0b10010110;
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
     executeNextOpcode(2);
     checkRegisters({ B: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.B = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ B: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x31 - SWAP C', () => {
@@ -936,16 +955,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x31;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x31;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x31;
 
     cpuRegisters.C = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ C: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.C = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ C: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.C = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ C: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x32 - SWAP D', () => {
@@ -953,16 +991,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x32;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x32;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x32;
 
     cpuRegisters.D = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ D: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.D = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ D: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.D = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ D: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x33 - SWAP E', () => {
@@ -970,16 +1027,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x33;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x33;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x33;
 
     cpuRegisters.E = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ E: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.E = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ E: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.E = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ E: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x34 - SWAP H', () => {
@@ -987,16 +1063,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x34;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x34;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x34;
 
     cpuRegisters.H = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ H: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.H = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ H: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.H = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ H: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x35 - SWAP L', () => {
@@ -1004,16 +1099,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x35;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x35;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x35;
 
     cpuRegisters.L = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ L: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.L = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ L: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.L = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ L: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x36 - SWAP (HL)', () => {
@@ -1021,20 +1135,40 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x36;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x36;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x36;
 
     cpuRegisters.HL = 0xC000;
 
     addressBus.get(0xC000).byte = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(4);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
     expect(addressBus.get(0xC000).byte).to.equal(0b10111101);
 
     addressBus.get(0xC000).byte = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(4);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
     expect(addressBus.get(0xC000).byte).to.equal(0b01101001);
+
+    addressBus.get(0xC000).byte = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(4);
+    checkRegisters({ PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
+    expect(addressBus.get(0xC000).byte).to.equal(0b00000000);
   });
 
   it('0x37 - SWAP A', () => {
@@ -1042,16 +1176,35 @@ describe('Opcodes - 0xCB table', () => {
     addressBus.get(0x0001).byte = 0x37;
     addressBus.get(0x0002).byte = 0xCB;
     addressBus.get(0x0003).byte = 0x37;
+    addressBus.get(0x0004).byte = 0xCB;
+    addressBus.get(0x0005).byte = 0x37;
 
     cpuRegisters.A = 0b11011011;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ A: 0b10111101, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
 
     cpuRegisters.A = 0b10010110;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
     executeNextOpcode(2);
     checkRegisters({ A: 0b01101001, PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
+
+    cpuRegisters.A = 0b00000000;
+    cpuRegisters.flags.Z = 0;
+    cpuRegisters.flags.N = 0;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    executeNextOpcode(2);
+    checkRegisters({ A: 0b00000000, PC: 0x0006 });
+    checkFlags({ Z: 1, N: 0, H: 0, C: 0 });
   });
 
   it('0x38 - SRL B', () => {
