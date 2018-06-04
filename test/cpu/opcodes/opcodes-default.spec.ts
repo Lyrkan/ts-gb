@@ -4050,6 +4050,11 @@ describe('Opcodes - Default table', () => {
     addressBus.get(0x0002).byte = 0xE8;
     addressBus.get(0x0003).byte = 0xFD;
 
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
+
     cpuRegisters.SP = 0x0FFE;
     executeNextOpcode(4);
     checkRegisters({ SP: 0x1001, PC: 0x0002 });
@@ -4237,6 +4242,11 @@ describe('Opcodes - Default table', () => {
     addressBus.get(0x0001).byte = 0x03;
     addressBus.get(0x0002).byte = 0xF8;
     addressBus.get(0x0003).byte = 0xFD;
+
+    cpuRegisters.flags.Z = 1;
+    cpuRegisters.flags.N = 1;
+    cpuRegisters.flags.H = 1;
+    cpuRegisters.flags.C = 1;
 
     cpuRegisters.SP = 0x1234;
     executeNextOpcode(3);

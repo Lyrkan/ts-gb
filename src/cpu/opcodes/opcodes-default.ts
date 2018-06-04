@@ -2154,6 +2154,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
     registers.SP = value;
     registers.flags.H = H;
+    registers.flags.Z = 0;
+    registers.flags.N = 0;
     registers.flags.C = C;
     return 4;
   },
@@ -2256,6 +2258,8 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
     registers.HL = value;
     registers.flags.H = H;
+    registers.flags.Z = 0;
+    registers.flags.N = 0;
     registers.flags.C = C;
     return 3;
   },
