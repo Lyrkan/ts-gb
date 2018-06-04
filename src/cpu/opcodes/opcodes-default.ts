@@ -348,6 +348,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   0x27: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, C } = ALU.daa(
       registers.A,
+      registers.flags.N,
       registers.flags.H,
       registers.flags.C
     );

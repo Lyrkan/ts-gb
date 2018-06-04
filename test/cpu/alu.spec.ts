@@ -127,20 +127,35 @@ describe('ALU', () => {
   });
 
   it('daa', () => {
-    expect(ALU.daa(0x00, 0, 0)).to.deep.equal({ value: 0x00, Z: 1, H: 0, C: 0 });
-    expect(ALU.daa(0x00, 1, 0)).to.deep.equal({ value: 0x06, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0x00, 1, 1)).to.deep.equal({ value: 0x66, Z: 0, H: 0, C: 1 });
-    expect(ALU.daa(0x00, 0, 1)).to.deep.equal({ value: 0x60, Z: 0, H: 0, C: 1 });
-    expect(ALU.daa(0x09, 0, 0)).to.deep.equal({ value: 0x09, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0x90, 0, 0)).to.deep.equal({ value: 0x90, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0x0A, 0, 0)).to.deep.equal({ value: 0x10, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0x0B, 0, 0)).to.deep.equal({ value: 0x11, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0x9A, 0, 0)).to.deep.equal({ value: 0xA0, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0x9B, 0, 0)).to.deep.equal({ value: 0xA1, Z: 0, H: 0, C: 0 });
-    expect(ALU.daa(0xA0, 0, 0)).to.deep.equal({ value: 0x00, Z: 1, H: 0, C: 1 });
-    expect(ALU.daa(0xB0, 0, 0)).to.deep.equal({ value: 0x10, Z: 0, H: 0, C: 1 });
-    expect(ALU.daa(0xA9, 0, 0)).to.deep.equal({ value: 0x09, Z: 0, H: 0, C: 1 });
-    expect(ALU.daa(0xB9, 0, 0)).to.deep.equal({ value: 0x19, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0x00, 0, 0, 0)).to.deep.equal({ value: 0x00, Z: 1, H: 0, C: 0 });
+    expect(ALU.daa(0x00, 0, 1, 0)).to.deep.equal({ value: 0x06, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x00, 0, 1, 1)).to.deep.equal({ value: 0x66, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0x00, 0, 0, 1)).to.deep.equal({ value: 0x60, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0x09, 0, 0, 0)).to.deep.equal({ value: 0x09, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x90, 0, 0, 0)).to.deep.equal({ value: 0x90, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x0A, 0, 0, 0)).to.deep.equal({ value: 0x10, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x0B, 0, 0, 0)).to.deep.equal({ value: 0x11, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x9A, 0, 0, 0)).to.deep.equal({ value: 0x00, Z: 1, H: 0, C: 1 });
+    expect(ALU.daa(0x9B, 0, 0, 0)).to.deep.equal({ value: 0x01, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0xA0, 0, 0, 0)).to.deep.equal({ value: 0x00, Z: 1, H: 0, C: 1 });
+    expect(ALU.daa(0xB0, 0, 0, 0)).to.deep.equal({ value: 0x10, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0xA9, 0, 0, 0)).to.deep.equal({ value: 0x09, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0xB9, 0, 0, 0)).to.deep.equal({ value: 0x19, Z: 0, H: 0, C: 1 });
+
+    expect(ALU.daa(0x00, 1, 0, 0)).to.deep.equal({ value: 0x00, Z: 1, H: 0, C: 0 });
+    expect(ALU.daa(0x00, 1, 1, 0)).to.deep.equal({ value: 0xFA, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x00, 1, 1, 1)).to.deep.equal({ value: 0x9A, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0x00, 1, 0, 1)).to.deep.equal({ value: 0xA0, Z: 0, H: 0, C: 1 });
+    expect(ALU.daa(0x09, 1, 0, 0)).to.deep.equal({ value: 0x09, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x90, 1, 0, 0)).to.deep.equal({ value: 0x90, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x0A, 1, 0, 0)).to.deep.equal({ value: 0x0A, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x0B, 1, 0, 0)).to.deep.equal({ value: 0x0B, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x9A, 1, 0, 0)).to.deep.equal({ value: 0x9A, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0x9B, 1, 0, 0)).to.deep.equal({ value: 0x9B, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0xA0, 1, 0, 0)).to.deep.equal({ value: 0xA0, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0xB0, 1, 0, 0)).to.deep.equal({ value: 0xB0, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0xA9, 1, 0, 0)).to.deep.equal({ value: 0xA9, Z: 0, H: 0, C: 0 });
+    expect(ALU.daa(0xB9, 1, 0, 0)).to.deep.equal({ value: 0xB9, Z: 0, H: 0, C: 0 });
   });
 
   it('rlc', () => {

@@ -788,10 +788,12 @@ describe('Opcodes - Default table', () => {
     addressBus.get(0x0000).byte = 0x27;
     addressBus.get(0x0001).byte = 0x27;
     addressBus.get(0x0002).byte = 0x27;
+    addressBus.get(0x0003).byte = 0x27;
 
     cpuRegisters.A = 0x00;
     cpuRegisters.flags.H = 1;
     cpuRegisters.flags.C = 1;
+    cpuRegisters.flags.N = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0x66, PC: 0x0001 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
@@ -799,6 +801,7 @@ describe('Opcodes - Default table', () => {
     cpuRegisters.A = 0x0A;
     cpuRegisters.flags.H = 0;
     cpuRegisters.flags.C = 0;
+    cpuRegisters.flags.N = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0x10, PC: 0x0002 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 0 });
@@ -806,9 +809,18 @@ describe('Opcodes - Default table', () => {
     cpuRegisters.A = 0xB0;
     cpuRegisters.flags.H = 0;
     cpuRegisters.flags.C = 0;
+    cpuRegisters.flags.N = 0;
     executeNextOpcode(1);
     checkRegisters({ A: 0x10, PC: 0x0003 });
     checkFlags({ Z: 0, N: 0, H: 0, C: 1 });
+
+    cpuRegisters.A = 0x0A;
+    cpuRegisters.flags.H = 0;
+    cpuRegisters.flags.C = 0;
+    cpuRegisters.flags.N = 1;
+    executeNextOpcode(1);
+    checkRegisters({ A: 0x0A, PC: 0x0004 });
+    checkFlags({ Z: 0, N: 1, H: 0, C: 0 });
   });
 
   it('0x28 - JR Z,r8', () => {

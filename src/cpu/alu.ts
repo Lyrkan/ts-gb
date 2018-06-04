@@ -137,24 +137,37 @@ export const ALU = {
     };
   },
 
-  daa(a: number, h: number, c: number) {
+  daa(a: number, n: number, h: number, c: number) {
     let res = a;
-    let setC = false;
+    let correction = 0;
 
-    if (h || ((a & 0xF) > 0x9)) {
-      res = (a + 0x06) & 0xFF;
+    if (h === 1) {
+      correction |= 0x06;
     }
 
-    if (c || (((a >> 4) & 0xF) > 0x9)) {
-      res = (res + 0x60) & 0xFF;
-      setC = true;
+    if (c === 1) {
+      correction |= 0x60;
+    }
+
+    if (n === 0) {
+      if ((res & 0x0F) > 0x09) {
+        correction |= 0x06;
+      }
+
+      if (res > 0x99) {
+        correction |= 0x60;
+      }
+
+      res = res + correction;
+    } else {
+      res = res - correction;
     }
 
     return {
-      value: res,
-      Z: (res === 0) ? 1 : 0,
+      value: res & 0xFF,
+      Z: ((res & 0xFF) === 0) ? 1 : 0,
       H: 0,
-      C: setC ? 1 : 0,
+      C: ((correction & 0x60) !== 0) ? 1 : 0,
     };
   },
 
