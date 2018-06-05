@@ -126,11 +126,12 @@ export const ALU = {
 
   sbc(a: number, b: number, carry: number) {
     const sub = a - b - carry;
+    const maskedSub = sub & 0xFF;
     const halfCarry = (((a & 0xF) - (b & 0xF) - carry) >> 4) & 1;
 
     return {
-      value: (sub & 0xFF),
-      Z: (sub === 0) ? 1 : 0,
+      value: maskedSub,
+      Z: (maskedSub === 0) ? 1 : 0,
       N: 1,
       H: halfCarry,
       C: (sub >> 8) & 1,

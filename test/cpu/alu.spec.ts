@@ -124,6 +124,8 @@ describe('ALU', () => {
     expect(ALU.sbc(0x02, 0x02, 1)).to.deep.equal({ value: 0xFF, Z: 0, N: 1, H: 1, C: 1 });
     expect(ALU.sbc(0x01, 0x02, 0)).to.deep.equal({ value: 0xFF, Z: 0, N: 1, H: 1, C: 1 });
     expect(ALU.sbc(0x01, 0x02, 1)).to.deep.equal({ value: 0xFE, Z: 0, N: 1, H: 1, C: 1 });
+    expect(ALU.sbc(0x00, 0xFF, 0)).to.deep.equal({ value: 0x01, Z: 0, N: 1, H: 1, C: 1 });
+    expect(ALU.sbc(0x00, 0xFF, 1)).to.deep.equal({ value: 0x00, Z: 1, N: 1, H: 1, C: 1 });
   });
 
   it('daa', () => {
