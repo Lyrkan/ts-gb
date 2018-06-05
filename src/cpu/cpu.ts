@@ -69,7 +69,7 @@ export class CPU {
     this.stopped = false;
     this.halted = false;
     this.haltedLastCycle = false;
-    this.interruptsEnabled = true;
+    this.interruptsEnabled = false;
   }
 
   /**
@@ -144,14 +144,14 @@ export class CPU {
     // Check if there are pending interrupts and
     // interrupts are globally enabled.
     if (this.interruptsEnabled && ((this.addressBus.get(0xFF0F).byte && 0x1F) > 0)) {
-      // Disable further interrupts.
-      this.interruptsEnabled = false;
-
       // Check each interrupt state
       const ieRegister = this.addressBus.get(0xFFFF).byte;
       const interruptFlags = this.addressBus.get(0xFF0F).byte;
       for (let bit = 0; bit < 5; bit++) {
         if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+          // Disable further interrupts.
+          this.interruptsEnabled = false;
+
           // Push PC into stack
           this.registers.SP -= 2;
           this.addressBus.get(this.registers.SP).word = this.registers.PC + 2;
