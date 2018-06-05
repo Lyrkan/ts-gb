@@ -109,6 +109,39 @@ export class AddressBus {
     this.ioRegisters = new MemorySegmentDecorator(
       new MemorySegment(IOREGISTERS_LENGTH),
       (obj, offset)  => {
+        // LY update.
+        // When that happens it should also change the value of LYC
+        // and eventually trigger an interrupt.
+        if (offset === 0x0044) {
+          const updateLyc = (decorated: IMemoryAccessor) => {
+            const lcdsRegister = obj.get(0x0041);
+            const ly = decorated.byte;
+            const lyc =  obj.get(0x0045).byte;
+
+            if (ly === lyc) {
+              lcdsRegister.byte |= 1 << 2;
+
+              // Check if we should trigger the LCDC Status Interrupt
+              if ((lcdsRegister.byte & 0x40) > 0) {
+                this.get(0xFF0F).byte |= 2;
+              }
+            } else {
+              lcdsRegister.byte &= ~(1 << 2);
+            }
+          };
+
+          return new MemoryAccessorDecorator(obj.get(0x0044), {
+            setByte: (decorated: IMemoryAccessor, value: number) => {
+              decorated.byte = value;
+              updateLyc(decorated);
+            },
+            setWord: (decorated: IMemoryAccessor, value: number) => {
+              decorated.word = value;
+              updateLyc(decorated);
+            },
+          });
+        }
+
         // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
         // Note that this is really inaccurate since it should
         // normally take 160 * 4 + 4 cycles to complete.

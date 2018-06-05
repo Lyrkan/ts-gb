@@ -42,7 +42,7 @@ export class Display {
     // Update current line every 114 ticks
     if ((this.clock > 0) && ((this.clock % 114) === 0)) {
       this.currentLine = (this.currentLine + 1) % 154;
-      this.updateLy();
+      this.addressBus.get(0xFF44).byte = this.currentLine;
     }
 
     // Scanline (access to OAM) in progress
@@ -96,30 +96,8 @@ export class Display {
     // V-Blank Interrupt (Mode 1) = bit 4
     // OAM Interrupt (Mode 2) = bit 5
     if ((mode !== GPU_MODE.PIXEL_TRANSFER) && (lcdsRegister.byte & (1 << (3 + mode))) > 0) {
-      this.triggerStatusInterrupt();
+      this.addressBus.get(0xFF0F).byte |= 2;
     }
-  }
-
-  private updateLy() {
-    // Update LY (0xFF44)
-    this.addressBus.get(0xFF44).byte = this.currentLine;
-
-    // LYC=LY Coincidence (2nd bit of 0xFF41)
-    const lcdsRegister = this.addressBus.get(0xFF41);
-    if (this.addressBus.get(0xFF45).byte === this.currentLine) {
-      lcdsRegister.byte |= 1 << 2;
-
-      // Check if we should trigger the LCDC Status Interrupt
-      if ((lcdsRegister.byte & 0x40) > 0) {
-        this.triggerStatusInterrupt();
-      }
-    } else {
-      lcdsRegister.byte &= ~(1 << 2);
-    }
-  }
-
-  private triggerStatusInterrupt() {
-    this.addressBus.get(0xFF0F).byte |= 2;
   }
 }
 
