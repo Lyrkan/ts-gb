@@ -154,7 +154,7 @@ export class CPU {
 
           // Push PC into stack
           this.registers.SP -= 2;
-          this.addressBus.get(this.registers.SP).word = this.registers.PC + 2;
+          this.addressBus.get(this.registers.SP).word = this.registers.PC;
 
           // Jump to the interrupt address
           this.registers.PC = 0x0040 + (8 * bit);
