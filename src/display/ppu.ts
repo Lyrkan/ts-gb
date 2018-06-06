@@ -108,7 +108,7 @@ export const PPU = {
         tileMap2;
 
       for (let i = 0; i < SCREEN_WIDTH; i++) {
-        const mapPosX = Math.floor((lcdPositions.windowPositionX + i) / 8);
+        const mapPosX = Math.floor((lcdPositions.windowPositionX + 7 + i) / 8);
         const mapPosY = Math.floor((lcdPositions.windowPositionY + line) / 8);
         let pixelColor = 0;
 
@@ -118,13 +118,13 @@ export const PPU = {
             tileIndex = uint8ToInt8(tileIndex);
           }
 
-          let tileStartOffset = (128 * tileIndex);
+          let tileStartOffset = (16 * tileIndex);
           if (lcdControl.backgroundTileArea === TILE_AREA.AREA_1) {
             tileStartOffset += 0x1000;
           }
 
           const tileLine = (lcdPositions.windowPositionY + line) % 8;
-          const tileColumn = (lcdPositions.windowPositionX + i) % 8;
+          const tileColumn = (lcdPositions.windowPositionX + 7 + i) % 8;
           const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
           const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
 
