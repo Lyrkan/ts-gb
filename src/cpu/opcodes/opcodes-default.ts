@@ -2151,8 +2151,10 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // ADD SP,r8
   0xE8: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const signedValue = uint8ToInt8(addressBus.get(registers.PC++).byte);
-    const { value, H, C } = ALU.addWords(registers.SP, signedValue);
+    const signedOperand = uint8ToInt8(addressBus.get(registers.PC++).byte);
+    const value = (registers.SP + signedOperand) & 0xFFFF;
+    const H = ((registers.SP & 0xF) + (signedOperand & 0xF)) >> 4;
+    const C = ((registers.SP & 0xFF) + (signedOperand & 0xFF)) >> 8;
 
     registers.SP = value;
     registers.flags.H = H;
@@ -2255,8 +2257,10 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
 
   // LD HL,SP+r8
   0xF8: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const signedValue = uint8ToInt8(addressBus.get(registers.PC++).byte);
-    const { value, H, C } = ALU.addWords(registers.SP, signedValue);
+    const signedOperand = uint8ToInt8(addressBus.get(registers.PC++).byte);
+    const value = (registers.SP + signedOperand) & 0xFFFF;
+    const H = ((registers.SP & 0xF) + (signedOperand & 0xF)) >> 4;
+    const C = ((registers.SP & 0xFF) + (signedOperand & 0xFF)) >> 8;
 
     registers.HL = value;
     registers.flags.H = H;

@@ -4073,12 +4073,12 @@ describe('Opcodes - Default table', () => {
     cpuRegisters.SP = 0x0FFE;
     executeNextOpcode(4);
     checkRegisters({ SP: 0x1001, PC: 0x0002 });
-    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 1 });
 
     cpuRegisters.SP = 0x0FFE;
     executeNextOpcode(4);
     checkRegisters({ SP: 0x0FFB, PC: 0x0004 });
-    checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
+    checkFlags({ Z: 0, N: 0, H: 1, C: 1 });
   });
 
   it('0xE9 - JP HL', () => {
