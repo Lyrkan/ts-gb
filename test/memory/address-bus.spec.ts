@@ -214,20 +214,6 @@ describe('AddressBus', () => {
     });
   });
 
-  describe('I/O Registers', () => {
-    it('should be able to read/write from/into I/O Registers', () => {
-      addressBus.get(0xFF00).byte = 0x12;
-      addressBus.get(0xFF12).word = 0x5678;
-      addressBus.get(0xFF7F).byte = 0x9A;
-
-      expect(addressBus.get(0xFF00).byte).to.equal(0x12);
-      expect(addressBus.get(0xFF12).byte).to.equal(0x78);
-      expect(addressBus.get(0xFF13).byte).to.equal(0x56);
-      expect(addressBus.get(0xFF12).word).to.equal(0x5678);
-      expect(addressBus.get(0xFF7F).byte).to.equal(0x9A);
-    });
-  });
-
   describe('High RAM', () => {
     it('should be able to read/write from/into HRAM', () => {
       addressBus.get(0xFF80).byte = 0x12;
@@ -258,7 +244,6 @@ describe('AddressBus', () => {
       addressBus.get(0x8000).byte = 0x12;
       addressBus.get(0xC000).byte = 0x12;
       addressBus.get(0xFE00).byte = 0x12;
-      addressBus.get(0xFF00).byte = 0x12;
       addressBus.get(0xFF80).byte = 0x12;
       addressBus.get(0xFFFF).byte = 0x12;
 
@@ -267,7 +252,6 @@ describe('AddressBus', () => {
       expect(addressBus.get(0x8000).byte).to.equal(0x00);
       expect(addressBus.get(0xC000).byte).to.equal(0x00);
       expect(addressBus.get(0xFE00).byte).to.equal(0x00);
-      expect(addressBus.get(0xFF00).byte).to.equal(0x00);
       expect(addressBus.get(0xFF80).byte).to.equal(0x00);
       expect(addressBus.get(0xFFFF).byte).to.equal(0x00);
 

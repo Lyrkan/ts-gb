@@ -109,6 +109,15 @@ export class AddressBus {
     this.ioRegisters = new MemorySegmentDecorator(
       new MemorySegment(IOREGISTERS_LENGTH),
       (obj, offset)  => {
+        // Joypad
+        // TODO Wire that to an external component
+        if (offset === 0x0000) {
+          return new MemoryAccessorDecorator(obj.get(0x0000), {
+            getByte: () => 0xFF,
+            getWord: () => 0xFFFF,
+          });
+        }
+
         // LY update.
         // When that happens it should also change the value of LYC
         // and eventually trigger an interrupt.
