@@ -87,9 +87,9 @@ describe('AddressBus', () => {
     });
 
     it('should be able to access cartridge static ROM bank', () => {
-      addressBus.get(0x0000); // tslint:disable-line:no-unused-expression
-      addressBus.get(0x2000); // tslint:disable-line:no-unused-expression
-      addressBus.get(0x3FFF); // tslint:disable-line:no-unused-expression
+      addressBus.get(0x0000);
+      addressBus.get(0x2000);
+      addressBus.get(0x3FFF);
 
       expect(staticRomBankSpy.get.callCount).to.equal(3);
       expect(switchableRomBankSpy.get.callCount).to.equal(0);
@@ -97,9 +97,9 @@ describe('AddressBus', () => {
     });
 
     it('should be able to access cartridge switchable ROM bank', () => {
-      addressBus.get(0x4000); // tslint:disable-line:no-unused-expression
-      addressBus.get(0x6000); // tslint:disable-line:no-unused-expression
-      addressBus.get(0x7FFF); // tslint:disable-line:no-unused-expression
+      addressBus.get(0x4000);
+      addressBus.get(0x6000);
+      addressBus.get(0x7FFF);
 
       expect(staticRomBankSpy.get.callCount).to.equal(0);
       expect(switchableRomBankSpy.get.callCount).to.equal(3);
@@ -107,9 +107,9 @@ describe('AddressBus', () => {
     });
 
     it('should be able to access cartridge RAM bank', () => {
-      addressBus.get(0xA000); // tslint:disable-line:no-unused-expression
-      addressBus.get(0xB000); // tslint:disable-line:no-unused-expression
-      addressBus.get(0xBFFF); // tslint:disable-line:no-unused-expression
+      addressBus.get(0xA000);
+      addressBus.get(0xB000);
+      addressBus.get(0xBFFF);
 
       expect(staticRomBankSpy.get.callCount).to.equal(0);
       expect(switchableRomBankSpy.get.callCount).to.equal(0);
@@ -262,11 +262,11 @@ describe('AddressBus', () => {
   describe('Errors handling', () => {
     it('should not allow to access invalid addresses', () => {
       expect(() => {
-        addressBus.get(-1); // tslint:disable-line:no-unused-expression
+        addressBus.get(-1);
       }).to.throw('Invalid address');
 
       expect(() => {
-        addressBus.get(0x10000); // tslint:disable-line:no-unused-expression
+        addressBus.get(0x10000);
       }).to.throw('Invalid address');
     });
   });
