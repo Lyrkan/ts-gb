@@ -149,11 +149,18 @@ export class CPU {
       const interruptFlags = this.addressBus.get(0xFF0F).byte;
       for (let bit = 0; bit < 5; bit++) {
         if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+          // An interrupt takes 5 cycles to dispatch
+          this.skipCyles = 5;
+
           // Disable further interrupts.
           this.interruptsEnabled = false;
 
           // Disable halt
-          this.halted = false;
+          // It takes one more cycle
+          if (this.halted) {
+            this.halted = false;
+            this.skipCyles += 1;
+          }
 
           // Push PC into stack
           this.registers.SP -= 2;
