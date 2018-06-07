@@ -4,6 +4,7 @@ import { OPCODES_0XCB } from '../../../src/cpu/opcodes/opcodes-0xCB';
 import { CpuRegisters } from '../../../src/cpu/cpu-registers';
 import { AddressBus } from '../../../src/memory/address-bus';
 import { GameCartridge } from '../../../src/cartridge/game-cartridge';
+import { Joypad } from '../../../src/controls/joypad';
 
 describe('Opcodes - 0xCB table', () => {
   let cpuRegisters: CpuRegisters;
@@ -38,7 +39,7 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.PC = 0x0000;
     cpuRegisters.SP = 0xFFFE;
 
-    addressBus = new AddressBus();
+    addressBus = new AddressBus(new Joypad());
     addressBus.loadCartridge(new GameCartridge(new ArrayBuffer(32 * 1024)));
   });
 

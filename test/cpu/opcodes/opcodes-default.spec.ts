@@ -6,6 +6,7 @@ import { CpuRegisters } from '../../../src/cpu/cpu-registers';
 import { AddressBus } from '../../../src/memory/address-bus';
 import { GameCartridge } from '../../../src/cartridge/game-cartridge';
 import { ICPUCallbacks } from '../../../src/cpu/opcodes';
+import { Joypad } from '../../../src/controls/joypad';
 
 describe('Opcodes - Default table', () => {
   let cpuRegisters: CpuRegisters;
@@ -51,7 +52,7 @@ describe('Opcodes - Default table', () => {
       halt: () => { /* NOP */ },
     };
 
-    addressBus = new AddressBus();
+    addressBus = new AddressBus(new Joypad());
     addressBus.loadCartridge(new GameCartridge(new ArrayBuffer(32 * 1024)));
   });
 

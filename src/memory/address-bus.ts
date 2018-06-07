@@ -5,6 +5,7 @@ import { STATIC_0000_SEGMENT } from './static-memory-segment';
 import { MemorySegmentDecorator } from './memory-segment-decorator';
 import { MemoryAccessorDecorator } from './memory-accessor-decorator';
 import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
+import { Joypad } from '../controls/joypad';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -64,10 +65,14 @@ export class AddressBus {
   // 0xFFFF
   private ieRegister: MemorySegment;
 
+  // Joypad (used by the I/O Register)
+  private joypad: Joypad;
+
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor() {
+  public constructor(joypad: Joypad) {
+    this.joypad = joypad;
     this.reset();
   }
 
@@ -110,12 +115,8 @@ export class AddressBus {
       new MemorySegment(IOREGISTERS_LENGTH),
       (obj, offset)  => {
         // Joypad
-        // TODO Wire that to an external component
         if (offset === 0x0000) {
-          return new MemoryAccessorDecorator(obj.get(0x0000), {
-            getByte: () => 0xFF,
-            getWord: () => 0xFFFF,
-          });
+          return this.joypad.memoryAccesor;
         }
 
         // LY update.
@@ -199,6 +200,12 @@ export class AddressBus {
 
     // Empty Interrupts Enable Register (1B)
     this.ieRegister = new MemorySegment(IEREGISTER_LENGTH);
+
+    // Set the interrupt callback on the joypad
+    // to catch button presses
+    this.joypad.setInterruptCallback(() => {
+      this.ioRegisters.get(0x000F).byte |=  0x10;
+    });
   }
 
   /**

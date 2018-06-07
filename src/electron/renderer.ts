@@ -3,6 +3,7 @@ import { ipcRenderer } from 'electron';
 import { System } from '../system';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../display/display';
 import { CPU_CLOCK_FREQUENCY, COLOR_PALETTE, WINDOW_SCALING, COLOR_OFF_SCREEN } from './constants';
+import { BUTTON } from '../controls/joypad';
 
 const fs = require('fs');
 
@@ -120,6 +121,30 @@ const printFps = () => {
   tps = 0;
 };
 setInterval(printFps, 1000);
+
+// Handle keypresses
+const keyMap: { [index: number]: BUTTON } = {
+  38: BUTTON.UP,
+  40: BUTTON.DOWN,
+  37: BUTTON.LEFT,
+  39: BUTTON.RIGHT,
+  65: BUTTON.A,
+  66: BUTTON.B,
+  32: BUTTON.SELECT,
+  13: BUTTON.START,
+};
+
+window.addEventListener('keydown', event => {
+  if (keyMap.hasOwnProperty(event.keyCode)) {
+    system.joypad.down(keyMap[event.keyCode]);
+  }
+});
+
+window.addEventListener('keyup', event => {
+  if (keyMap.hasOwnProperty(event.keyCode)) {
+    system.joypad.up(keyMap[event.keyCode]);
+  }
+});
 
 // Game loop
 let lastLoopTime: number|null = null;

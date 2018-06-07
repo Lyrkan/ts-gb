@@ -2,14 +2,17 @@ import { CPU } from './cpu/cpu';
 import { AddressBus } from './memory/address-bus';
 import { GameCartridge } from './cartridge/game-cartridge';
 import { Display } from './display/display';
+import { Joypad } from './controls/joypad';
 
 export class System {
   public readonly cpu: CPU;
   public readonly memory: AddressBus;
   public readonly display: Display;
+  public readonly joypad: Joypad;
 
   public constructor() {
-    this.memory = new AddressBus();
+    this.joypad = new Joypad();
+    this.memory = new AddressBus(this.joypad);
     this.display = new Display(this.memory);
     this.cpu = new CPU(this.memory, this.display);
   }

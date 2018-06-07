@@ -3,12 +3,13 @@ import * as sinon from 'sinon';
 import { expect } from 'chai';
 import { AddressBus } from '../../src/memory/address-bus';
 import { GameCartridge } from '../../src/cartridge/game-cartridge';
+import { Joypad } from '../../src/controls/joypad';
 
 describe('AddressBus', () => {
   let addressBus: AddressBus;
 
   beforeEach(() => {
-    addressBus = new AddressBus();
+    addressBus = new AddressBus(new Joypad());
   });
 
   describe('Bootstrap ROM', () => {
