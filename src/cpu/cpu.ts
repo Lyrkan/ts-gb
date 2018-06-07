@@ -29,7 +29,6 @@ export class CPU {
   private stopped: boolean;
 
   // Whether or not the processor is halted.
-  // Should resume
   private halted: boolean;
   private haltedLastCycle: boolean;
 
@@ -113,6 +112,7 @@ export class CPU {
     // properly)
     if (this.halted) {
       if (this.interruptsEnabled) {
+        this.executeInterrupts();
         return;
       } else {
         this.halted = false;
@@ -151,6 +151,9 @@ export class CPU {
         if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
           // Disable further interrupts.
           this.interruptsEnabled = false;
+
+          // Disable halt
+          this.halted = false;
 
           // Push PC into stack
           this.registers.SP -= 2;

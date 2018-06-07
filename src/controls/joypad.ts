@@ -53,10 +53,10 @@ export class Joypad {
       },
 
       set byte(value: number) {
-        if (value & 0x20) {
-          currentMode = REGISTER_MODE.BUTTONS;
-        } else if (value & 0x10) {
+        if ((value & 0x10) === 0) {
           currentMode = REGISTER_MODE.DIRECTION;
+        } else if ((value & 0x20) === 0) {
+          currentMode = REGISTER_MODE.BUTTONS;
         }
       },
 
