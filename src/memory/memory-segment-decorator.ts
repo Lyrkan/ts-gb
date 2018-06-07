@@ -28,8 +28,8 @@ export class MemorySegmentDecorator implements IMemorySegment {
   }
 
   public get(offset: number) {
-    return this.trap(this.decorated, offset) || this.decorated.get(offset);
+    return this.trap(this.decorated, offset);
   }
 }
 
-type MemorySegmentTrap = (obj: IMemorySegment, offset: number) => IMemoryAccessor | null;
+type MemorySegmentTrap = (obj: IMemorySegment, offset: number) => IMemoryAccessor;

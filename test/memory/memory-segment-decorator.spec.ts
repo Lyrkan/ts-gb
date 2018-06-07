@@ -18,7 +18,7 @@ describe('MemorySegmentDecorator', () => {
       }
 
       // Use default behavior
-      return null;
+      return obj.get(offset);
     });
 
     decoratedSegment.get(0x0001).byte = 0x12;
