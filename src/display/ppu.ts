@@ -93,7 +93,7 @@ export const PPU = {
           const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
           const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
 
-          pixelColor = palettes.backgroundPalette[(color1 << 1) | color2];
+          pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
         }
 
         screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
@@ -128,7 +128,7 @@ export const PPU = {
           const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
           const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
 
-          pixelColor = palettes.backgroundPalette[(color1 << 1) | color2];
+          pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
         }
 
         screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
