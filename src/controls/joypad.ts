@@ -12,12 +12,21 @@ export class Joypad {
   }
 
   public down(button: BUTTON) {
-    this.pressedButtons.add(button);
-    this.interruptCallback();
+    if (!this.pressedButtons.has(button)) {
+      this.pressedButtons.add(button);
+      this.interruptCallback();
+    }
   }
 
   public up(button: BUTTON) {
-    this.pressedButtons.delete(button);
+    if (this.pressedButtons.has(button)) {
+      this.pressedButtons.delete(button);
+
+      // Theoretically no interrupt should be
+      // triggered when releasing a button but
+      // in practice that does happen...
+      this.interruptCallback();
+    }
   }
 
   public isPressed(button: BUTTON) {
