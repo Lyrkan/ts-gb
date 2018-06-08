@@ -20,12 +20,12 @@ export const IEREGISTER_LENGTH = 1;
  *   const addressBus = new AddressBus();
  *
  *   // Write values
- *   addressBus[0xC000].byte = 0x12;
- *   addressBus[0xC001].word = 0x3456;
+ *   addressBus.get(0xC000).byte = 0x12;
+ *   addressBus.get(0xC001).word = 0x3456;
  *
  *   // Read values
- *   const bC000 = addressBus[0xC000].byte;
- *   const wC001 = addressBus[0xC001].word;
+ *   const bC000 = addressBus.get(0xC000).byte;
+ *   const wC001 = addressBus.get(0xC001).word;
  */
 export class AddressBus {
   // Segment that contains the boot ROM

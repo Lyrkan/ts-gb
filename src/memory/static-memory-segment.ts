@@ -6,14 +6,14 @@ import { IMemorySegment } from './memory-segment';
  *   const segment = new StaticMemorySegment({ byte: 0x12, word: 0x1234 });
  *
  *   // Writing does nothing
- *   segment[0].byte = 0xAB;
- *   segment[1].byte = 0xCD;
- *   segment[2].word = 0xEFGH;
+ *   segment.get(0).byte = 0xAB;
+ *   segment.get(1).byte = 0xCD;
+ *   segment.get(2).word = 0xEFGH;
  *
  *   // Reading always return the given values
- *   const b0 = segment[0].byte; // 0x12
- *   const b1 = segment[1].byte; // 0x12
- *   const w2 = segment[2].word; // 0x1234
+ *   const b0 = segment.get(0).byte; // 0x12
+ *   const b1 = segment.get(1).byte; // 0x12
+ *   const w2 = segment.get(2).word; // 0x1234
  */
 export class StaticMemorySegment implements IMemorySegment {
   private readonly filledWith: { byte: number, word: number };

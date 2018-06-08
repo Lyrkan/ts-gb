@@ -16,7 +16,7 @@ import { IMemorySegment } from './memory-segment';
  *   });
  *
  *   // Returns 0xFF no matter what the segment contains at 0x00FF
- *   decoratedSegment[0x00FF].byte;
+ *   decoratedSegment.get(0x00FF).byte;
  */
 export class MemorySegmentDecorator implements IMemorySegment {
   private decorated: IMemorySegment;
