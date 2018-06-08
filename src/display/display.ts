@@ -77,9 +77,6 @@ export class Display {
   }
 
   private switchBuffers(): void {
-    // Blank has happened, trigger interrupt
-    this.addressBus.get(0xFF0F).byte |= 1;
-
     // Switch the current buffer
     this.currentBuffer = ~this.currentBuffer & 1;
   }
@@ -90,6 +87,11 @@ export class Display {
     // Switch mode in LCD Status Register
     const lcdsRegister = this.addressBus.get(0xFF41);
     lcdsRegister.byte = (lcdsRegister.byte & 0xFC) | mode;
+
+    // Trigger VBLANK interrupt if needed
+    if (mode === GPU_MODE.VBLANK) {
+      this.addressBus.get(0xFF0F).byte |= 1;
+    }
 
     // Check if the LCDC Status Interrupt should be triggered:
     // H-Blank Interrupt (Mode 0) = bit 3
