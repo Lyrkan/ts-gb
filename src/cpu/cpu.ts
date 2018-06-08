@@ -86,14 +86,19 @@ export class CPU {
       this.firstCycle = false;
     }
 
+    // Update timers
+    this.timer.tick();
+    this.display.tick();
+
     // Skip the current cycle if needed
     // (but still update the timer)
     if (this.skipCyles > 0) {
       this.skipCyles--;
-      this.timer.tick();
-      this.display.tick();
       return;
     }
+
+    // Execute pending interrupts (if enabled)
+    this.executeInterrupts();
 
     // Do nothing if stopped
     if (this.stopped) {
@@ -112,25 +117,15 @@ export class CPU {
     // properly)
     if (this.halted) {
       if (this.interruptsEnabled) {
-        this.executeInterrupts();
         return;
       } else {
         this.halted = false;
         this.haltedLastCycle = true;
       }
-    } else if (this.haltedLastCycle) {
-      this.haltedLastCycle = false;
     }
-
-    // Execute pending interrupts (if enabled)
-    this.executeInterrupts();
 
     // Execute the next OPCode
     this.executeOpcode();
-
-    // Update the timer and display clock
-    this.timer.tick();
-    this.display.tick();
   }
 
   /**
@@ -188,6 +183,7 @@ export class CPU {
     // HALT bug
     if (this.haltedLastCycle) {
       this.registers.PC--;
+      this.haltedLastCycle = false;
     }
 
     if (opcodeIndex in OPCODES) {
