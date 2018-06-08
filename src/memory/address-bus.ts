@@ -111,7 +111,6 @@ export class AddressBus {
     this.oam = new MemorySegment(OAM_LENGTH);
 
     // Empty I/O Registers (128B)
-    let blarggsBuffer = '';
     this.ioRegisters = new MemorySegmentDecorator(
       new MemorySegment(IOREGISTERS_LENGTH),
       (obj, offset)  => {
@@ -190,21 +189,6 @@ export class AddressBus {
           };
 
           return new MemoryAccessorDecorator(obj.get(0x0050), { setByte, setWord });
-        }
-
-        // Blargg's test roms output
-        if (offset === 0x0002) {
-          return new MemoryAccessorDecorator(obj.get(0x0050), {
-            setByte: (decorated: IMemoryAccessor, value: number) => {
-              const charCode = obj.get(0x0001).byte;
-              if (charCode === 10) {
-                console.log(blarggsBuffer); // tslint:disable-line
-                blarggsBuffer = '';
-              } else {
-                blarggsBuffer += String.fromCharCode(charCode);
-              }
-            }
-          });
         }
 
         return obj.get(offset);
