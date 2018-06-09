@@ -129,7 +129,7 @@ export const PPU = {
       let spriteColor = 0;
       let spritePriority = SPRITE_PRIORITY.BELOW_BG;
       for (const sprite of sprites) {
-        if (i >= sprite.x && i <= (sprite.x + 8)) {
+        if (i >= sprite.x && i < (sprite.x + 8)) {
           const tileIndex = sprite.tile;
           const tileStartOffset = (16 * tileIndex);
 
@@ -137,11 +137,11 @@ export const PPU = {
           let tileLine = line - sprite.y;
 
           if (sprite.xFlip) {
-            tileColumn = 8 - tileColumn;
+            tileColumn = 7 - tileColumn;
           }
 
           if (sprite.yFlip) {
-            tileLine = 8 - tileLine;
+            tileLine = 7 - tileLine;
           }
 
           const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
