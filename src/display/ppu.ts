@@ -77,8 +77,8 @@ export const PPU = {
           x: xPos,
           tile: attributes[(i * 4) + 2],
           priority: (spriteFlags >> 7) & 1,
-          yFlip: (spriteFlags >> 6) & 1,
-          xFlip: (spriteFlags >> 5) & 1,
+          yFlip: ((spriteFlags >> 6) & 1) === 1,
+          xFlip: ((spriteFlags >> 5) & 1) === 1,
           palette: (spriteFlags >> 4) & 1,
         });
       }
@@ -129,8 +129,17 @@ export const PPU = {
         if (i >= sprite.x && i <= (sprite.x + 8)) {
           const tileIndex = sprite.tile;
           const tileStartOffset = (16 * tileIndex);
-          const tileColumn = i - sprite.x;
-          const tileLine = line - sprite.y;
+
+          let tileColumn = i - sprite.x;
+          let tileLine = line - sprite.y;
+
+          if (sprite.xFlip) {
+            tileColumn = 8 - tileColumn;
+          }
+
+          if (sprite.yFlip) {
+            tileLine = 8 - tileLine;
+          }
 
           const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
           const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
@@ -138,7 +147,10 @@ export const PPU = {
 
           spriteColor = spritePalette[(color2 << 1) | color1];
           spritePriority = sprite.priority;
-          break;
+
+          if (spriteColor) {
+            break;
+          }
         }
       }
 
@@ -249,7 +261,7 @@ interface ISprite {
   x: number;
   tile: number;
   priority: SPRITE_PRIORITY;
-  yFlip: number;
-  xFlip: number;
+  yFlip: boolean;
+  xFlip: boolean;
   palette: number;
 }
