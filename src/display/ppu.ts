@@ -55,12 +55,52 @@ export const PPU = {
     };
   },
 
+  retrieveSprites: (attributes: Uint8Array, line: number, spritesSize: SPRITE_SIZE): ISprite[] => {
+    const sprites: ISprite[] = [];
+    const spritesHeight = (spritesSize === SPRITE_SIZE.SIZE_8x8) ? 8 : 16;
+
+    for (let i = 0; i < 40; i++) {
+      // Only 10 sprites can be displayed for a given line
+      if (sprites.length >= 10) {
+        break;
+      }
+
+      const yPos = attributes[i * 4] - 16;
+      const xPos = attributes[(i * 4) + 1] - 8;
+
+      // Filter sprites based on the current line
+      if ((yPos <= line) && (yPos + spritesHeight >= line)) {
+        const spriteFlags = attributes[(i * 4) + 3];
+
+        sprites.push({
+          y: yPos,
+          x: xPos,
+          tile: attributes[(i * 4) + 2],
+          priority: (spriteFlags >> 7) & 1,
+          yFlip: (spriteFlags >> 6) & 1,
+          xFlip: (spriteFlags >> 5) & 1,
+          palette: (spriteFlags >> 4) & 1,
+        });
+      }
+    }
+
+    // Sort by x position to avoid doing it later.
+    sprites.sort((a, b) => {
+      return a.x - b.x;
+    });
+
+    return sprites;
+  },
+
   renderLine: (addressBus: AddressBus, screenBuffer: Uint8Array, line: number): void => {
     const vramData = addressBus.getVideoRamSegment().data;
+    const oamData = addressBus.getOamSegment().data;
+
     const lcdControl = PPU.readLcdcRegister(addressBus);
     const lcdPositions = PPU.readPosRegisters(addressBus);
     const palettes = PPU.readPaletteRegisters(addressBus);
 
+    const spriteAttributeTable = new Uint8Array(oamData.slice(0, 0x9F));
     const tileSets = new Uint8Array(vramData.slice(0, 0x17FF));
     const tileMap1 = new Uint8Array(vramData.slice(0x1800, 0x1BFF));
     const tileMap2 = new Uint8Array(vramData.slice(0x1C00, 0x1FFF));
@@ -74,7 +114,29 @@ export const PPU = {
     const winPosX = lcdPositions.windowPositionX;
     const winPosY = lcdPositions.windowPositionY;
 
+    // Retrieve sprites for the current line
+    let sprites: ISprite[] = [];
+    if (lcdControl.spritesEnabled) {
+      sprites = PPU.retrieveSprites(spriteAttributeTable, line, lcdControl.spritesSize);
+    }
+
+    // Render current line
     for (let i = 0; i < SCREEN_WIDTH; i++) {
+      // Check if a sprite should be rendered
+      let spriteColorIndex = 0;
+      let spritePriority = SPRITE_PRIORITY.BELOW_BG;
+      let spritePalette = palettes.spritePalette0;
+      for (const sprite of sprites) {
+        if (i >= sprite.x && i <= (sprite.x + 8)) {
+          spritePriority = sprite.priority;
+          spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
+
+          // TODO Retrieve color index
+          spriteColorIndex = 1;
+          break;
+        }
+      }
+
       // Render background
       if (lcdControl.backgroundEnabled) {
         const mapPosX = Math.floor((bgScrollX + i) / 8) % 32;
@@ -94,9 +156,25 @@ export const PPU = {
         const tileLine = (line + bgScrollY) % 8;
         const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
         const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+        const colorIndex = (color2 << 1) | color1;
 
-        const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
-        screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
+        // Check if the background should be drawn.
+        // That's the case if:
+        //   - The current sprite (if there is one) is located below it
+        //     and either the current background pixel has a color index
+        //     greater than 0 or the current sprite pixel has a color index
+        //     equals to 0.
+        //   - The sprite is located above the background and its current
+        //     pixel has a color index equals to 0.
+        const isSpriteBelow = (spritePriority === SPRITE_PRIORITY.BELOW_BG);
+        const drawBg =
+          (isSpriteBelow && ((colorIndex > 0) || (spriteColorIndex === 0))) ||
+          (spriteColorIndex === 0);
+
+        if (drawBg) {
+          const pixelColor = palettes.backgroundPalette[colorIndex];
+          screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
+        }
       }
 
       // Render window
@@ -118,8 +196,24 @@ export const PPU = {
         const tileLine = (line - winPosY) % 8;
         const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
         const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+        const colorIndex = (color2 << 1) | color1;
 
-        const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
+        // Check if the background should be drawn.
+        // The check are the same than for the background.
+        const isSpriteBelow = (spritePriority === SPRITE_PRIORITY.BELOW_BG);
+        const drawWindow =
+          (isSpriteBelow && ((colorIndex > 0) || (spriteColorIndex === 0))) ||
+          (spriteColorIndex === 0);
+
+        if (drawWindow) {
+          const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
+          screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
+        }
+      }
+
+      // Render sprite if there is one
+      if (spriteColorIndex > 0) {
+        const pixelColor = spritePalette[spriteColorIndex];
         screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
       }
     }
@@ -131,6 +225,11 @@ enum SPRITE_SIZE  {
   SIZE_8x16
 }
 
+enum SPRITE_PRIORITY {
+  ABOVE_BG,
+  BELOW_BG,
+}
+
 enum TILE_MAP {
   MAP_1,
   MAP_2,
@@ -139,4 +238,14 @@ enum TILE_MAP {
 enum TILE_AREA {
   AREA_1,
   AREA_2,
+}
+
+interface ISprite {
+  y: number;
+  x: number;
+  tile: number;
+  priority: SPRITE_PRIORITY;
+  yFlip: number;
+  xFlip: number;
+  palette: number;
 }

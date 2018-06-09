@@ -157,7 +157,7 @@ export class AddressBus {
         // normally take 160 * 4 + 4 cycles to complete.
         if (offset === 0x0046) {
           const copyData = (value: number) => {
-            const fromAddress = (value & 0b11) << 2;
+            const fromAddress = (value & 0xFF) << 8;
             for (let i = 0; i < OAM_LENGTH; i++) {
               this.get(0xFE00 + i).byte = this.get(fromAddress + i).byte;
             }
@@ -260,6 +260,15 @@ export class AddressBus {
    */
   public getVideoRamSegment(): MemorySegment {
     return this.videoRam;
+  }
+
+  /**
+   * Return the memory segment associated to the
+   * OAM in order to avoid creating a lot of accessors
+   * during rendering.
+   */
+  public getOamSegment(): MemorySegment {
+    return this.oam;
   }
 
   /**
