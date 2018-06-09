@@ -2,6 +2,7 @@ import { IGameCartridgeMBC, CARTRIDGE_ROM_BANK_LENGTH } from '../game-cartridge'
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
 import { MemoryAccessorDecorator } from '../../memory/memory-accessor-decorator';
+import { STATIC_FFFF_ACCESSOR } from '../../memory/static-memory-accessor';
 
 export class MBC2 implements IGameCartridgeMBC {
   private romBanks: IMemorySegment[];
@@ -65,7 +66,7 @@ export class MBC2 implements IGameCartridgeMBC {
     this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, (obj, offset) => {
       // If RAM is not enabled return a static accessor
       if (!this.enabledRam) {
-        return { byte: 0xFF, word: 0xFFFF };
+        return STATIC_FFFF_ACCESSOR;
       }
 
       // Only the lower 4 bits are used

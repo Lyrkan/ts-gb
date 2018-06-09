@@ -1,4 +1,6 @@
 import { IMemorySegment } from './memory-segment';
+import { StaticMemoryAccessor } from './static-memory-accessor';
+import { IMemoryAccessor } from './memory-accessor';
 
 /**
  * Usage:
@@ -16,17 +18,17 @@ import { IMemorySegment } from './memory-segment';
  *   const w2 = segment.get(2).word; // 0x1234
  */
 export class StaticMemorySegment implements IMemorySegment {
-  private readonly filledWith: { byte: number, word: number };
+  private readonly accessor: IMemoryAccessor;
 
   public constructor(filledWith: {byte: number, word: number}) {
-    this.filledWith = {
-      byte: filledWith.byte & 0xFF,
-      word: filledWith.word & 0xFFFF,
-    };
+    this.accessor = new StaticMemoryAccessor({
+      byte: filledWith.byte,
+      word: filledWith.word
+    });
   }
 
   public get(offset: number) {
-    return { ...this.filledWith };
+    return this.accessor;
   }
 }
 

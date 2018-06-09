@@ -2,9 +2,9 @@ import { IGameCartridgeMBC, CARTRIDGE_ROM_BANK_LENGTH } from '../game-cartridge'
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
 import { MemoryAccessorDecorator } from '../../memory/memory-accessor-decorator';
-import { STATIC_FFFF_ACCESSOR } from '../../memory/static-memory-accessor';
+import { STATIC_0000_ACCESSOR, STATIC_FFFF_ACCESSOR } from '../../memory/static-memory-accessor';
 
-export class MBC1 implements IGameCartridgeMBC {
+export class MBC3 implements IGameCartridgeMBC {
   private romBanks: IMemorySegment[];
   private ramBanks: IMemorySegment[];
 
@@ -12,14 +12,14 @@ export class MBC1 implements IGameCartridgeMBC {
   private currentRamBank: number;
 
   private enabledRam: boolean;
-  private romMode: boolean;
+  private hasRtc: boolean;
+  private rtcMode: boolean;
 
-  public constructor(romBanks: IMemorySegment[], ramBanks: IMemorySegment[]) {
+  public constructor(romBanks: IMemorySegment[], ramBanks: IMemorySegment[], hasRtc: boolean) {
     this.currentRomBank = 1;
     this.currentRamBank = 0;
-
-    this.enabledRam = true;
-    this.romMode = true;
+    this.hasRtc = hasRtc;
+    this.rtcMode = false;
 
     // Create a trap that will be called when something
     // tries to write into the ROM banks.
@@ -36,27 +36,20 @@ export class MBC1 implements IGameCartridgeMBC {
           // Enable/disable RAM
           this.enabledRam = (value & 0b1111) === 0x0A;
         } else if (offset < 0x4000) {
-          // ROM Bank switch (lower 5 bits)
+          // ROM Bank switch (7-bits value)
           // If the value is equal to 0x00 it is changed
           // to 0x01.
-          this.currentRomBank = (this.currentRomBank & ~0b11111) | ((value || 1) & 0b11111);
+          this.currentRomBank = ((value || 1) & 0xA7);
         }
       } else {
-        if (offset < 0x2000) {
-          // RAM Bank switch / bits 6 and 7 of ROM bank
-          if (this.enabledRam) {
-            this.currentRamBank = (value & 0b11);
-          } else {
-            this.currentRomBank = (this.currentRomBank & ~(0b11 << 5)) | ((value & 0b11) << 5);
-          }
-        } else if (offset < 0x4000) {
-          // Enable/disable ROM mode
-          this.romMode = !(value & 1);
-
-          // If we are in RAM mode, remove bits 6 and 7
-          // of the current ROM bank.
-          if (!this.romMode) {
-            this.currentRomBank = this.currentRomBank & ~(0b11 << 5);
+        if (offset < 0x4000) {
+          if (!this.hasRtc || (value >= 0x0 && value < 0x4)) {
+            // RAM Bank switch (2-bits value)
+            this.currentRamBank = value & 0b11;
+            this.rtcMode = false;
+          } else if (value >= 0x8 && value <= 0xC) {
+            // Switch to RTC-mode
+            this.rtcMode = true;
           }
         }
       }
@@ -76,10 +69,20 @@ export class MBC1 implements IGameCartridgeMBC {
       })
     );
 
+    const rtcAccessor = new MemoryAccessorDecorator(STATIC_0000_ACCESSOR, {
+      // TODO
+    });
+
     this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, (obj, offset: number) => {
       // If RAM is not enabled return a static accessor
       if (!this.enabledRam) {
         return STATIC_FFFF_ACCESSOR;
+      }
+
+      // If RTC mode is enabled return the
+      // RTC accessor.
+      if (this.rtcMode) {
+        return rtcAccessor;
       }
 
       return obj.get(offset);
