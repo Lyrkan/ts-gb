@@ -69,7 +69,14 @@ export class MBC2 implements IGameCartridgeMBC {
       }
 
       // Only the lower 4 bits are used
-      return obj.get(offset);
+      return new MemoryAccessorDecorator(obj.get(offset), {
+        setByte: (decorated, value) => {
+          decorated.byte = value & 0x0F;
+        },
+        setWord: (decorated, value) => {
+          decorated.word = value & 0x0F0F;
+        }
+      });
     }));
   }
 
