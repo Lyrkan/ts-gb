@@ -30,6 +30,7 @@ canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WIND
 // Status flags
 let gameRomLoaded = false;
 let emulationPaused = false;
+let statsDisplayed = false;
 
 // Events handling
 const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
@@ -94,6 +95,10 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
     console.log(new Uint8Array(system.memory.getVideoRamSegment().data));
   },
 
+  toggleStats: () => {
+    statsDisplayed = !statsDisplayed;
+  },
+
   runSingleTick: () => {
     const oldPC = system.cpu.getRegisters().PC;
     system.tick();
@@ -114,7 +119,14 @@ let tps: number = 0;
 const printFps = () => {
   const fpsCounterElement = document.getElementById('fps-counter');
   if (fpsCounterElement) {
-    fpsCounterElement.innerText = `FPS: ${fps}, CPU: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz`;
+    if (statsDisplayed) {
+      fpsCounterElement.innerText = `
+        FPS: ${fps},
+        CPU: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz
+      `;
+    } else {
+      fpsCounterElement.innerText = '';
+    }
   }
 
   fps = 0;

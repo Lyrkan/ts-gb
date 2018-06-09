@@ -64,6 +64,12 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
       label: 'Debug',
       submenu: [
         {
+          label: 'Toggle stats',
+          click: () => {
+            window.webContents.send('toggleStats');
+          }
+        },
+        {
           label: 'Dump registers',
           click: () => {
             window.webContents.send('dumpRegisters');
