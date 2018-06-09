@@ -86,7 +86,7 @@ export const PPU = {
 
     // Sort by x position to avoid doing it later.
     sprites.sort((a, b) => {
-      return b.x - a.x;
+      return a.x - b.x;
     });
 
     return sprites;
@@ -122,7 +122,10 @@ export const PPU = {
 
     // Render current line
     for (let i = 0; i < SCREEN_WIDTH; i++) {
+      const screenBufferIndex = (line * SCREEN_WIDTH) + i;
+
       // Check if a sprite should be rendered
+      let hasVisibleSprite = false;
       let spriteColor = 0;
       let spritePriority = SPRITE_PRIORITY.BELOW_BG;
       for (const sprite of sprites) {
@@ -144,11 +147,12 @@ export const PPU = {
           const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
           const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
           const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+          const colorIndex = (color2 << 1) | color1;
 
-          spriteColor = spritePalette[(color2 << 1) | color1];
-          spritePriority = sprite.priority;
-
-          if (spriteColor) {
+          if (colorIndex !== 0) {
+            hasVisibleSprite = true;
+            spriteColor = spritePalette[colorIndex];
+            spritePriority = sprite.priority;
             break;
           }
         }
@@ -173,25 +177,8 @@ export const PPU = {
         const tileLine = (line + bgScrollY) % 8;
         const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
         const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
-        const colorIndex = (color2 << 1) | color1;
-
-        // Check if the background should be drawn.
-        // That's the case if:
-        //   - The current sprite (if there is one) is located below it
-        //     and either the current background pixel has a color index
-        //     greater than 0 or the current sprite pixel has transparent
-        //     color
-        //   - The sprite is located above the background and its current
-        //     pixel has a transparent color.
-        const isSpriteBelow = (spritePriority === SPRITE_PRIORITY.BELOW_BG);
-        const drawBg =
-          (isSpriteBelow && ((colorIndex > 0) || (spriteColor === 0))) ||
-          (spriteColor === 0);
-
-        if (drawBg) {
-          const pixelColor = palettes.backgroundPalette[colorIndex];
-          screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
-        }
+        const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
+        screenBuffer[screenBufferIndex] = pixelColor;
       }
 
       // Render window
@@ -213,24 +200,21 @@ export const PPU = {
         const tileLine = (line - winPosY) % 8;
         const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
         const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
-        const colorIndex = (color2 << 1) | color1;
-
-        // Check if the background should be drawn.
-        // The check are the same than for the background.
-        const isSpriteBelow = (spritePriority === SPRITE_PRIORITY.BELOW_BG);
-        const drawWindow =
-          (isSpriteBelow && ((colorIndex > 0) || (spriteColor === 0))) ||
-          (spriteColor === 0);
-
-        if (drawWindow) {
-          const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
-          screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
-        }
+        const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
+        screenBuffer[screenBufferIndex] = pixelColor;
       }
 
-      // Render sprite if there is one
-      if (spriteColor > 0) {
-        screenBuffer[(line * SCREEN_WIDTH) + i] = spriteColor;
+      // Render sprite if there is one and if one of the two
+      // following conditions is true:
+      //   - Its priority is equal to "above background"
+      //   - The current color (set back either the background
+      //     or the window) is equal to 0
+      if (hasVisibleSprite) {
+        const spriteIsAbove = (spritePriority === SPRITE_PRIORITY.ABOVE_BG);
+        const pixelIsFree = (screenBuffer[screenBufferIndex] === 0);
+        if (spriteIsAbove || pixelIsFree) {
+          screenBuffer[screenBufferIndex] = spriteColor;
+        }
       }
     }
   }
