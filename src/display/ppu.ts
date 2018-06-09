@@ -69,7 +69,7 @@ export const PPU = {
       const xPos = attributes[(i * 4) + 1] - 8;
 
       // Filter sprites based on the current line
-      if ((yPos <= line) && (yPos + spritesHeight >= line)) {
+      if ((yPos <= line) && (yPos + spritesHeight > line)) {
         const spriteFlags = attributes[(i * 4) + 3];
 
         sprites.push({
@@ -86,7 +86,7 @@ export const PPU = {
 
     // Sort by x position to avoid doing it later.
     sprites.sort((a, b) => {
-      return a.x - b.x;
+      return b.x - a.x;
     });
 
     return sprites;
@@ -123,16 +123,21 @@ export const PPU = {
     // Render current line
     for (let i = 0; i < SCREEN_WIDTH; i++) {
       // Check if a sprite should be rendered
-      let spriteColorIndex = 0;
+      let spriteColor = 0;
       let spritePriority = SPRITE_PRIORITY.BELOW_BG;
-      let spritePalette = palettes.spritePalette0;
       for (const sprite of sprites) {
         if (i >= sprite.x && i <= (sprite.x + 8)) {
-          spritePriority = sprite.priority;
-          spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
+          const tileIndex = sprite.tile;
+          const tileStartOffset = (16 * tileIndex);
+          const tileColumn = i - sprite.x;
+          const tileLine = line - sprite.y;
 
-          // TODO Retrieve color index
-          spriteColorIndex = 1;
+          const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
+          const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
+          const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+
+          spriteColor = spritePalette[(color2 << 1) | color1];
+          spritePriority = sprite.priority;
           break;
         }
       }
@@ -162,14 +167,14 @@ export const PPU = {
         // That's the case if:
         //   - The current sprite (if there is one) is located below it
         //     and either the current background pixel has a color index
-        //     greater than 0 or the current sprite pixel has a color index
-        //     equals to 0.
+        //     greater than 0 or the current sprite pixel has transparent
+        //     color
         //   - The sprite is located above the background and its current
-        //     pixel has a color index equals to 0.
+        //     pixel has a transparent color.
         const isSpriteBelow = (spritePriority === SPRITE_PRIORITY.BELOW_BG);
         const drawBg =
-          (isSpriteBelow && ((colorIndex > 0) || (spriteColorIndex === 0))) ||
-          (spriteColorIndex === 0);
+          (isSpriteBelow && ((colorIndex > 0) || (spriteColor === 0))) ||
+          (spriteColor === 0);
 
         if (drawBg) {
           const pixelColor = palettes.backgroundPalette[colorIndex];
@@ -202,8 +207,8 @@ export const PPU = {
         // The check are the same than for the background.
         const isSpriteBelow = (spritePriority === SPRITE_PRIORITY.BELOW_BG);
         const drawWindow =
-          (isSpriteBelow && ((colorIndex > 0) || (spriteColorIndex === 0))) ||
-          (spriteColorIndex === 0);
+          (isSpriteBelow && ((colorIndex > 0) || (spriteColor === 0))) ||
+          (spriteColor === 0);
 
         if (drawWindow) {
           const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
@@ -212,9 +217,8 @@ export const PPU = {
       }
 
       // Render sprite if there is one
-      if (spriteColorIndex > 0) {
-        const pixelColor = spritePalette[spriteColorIndex];
-        screenBuffer[(line * SCREEN_WIDTH) + i] = pixelColor;
+      if (spriteColor > 0) {
+        screenBuffer[(line * SCREEN_WIDTH) + i] = spriteColor;
       }
     }
   }
