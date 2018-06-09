@@ -14,22 +14,22 @@ export class CpuTimer {
     const control = this.addressBus.get(0xFF07).byte;
     const running = checkBit(2, control);
 
+    // Increment ticks count
+    // There is no need to keep track over 255
+    this.ticksCount = (this.ticksCount + 1) & 0xFF;
+
+    // We don't need to check anything if the current
+    // count isn't a multiple of 4.
+    if ((this.ticksCount % 4) !== 0) {
+      return;
+    }
+
+    // Divider counts up at 16384Hz (= every 64 ticks)
+    if ((this.ticksCount % 64) === 0) {
+      this.incrementDivider();
+    }
+
     if (running) {
-      // Increment ticks count
-      // There is no need to keep track over 255
-      this.ticksCount = (this.ticksCount + 1) & 0xFF;
-
-      // We don't need to check anything if the current
-      // count isn't a multiple of 4.
-      if ((this.ticksCount % 4) !== 0) {
-        return;
-      }
-
-      // Divider counts up at 16384Hz (= every 64 ticks)
-      if ((this.ticksCount % 64) === 0) {
-        this.incrementDivider();
-      }
-
       const speed = control & 0b11;
 
       let shouldIncrementCounter = false;
