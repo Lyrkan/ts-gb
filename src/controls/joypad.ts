@@ -14,7 +14,9 @@ export class Joypad {
   public down(button: BUTTON) {
     if (!this.pressedButtons.has(button)) {
       this.pressedButtons.add(button);
-      this.interruptCallback();
+      if (this.interruptCallback) {
+        this.interruptCallback();
+      }
     }
   }
 
@@ -25,7 +27,9 @@ export class Joypad {
       // Theoretically no interrupt should be
       // triggered when releasing a button but
       // in practice that does happen...
-      this.interruptCallback();
+      if (this.interruptCallback) {
+        this.interruptCallback();
+      }
     }
   }
 
