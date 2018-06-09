@@ -3,8 +3,13 @@ import { expect } from 'chai';
 import { OPCODES_0XCB } from '../../../src/cpu/opcodes/opcodes-0xCB';
 import { CpuRegisters } from '../../../src/cpu/cpu-registers';
 import { AddressBus } from '../../../src/memory/address-bus';
-import { GameCartridge } from '../../../src/cartridge/game-cartridge';
 import { Joypad } from '../../../src/controls/joypad';
+import { MBC_TYPE } from '../../../src/cartridge/game-cartridge-info';
+import { MemorySegment } from '../../../src/memory/memory-segment';
+import {
+  CARTRIDGE_ROM_BANK_LENGTH,
+  CARTRIDGE_RAM_BANK_LENGTH
+} from '../../../src/cartridge/game-cartridge';
 
 describe('Opcodes - 0xCB table', () => {
   let cpuRegisters: CpuRegisters;
@@ -40,7 +45,21 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.SP = 0xFFFE;
 
     addressBus = new AddressBus(new Joypad());
-    addressBus.loadCartridge(new GameCartridge(new ArrayBuffer(32 * 1024)));
+    addressBus.loadCartridge({
+      cartridgeInfo: {
+        gameTitle: 'TEST',
+        hasRam: true,
+        hasRumble: false,
+        hasTimer: false,
+        mbcType: MBC_TYPE.NONE,
+        romSize: CARTRIDGE_ROM_BANK_LENGTH * 2,
+        ramSize: CARTRIDGE_RAM_BANK_LENGTH,
+      },
+      staticRomBank: new MemorySegment(CARTRIDGE_ROM_BANK_LENGTH),
+      switchableRomBank: new MemorySegment(CARTRIDGE_ROM_BANK_LENGTH),
+      ramBank: new MemorySegment(CARTRIDGE_ROM_BANK_LENGTH),
+      reset: () => { /* NOP */ }
+    });
   });
 
   it('0x00 - RLC B', () => {

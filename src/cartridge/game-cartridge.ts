@@ -1,10 +1,11 @@
 import { MemorySegment, IMemorySegment } from '../memory/memory-segment';
 import { STATIC_FFFF_SEGMENT } from '../memory/static-memory-segment';
+import { NoMBC } from './mbc/no-mbc';
 import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
 import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
 
-export class GameCartridge {
+export class GameCartridge implements IGameCartridge {
   public static readCartridgeInfo(data: ArrayBuffer): IGameCartridgeInfo {
     const dataView = new DataView(data);
 
@@ -94,11 +95,7 @@ export class GameCartridge {
       // If there is no MBC, directly use all the
       // banks created above
       case MBC_TYPE.NONE:
-        return {
-          staticRomBank: romBanks[0],
-          switchableRomBank: romBanks[1],
-          ramBank: ramBanks[0],
-        };
+        return new NoMBC(romBanks, ramBanks);
       case MBC_TYPE.MBC1:
         return new MBC1(romBanks, ramBanks);
       case MBC_TYPE.MBC2:
@@ -113,18 +110,18 @@ export class GameCartridge {
   }
 
   public readonly cartridgeInfo: IGameCartridgeInfo;
-  public readonly mbc: IGameCartridgeMBC;
+  private data: ArrayBuffer;
+  private mbc: IGameCartridgeMBC;
 
   public constructor(data: ArrayBuffer) {
-    // Load infos from header
+    // Save initial data so we can reset te whole thing later on
+    this.data = data.slice(0, data.byteLength - 1);
+
+    // Load infos from the header
     this.cartridgeInfo = GameCartridge.readCartridgeInfo(data);
 
-    // Initialize the MBC if there is one
-    this.mbc = GameCartridge.createMBC(
-      this.cartridgeInfo,
-      GameCartridge.createRomBanks(this.cartridgeInfo, data),
-      GameCartridge.createRamBanks(this.cartridgeInfo)
-    );
+    // Load data
+    this.reset();
   }
 
   public get staticRomBank(): IMemorySegment {
@@ -140,9 +137,12 @@ export class GameCartridge {
   }
 
   public reset(): void {
-    if (this.mbc.reset) {
-      this.mbc.reset();
-    }
+    // Initialize a new MBC
+    this.mbc = GameCartridge.createMBC(
+      this.cartridgeInfo,
+      GameCartridge.createRomBanks(this.cartridgeInfo, this.data),
+      GameCartridge.createRamBanks(this.cartridgeInfo)
+    );
   }
 }
 
@@ -158,9 +158,16 @@ export const CARTRIDGE_RAM_MAP: { [index: number]: number } = {
   0x05: 1024 * 64, // 64KB
 };
 
+export interface IGameCartridge {
+  cartridgeInfo: IGameCartridgeInfo;
+  staticRomBank: IMemorySegment ;
+  switchableRomBank: IMemorySegment;
+  ramBank: IMemorySegment;
+  reset(): void;
+}
+
 export interface IGameCartridgeMBC {
   staticRomBank: IMemorySegment;
   switchableRomBank: IMemorySegment;
   ramBank: IMemorySegment;
-  reset?: () => void;
 }

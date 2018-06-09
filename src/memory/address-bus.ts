@@ -1,6 +1,6 @@
 import { MemorySegment, IMemorySegment } from './memory-segment';
 import { IMemoryAccessor } from './memory-accessor';
-import { GameCartridge } from '../cartridge/game-cartridge';
+import { IGameCartridge } from '../cartridge/game-cartridge';
 import { STATIC_0000_SEGMENT } from './static-memory-segment';
 import { MemorySegmentDecorator } from './memory-segment-decorator';
 import { MemoryAccessorDecorator } from './memory-accessor-decorator';
@@ -38,7 +38,7 @@ export class AddressBus {
   // First ROM bank: 0x0000 to 0x3FFF
   // Switchable ROM bank: 0x4000 to 0x7FFF
   // Switchable RAM bank: 0xA000 to 0xBFFF
-  private gameCartridge: GameCartridge;
+  private gameCartridge: IGameCartridge;
 
   // Video RAM
   // 0x8000 to 0x9FFF
@@ -230,7 +230,7 @@ export class AddressBus {
    *
    * @param banks Cartridge ROM banks
    */
-  public loadCartridge(gameCartridge: GameCartridge): void {
+  public loadCartridge(gameCartridge: IGameCartridge): void {
     this.gameCartridge = gameCartridge;
   }
 
