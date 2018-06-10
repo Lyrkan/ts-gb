@@ -61,6 +61,8 @@ export const PPU = {
 
     for (let i = 0; i < 40; i++) {
       // Only 10 sprites can be displayed for a given line
+      // TODO Not sure this check should be done there since
+      // a sprite can have a line with only transparent pixels.
       if (sprites.length >= 10) {
         break;
       }
@@ -141,7 +143,7 @@ export const PPU = {
           }
 
           if (sprite.yFlip) {
-            tileLine = 7 - tileLine;
+            tileLine = 15 - tileLine;
           }
 
           const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;

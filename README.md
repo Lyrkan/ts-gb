@@ -67,7 +67,7 @@ Once that's done you'll have to handle the following things:
 
 You'll then be able to call `display.getFrontBuffer()` everytime
 you want to refresh your screen (the closer from 59.7 FPS the
-better):
+better).
 
 If you want to see how that can be done take a look at the
 [renderer.ts](src/electron/renderer.ts) file.
