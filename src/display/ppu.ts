@@ -8,7 +8,7 @@ export const PPU = {
     return {
       backgroundEnabled: checkBit(0, lcdcRegister),
       spritesEnabled: checkBit(1, lcdcRegister),
-      spritesSize: checkBit(2, lcdcRegister) ? SPRITE_SIZE.SIZE_8x16 : SPRITE_SIZE.SIZE_8x8,
+      spritesHeight: checkBit(2, lcdcRegister) ? 16 : 8,
       backgroundTileMap: checkBit(3, lcdcRegister) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
       backgroundTileArea: checkBit(4, lcdcRegister) ? TILE_AREA.AREA_2 : TILE_AREA.AREA_1,
       windowEnabled: checkBit(5, lcdcRegister),
@@ -55,9 +55,8 @@ export const PPU = {
     };
   },
 
-  retrieveSprites: (attributes: Uint8Array, line: number, spritesSize: SPRITE_SIZE): ISprite[] => {
+  retrieveSprites: (attributes: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
     const sprites: ISprite[] = [];
-    const spritesHeight = (spritesSize === SPRITE_SIZE.SIZE_8x8) ? 8 : 16;
 
     for (let i = 0; i < 40; i++) {
       // Only 10 sprites can be displayed for a given line
@@ -119,7 +118,7 @@ export const PPU = {
     // Retrieve sprites for the current line
     let sprites: ISprite[] = [];
     if (lcdControl.spritesEnabled) {
-      sprites = PPU.retrieveSprites(spriteAttributeTable, line, lcdControl.spritesSize);
+      sprites = PPU.retrieveSprites(spriteAttributeTable, line, lcdControl.spritesHeight);
     }
 
     // Render current line
@@ -143,7 +142,7 @@ export const PPU = {
           }
 
           if (sprite.yFlip) {
-            tileLine = 15 - tileLine;
+            tileLine = lcdControl.spritesHeight - 1 - tileLine;
           }
 
           const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
@@ -209,7 +208,7 @@ export const PPU = {
       // Render sprite if there is one and if one of the two
       // following conditions is true:
       //   - Its priority is equal to "above background"
-      //   - The current color (set back either the background
+      //   - The current color (set by either the background
       //     or the window) is equal to 0
       if (hasVisibleSprite) {
         const spriteIsAbove = (spritePriority === SPRITE_PRIORITY.ABOVE_BG);
@@ -221,11 +220,6 @@ export const PPU = {
     }
   }
 };
-
-enum SPRITE_SIZE  {
-  SIZE_8x8,
-  SIZE_8x16
-}
 
 enum SPRITE_PRIORITY {
   ABOVE_BG,
