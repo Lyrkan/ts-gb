@@ -70,4 +70,4 @@ you want to refresh your screen (the closer from 59.7 FPS the
 better).
 
 If you want to see how that can be done take a look at the
-[renderer.ts](src/electron/renderer.ts) file.
+[TS-GB Web](https://github.com/Lyrkan/ts-gb-web) implementation.
