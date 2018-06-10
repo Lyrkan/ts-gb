@@ -55,7 +55,7 @@ export const PPU = {
     };
   },
 
-  retrieveSprites: (attributes: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
+  retrieveSprites: (attributes: DataView, line: number, spritesHeight: number): ISprite[] => {
     const sprites: ISprite[] = [];
 
     for (let i = 0; i < 40; i++) {
@@ -66,17 +66,17 @@ export const PPU = {
         break;
       }
 
-      const yPos = attributes[i * 4] - 16;
-      const xPos = attributes[(i * 4) + 1] - 8;
+      const yPos = attributes.getUint8(i * 4) - 16;
+      const xPos = attributes.getUint8((i * 4) + 1) - 8;
 
       // Filter sprites based on the current line
       if ((yPos <= line) && (yPos + spritesHeight > line)) {
-        const spriteFlags = attributes[(i * 4) + 3];
+        const spriteFlags = attributes.getUint8((i * 4) + 3);
 
         sprites.push({
           y: yPos,
           x: xPos,
-          tile: attributes[(i * 4) + 2],
+          tile: attributes.getUint8((i * 4) + 2),
           priority: (spriteFlags >> 7) & 1,
           yFlip: ((spriteFlags >> 6) & 1) === 1,
           xFlip: ((spriteFlags >> 5) & 1) === 1,
@@ -101,10 +101,11 @@ export const PPU = {
     const lcdPositions = PPU.readPosRegisters(addressBus);
     const palettes = PPU.readPaletteRegisters(addressBus);
 
-    const spriteAttributeTable = new Uint8Array(oamData.slice(0, 0x9F));
-    const tileSets = new Uint8Array(vramData.slice(0, 0x17FF));
-    const tileMap1 = new Uint8Array(vramData.slice(0x1800, 0x1BFF));
-    const tileMap2 = new Uint8Array(vramData.slice(0x1C00, 0x1FFF));
+    const spriteAttributeTable = new DataView(oamData, 0, 0xA0);
+
+    const tileSets = new DataView(vramData, 0, 0x1800);
+    const tileMap1 = new DataView(vramData, 0x1800, 0x400);
+    const tileMap2 = new DataView(vramData, 0x1C00, 0x400);
 
     const backgroundMap = (lcdControl.backgroundTileMap === TILE_MAP.MAP_1) ? tileMap1 : tileMap2;
     const windowMap = (lcdControl.windowTileMap === TILE_MAP.MAP_1) ? tileMap1 : tileMap2;
@@ -146,8 +147,9 @@ export const PPU = {
           }
 
           const spritePalette = sprite.palette ? palettes.spritePalette1 : palettes.spritePalette0;
-          const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
-          const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+          const tileOffset = tileStartOffset + (tileLine * 2);
+          const color1 = (tileSets.getUint8(tileOffset) >> (7 - tileColumn)) & 1;
+          const color2 = (tileSets.getUint8(tileOffset + 1) >> (7 - tileColumn)) & 1;
           const colorIndex = (color2 << 1) | color1;
 
           if (colorIndex !== 0) {
@@ -164,7 +166,7 @@ export const PPU = {
         const mapPosX = Math.floor((bgScrollX + i) / 8) % 32;
         const mapPosY = Math.floor((bgScrollY + line) / 8) % 32;
 
-        let tileIndex = backgroundMap[mapPosY * 32 + mapPosX];
+        let tileIndex = backgroundMap.getUint8(mapPosY * 32 + mapPosX);
         if (lcdControl.backgroundTileArea === TILE_AREA.AREA_1) {
           tileIndex = uint8ToInt8(tileIndex);
         }
@@ -176,8 +178,9 @@ export const PPU = {
 
         const tileColumn = (i + bgScrollX) % 8;
         const tileLine = (line + bgScrollY) % 8;
-        const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
-        const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+        const tileOffset = tileStartOffset + (tileLine * 2);
+        const color1 = (tileSets.getUint8(tileOffset) >> (7 - tileColumn)) & 1;
+        const color2 = (tileSets.getUint8(tileOffset + 1) >> (7 - tileColumn)) & 1;
         const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
         screenBuffer[screenBufferIndex] = pixelColor;
       }
@@ -187,7 +190,7 @@ export const PPU = {
         const mapPosX = Math.floor((i - winPosX) / 8) % 32;
         const mapPosY = Math.floor((line - winPosY) / 8) % 32;
 
-        let tileIndex = windowMap[mapPosY * 32 + mapPosX];
+        let tileIndex = windowMap.getUint8(mapPosY * 32 + mapPosX);
         if (lcdControl.backgroundTileArea === TILE_AREA.AREA_1) {
           tileIndex = uint8ToInt8(tileIndex);
         }
@@ -199,8 +202,9 @@ export const PPU = {
 
         const tileColumn = (i - winPosX) % 8;
         const tileLine = (line - winPosY) % 8;
-        const color1 = (tileSets[tileStartOffset + (tileLine * 2)] >> (7 - tileColumn)) & 1;
-        const color2 = (tileSets[tileStartOffset + (tileLine * 2) + 1] >> (7 - tileColumn)) & 1;
+        const tileOffset = tileStartOffset + (tileLine * 2);
+        const color1 = (tileSets.getUint8(tileOffset) >> (7 - tileColumn)) & 1;
+        const color2 = (tileSets.getUint8(tileOffset + 1) >> (7 - tileColumn)) & 1;
         const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
         screenBuffer[screenBufferIndex] = pixelColor;
       }
