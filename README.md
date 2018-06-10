@@ -23,6 +23,11 @@ $ yarn start
 
 ## Doing it manually
 
+```
+$ yarn add ts-gb
+```
+
+
 ```ts
 import {
   AddressBus,
@@ -61,7 +66,7 @@ Once that's done you'll have to handle the following things:
 * The `cpu.tick()` method will need to be called at a 1Mhz frequency
 
 You'll then be able to call `display.getFrontBuffer()` everytime
-you want to refresh your screen (the closest from 59.7 FPS the
+you want to refresh your screen (the closer from 59.7 FPS the
 better):
 
 If you want to see how that can be done take a look at the
