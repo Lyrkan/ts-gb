@@ -53,7 +53,7 @@ export class MemoryAccessorDecorator implements IMemoryAccessor {
   }
 }
 
-interface IMemoryAccessorTraps {
+export interface IMemoryAccessorTraps {
   getByte?: (decorated: IMemoryAccessor) => number;
   setByte?: (decorated: IMemoryAccessor, value: number) => void;
   getWord?: (decorated: IMemoryAccessor) => number;

@@ -32,4 +32,4 @@ export class MemorySegmentDecorator implements IMemorySegment {
   }
 }
 
-type MemorySegmentTrap = (obj: IMemorySegment, offset: number) => IMemoryAccessor;
+export type MemorySegmentTrap = (obj: IMemorySegment, offset: number) => IMemoryAccessor;

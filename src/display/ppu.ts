@@ -221,22 +221,22 @@ export const PPU = {
   }
 };
 
-enum SPRITE_PRIORITY {
+export enum SPRITE_PRIORITY {
   ABOVE_BG,
   BELOW_BG,
 }
 
-enum TILE_MAP {
+export enum TILE_MAP {
   MAP_1,
   MAP_2,
 }
 
-enum TILE_AREA {
+export enum TILE_AREA {
   AREA_1,
   AREA_2,
 }
 
-interface ISprite {
+export interface ISprite {
   y: number;
   x: number;
   tile: number;
