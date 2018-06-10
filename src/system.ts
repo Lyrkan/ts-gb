@@ -1,8 +1,10 @@
-import { CPU } from './cpu/cpu';
-import { AddressBus } from './memory/address-bus';
-import { GameCartridge } from './cartridge/game-cartridge';
-import { Display } from './display/display';
-import { Joypad } from './controls/joypad';
+import {
+  AddressBus,
+  CPU,
+  Display,
+  GameCartridge,
+  Joypad
+} from './index';
 
 export class System {
   public readonly cpu: CPU;
