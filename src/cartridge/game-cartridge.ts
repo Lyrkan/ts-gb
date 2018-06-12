@@ -115,7 +115,7 @@ export class GameCartridge implements IGameCartridge {
 
   public constructor(data: ArrayBuffer) {
     // Save initial data so we can reset te whole thing later on
-    this.data = data.slice(0, data.byteLength - 1);
+    this.data = data.slice(0);
 
     // Load infos from the header
     this.cartridgeInfo = GameCartridge.readCartridgeInfo(data);
