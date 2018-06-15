@@ -7,6 +7,8 @@ const process = require('process');
 const ora = require('ora');
 const yargs = require('yargs');
 
+let currentSpinner: any = null;
+
 /**
  * Run a single test and return its duration in microseconds.
  *
@@ -30,6 +32,10 @@ function runSingleTest(romPath: string, ticks: number): number {
 
   const start = process.hrtime();
   for (let i = 0; i < ticks; i++) {
+    if (currentSpinner && (i % CPU_CLOCK_FREQUENCY) === 0) {
+      currentSpinner.render();
+    }
+
     system.tick();
   }
 
@@ -66,27 +72,37 @@ const argv = yargs
   .default('ticks', CPU_CLOCK_FREQUENCY * 10)
   .argv;
 
+console.log(`
+---------------------------
+  Starting benchmark
+
+  ROM: ${argv.rom}
+  Iterations: ${argv.iterations}
+  Ticks: ${argv.ticks}
+---------------------------
+`);
+
 const results: number[] = [];
 for (let i = 0; i < argv.iterations; i++) {
-  const spinner = ora(`Running iteration ${i}`).start();
+  currentSpinner = ora(`Running iteration ${i}`);
   results.push(runSingleTest(argv.rom, argv.ticks));
-  spinner.succeed();
+  currentSpinner.succeed();
 }
 
+const expectedTime = (argv.ticks / CPU_CLOCK_FREQUENCY) * 1000;
 const total = results.reduce((prev, current) => prev + current, 0);
 const mean = total / argv.iterations;
+const meanFrequency = ((expectedTime * CPU_CLOCK_FREQUENCY) / mean) / 1000;
 
 console.log(`
 ---------------------------
-  Benchmark results
+  Results
 ---------------------------
 
 ${results.map((res, index) => {
-  const expectedTime = (argv.ticks / CPU_CLOCK_FREQUENCY) * 1000;
   const frequency = ((expectedTime * CPU_CLOCK_FREQUENCY) / res) / 1000;
   return `[${index}] ${Math.round(res)}μs (${frequency.toFixed(4)}Mhz)`;
 }).join('\n')}
 
-MEAN: ${Math.round(mean)}μs
-TOTAL: ${Math.round(total)}μs
+Mean: ${Math.round(mean)}μs (${meanFrequency.toFixed(4)}MHz)
 `);
