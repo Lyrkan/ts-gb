@@ -5,10 +5,11 @@
   "author": "Vincent Le Biannic",
   "license": "MIT",
   "main": "dist/index.js",
-  "types" : "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/Lyrkan/ts-gb/",
   "scripts": {
     "clean": "rimraf dist",
+    "benchmark": "ts-node ./benchmark/index.ts",
     "build": "yarn run clean && tsc",
     "lint": "tslint './src/**/*.ts' './test/**/*.ts'",
     "nsp": "nsp check",
@@ -28,11 +29,13 @@
     "husky": "^0.14.3",
     "mocha": "^5.1.1",
     "nsp": "^3.2.1",
+    "ora": "^2.1.0",
     "rimraf": "^2.6.2",
     "sinon": "^5.0.10",
     "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
-    "typescript": "^2.8.3"
+    "typescript": "^2.8.3",
+    "yargs": "^11.0.0"
   },
   "files": [
     "src/",
