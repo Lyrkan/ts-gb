@@ -51,7 +51,6 @@ const argv = yargs
       type: 'string',
     });
   })
-  .command('')
   .help('help').alias('help', 'h')
   .version('1.0.0', 'version').alias('version', 'v')
   .options({
