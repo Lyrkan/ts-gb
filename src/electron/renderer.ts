@@ -1,11 +1,13 @@
 // tslint:disable:no-console
 import { ipcRenderer } from 'electron';
 import { System } from '../system';
+import { CPU_CLOCK_FREQUENCY } from '../cpu/cpu';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../display/display';
-import { CPU_CLOCK_FREQUENCY, COLOR_PALETTE, WINDOW_SCALING, COLOR_OFF_SCREEN } from './constants';
+import { COLOR_PALETTE, WINDOW_SCALING, COLOR_OFF_SCREEN } from './constants';
 import { BUTTON } from '../controls/joypad';
 
 const fs = require('fs');
+const crypto = require('crypto');
 
 // Create the system object which contains
 // the CPU/MMU/...
@@ -104,6 +106,13 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
     system.tick();
     console.log(`PC: 0x${oldPC.toString(16)} => 0x${system.cpu.getRegisters().PC.toString(16)}`);
     WINDOW_EVENTS.dumpRegisters();
+  },
+
+  getScreenBufferSha1: () => {
+    const buffer = system.display.getFrontBuffer();
+    const sha1 = crypto.createHash('sha1');
+    sha1.update(buffer);
+    console.log(sha1.digest('hex'));
   }
 };
 

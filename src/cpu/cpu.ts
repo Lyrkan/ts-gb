@@ -212,3 +212,5 @@ export class CPU {
     this.skipCyles += opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
   }
 }
+
+export const CPU_CLOCK_FREQUENCY = 1024 * 1024;

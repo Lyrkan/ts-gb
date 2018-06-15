@@ -87,7 +87,13 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
           click: () => {
             window.webContents.send('runSingleTick');
           }
-        }
+        },
+        {
+          label: 'Print screen buffer SHA-1',
+          click: () => {
+            window.webContents.send('getScreenBufferSha1');
+          }
+        },
       ]
     }
   ];
