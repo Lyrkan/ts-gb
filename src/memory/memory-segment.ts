@@ -19,12 +19,9 @@ export class MemorySegment implements IMemorySegment {
   public readonly data: ArrayBuffer;
   public readonly view: DataView;
 
-  private accessorsCache: { [index: number]: MemoryAccessor };
-
   public constructor(byteLength: number) {
     this.data = new ArrayBuffer(byteLength);
     this.view = new DataView(this.data);
-    this.accessorsCache = [];
   }
 
   public get(offset: number) {
@@ -32,15 +29,7 @@ export class MemorySegment implements IMemorySegment {
       throw new RangeError(`Invalid address "0x${offset.toString(16).toUpperCase()}"`);
     }
 
-    const cachedValue = this.accessorsCache[offset];
-    if (cachedValue) {
-      return cachedValue;
-    }
-
-    const accessor = new MemoryAccessor(this.view, offset);
-    this.accessorsCache[offset] = accessor;
-
-    return accessor;
+    return new MemoryAccessor(this.view, offset);
   }
 }
 

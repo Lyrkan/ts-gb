@@ -55,7 +55,7 @@ export const PPU = {
     };
   },
 
-  retrieveSprites: (attributes: DataView, line: number, spritesHeight: number): ISprite[] => {
+  retrieveSprites: (attributes: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
     const sprites: ISprite[] = [];
 
     for (let i = 0; i < 40; i++) {
@@ -66,17 +66,17 @@ export const PPU = {
         break;
       }
 
-      const yPos = attributes.getUint8(i * 4) - 16;
-      const xPos = attributes.getUint8((i * 4) + 1) - 8;
+      const yPos = attributes[i * 4] - 16;
+      const xPos = attributes[(i * 4) + 1] - 8;
 
       // Filter sprites based on the current line
       if ((yPos <= line) && (yPos + spritesHeight > line)) {
-        const spriteFlags = attributes.getUint8((i * 4) + 3);
+        const spriteFlags = attributes[(i * 4) + 3];
 
         sprites.push({
           y: yPos,
           x: xPos,
-          tile: attributes.getUint8((i * 4) + 2),
+          tile: attributes[(i * 4) + 2],
           priority: (spriteFlags >> 7) & 1,
           yFlip: ((spriteFlags >> 6) & 1) === 1,
           xFlip: ((spriteFlags >> 5) & 1) === 1,
@@ -101,7 +101,7 @@ export const PPU = {
     const lcdPositions = PPU.readPosRegisters(addressBus);
     const palettes = PPU.readPaletteRegisters(addressBus);
 
-    const spriteAttributeTable = new DataView(oamData, 0, 0xA0);
+    const spriteAttributeTable = new Uint8Array(oamData, 0, 0xA0);
 
     const tileSets = new Uint8Array(vramData, 0, 0x1800);
     const tileMap1 = new Uint8Array(vramData, 0x1800, 0x400);
