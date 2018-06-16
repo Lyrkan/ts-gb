@@ -50,7 +50,11 @@ describe('Functional tests', () => {
       checkScreenBuffer('21efc7402a70a2f091d9623541ec481f048c4559');
     });
 
-    it('02-interrupts.gb'); // TODO
+    it('02-interrupts.gb', () => {
+      loadGame('../roms/02-interrupts.gb');
+      runTicks(CPU_CLOCK_FREQUENCY);
+      checkScreenBuffer('24210fc58676ab499e343ae549655d420c5d4866');
+    });
 
     it('03-op sp,hl.gb', () => {
       loadGame('../roms/03-op sp,hl.gb');

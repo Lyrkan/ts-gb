@@ -98,6 +98,8 @@ export class CPU {
     }
 
     // Execute pending interrupts (if enabled)
+    // If the CPU is halted it may result in it
+    // leaving this state.
     this.executeInterrupts();
     if (this.skipCycles > 0) {
       this.skipCycles--;
@@ -109,23 +111,33 @@ export class CPU {
       return;
     }
 
-    // If interrupts are enabled the CPU
-    // won't do anything until an interrupt
-    // occurs.
-    //
-    // If interrupts are disabled the halt
-    // isn't effective... however we need
-    // to know that the last instruction was
-    // an HALT to emulate the HALT bug (repeated
-    // instruction due to PC not being incremented
-    // properly)
-    if (this.halted) {
-      if (this.interruptsEnabled) {
+    // If the CPU is halted but interrupts are not
+    // globally enabled, check if an enabled interrupt
+    // has been triggered. This won't execute the
+    // interrupt but will make the CPU leave that state.
+    if (this.halted && !this.interruptsEnabled) {
+      // Check if an interrupt is enabled
+      const interruptFlags = this.addressBus.get(0xFF0F).byte;
+      if ((interruptFlags & 0x1F) === 0) {
         return;
-      } else {
-        this.halted = false;
-        this.haltedLastCycle = true;
       }
+
+      // Check if an enabled interrupt has been triggered
+      const ieRegister = this.addressBus.get(0xFFFF).byte;
+      for (let bit = 0; bit < 5; bit++) {
+        if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+          // If interrupts are globally disabled we need
+          // to know that the last instruction was an
+          // HALT to emulate the HALT bug (repeated
+          // instruction due to PC not being incremented
+          // properly)
+          this.halted = false;
+          this.haltedLastCycle = true;
+          break;
+        }
+      }
+
+      return;
     }
 
     // Execute the next OPCode
