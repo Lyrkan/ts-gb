@@ -1,11 +1,9 @@
 import { MemorySegment, IMemorySegment } from './memory-segment';
-import { IMemoryAccessor } from './memory-accessor';
 import { IGameCartridge } from '../cartridge/game-cartridge';
 import { STATIC_0000_SEGMENT } from './static-memory-segment';
 import { MemorySegmentDecorator } from './memory-segment-decorator';
-import { MemoryAccessorDecorator } from './memory-accessor-decorator';
 import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
-import { Joypad } from '../controls/joypad';
+import { Joypad, BUTTON } from '../controls/joypad';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -20,12 +18,12 @@ export const IEREGISTER_LENGTH = 1;
  *   const addressBus = new AddressBus();
  *
  *   // Write values
- *   addressBus.get(0xC000).byte = 0x12;
- *   addressBus.get(0xC001).word = 0x3456;
+ *   addressBus.setByte(0xC000, 0x12);
+ *   addressBus.setWord(0xC001, 0x3456);
  *
  *   // Read values
- *   const bC000 = addressBus.get(0xC000).byte;
- *   const wC001 = addressBus.get(0xC001).word;
+ *   const bC000 = addressBus.getByte(0xC000);
+ *   const wC001 = addressBus.getWord(0xC001);
  */
 export class AddressBus {
   // Segment that contains the boot ROM
@@ -77,13 +75,43 @@ export class AddressBus {
   }
 
   /**
-   * Get the accessor associated to the given address.
+   * Get the byte stored at the given address
    *
-   * @param address Address of the accessor
+   * @param address Address
    */
-  public get(address: number): IMemoryAccessor {
+  public getByte(address: number): number {
     const { segment, offset } = this.getSegment(address);
-    return segment.get(address - offset);
+    return segment.getByte(address - offset);
+  }
+
+  /**
+   * Set the value of the byte stored at the given address
+   *
+   * @param address Address
+   */
+  public setByte(address: number, value: number): void {
+    const { segment, offset } = this.getSegment(address);
+    segment.setByte(address - offset, value);
+  }
+
+  /**
+   * Get the word stored at the given address
+   *
+   * @param address Address
+   */
+  public getWord(address: number): number {
+    const { segment, offset } = this.getSegment(address);
+    return segment.getWord(address - offset);
+  }
+
+  /**
+   * Set the value of the word stored at the given address
+   *
+   * @param address Address
+   */
+  public setWord(address: number, value: number): void {
+    const { segment, offset } = this.getSegment(address);
+    segment.setWord(address - offset, value);
   }
 
   /**
@@ -111,89 +139,81 @@ export class AddressBus {
     this.oam = new MemorySegment(OAM_LENGTH);
 
     // Empty I/O Registers (128B)
-    this.ioRegisters = new MemorySegmentDecorator(
-      new MemorySegment(IOREGISTERS_LENGTH),
-      (obj, offset)  => {
-        // Joypad
+    let joypadMode = JOYPAD_MODE.DIRECTIONS;
+    this.ioRegisters = new MemorySegmentDecorator(new MemorySegment(IOREGISTERS_LENGTH), {
+      getByte: (decorated, offset) => {
         if (offset === 0x0000) {
-          return this.joypad.memoryAccesor;
+          let value = 0xFF;
+
+          if (joypadMode === JOYPAD_MODE.BUTTONS) {
+            value &= ~0x10;
+            value &= this.joypad.isPressed(BUTTON.START) ? ~0x08 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.SELECT) ? ~0x04 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.A) ? ~0x01 : 0xFF;
+          } else {
+            value &= ~0x20;
+            value &= this.joypad.isPressed(BUTTON.DOWN) ? ~0x08 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.UP) ? ~0x04 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.LEFT) ? ~0x02 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.RIGHT) ? ~0x01 : 0xFF;
+          }
+
+          return value;
+        }
+
+        return decorated.getByte(offset);
+      },
+      setByte: (decorated, offset, value) => {
+        // Joypad update
+        // Mostly used to switch between directions and buttons modes.
+        if (offset === 0x0000) {
+          if ((value & 0x10) === 0) {
+            joypadMode = JOYPAD_MODE.DIRECTIONS;
+          } else if ((value & 0x20) === 0) {
+            joypadMode = JOYPAD_MODE.BUTTONS;
+          }
         }
 
         // LY update.
         // When that happens it should also change the value of LYC
         // and eventually trigger an interrupt.
         if (offset === 0x0044) {
-          const updateLyc = (decorated: IMemoryAccessor) => {
-            const lcdsRegister = obj.get(0x0041);
-            const ly = decorated.byte;
-            const lyc =  obj.get(0x0045).byte;
+          const lcdsRegister = decorated.getByte(0x0041);
+          const ly = decorated.getByte(0x0044);
+          const lyc =  decorated.getByte(0x0045);
 
-            if (ly === lyc) {
-              lcdsRegister.byte |= 1 << 2;
+          if (ly === lyc) {
+            decorated.setByte(0x0041, lcdsRegister | (1 << 2));
 
-              // Check if we should trigger the LCDC Status Interrupt
-              if ((lcdsRegister.byte & 0x40) > 0) {
-                this.get(0xFF0F).byte |= 2;
-              }
-            } else {
-              lcdsRegister.byte &= ~(1 << 2);
+            // Check if we should trigger the LCDC Status Interrupt
+            if ((lcdsRegister & 0x40) > 0) {
+              this.setByte(0xFF0F, this.getByte(0xFF0F) | 2);
             }
-          };
-
-          return new MemoryAccessorDecorator(obj.get(0x0044), {
-            setByte: (decorated: IMemoryAccessor, value: number) => {
-              decorated.byte = value;
-              updateLyc(decorated);
-            },
-            setWord: (decorated: IMemoryAccessor, value: number) => {
-              decorated.word = value;
-              updateLyc(decorated);
-            },
-          });
+          } else {
+            decorated.setByte(0x0041, lcdsRegister & ~(1 << 2));
+          }
         }
 
         // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
         // Note that this is really inaccurate since it should
         // normally take 160 * 4 + 4 cycles to complete.
         if (offset === 0x0046) {
-          const copyData = (value: number) => {
-            const fromAddress = (value & 0xFF) << 8;
-            for (let i = 0; i < OAM_LENGTH; i++) {
-              this.get(0xFE00 + i).byte = this.get(fromAddress + i).byte;
-            }
-          };
-
-          const setByte = (decorated: IMemoryAccessor, value: number) => {
-            copyData(value);
-            decorated.byte = value;
-          };
-
-          const setWord = (decorated: IMemoryAccessor, value: number) => {
-            copyData(value);
-            decorated.word = value;
-          };
-
-          return new MemoryAccessorDecorator(obj.get(0x0046), { setByte, setWord });
+          const fromAddress = (value & 0xFF) << 8;
+          for (let i = 0; i < OAM_LENGTH; i++) {
+            this.setByte(0xFE00 + i, this.getByte(fromAddress + i));
+          }
         }
 
         // Writes on 0x0050 (=0xFF50) disable the boot rom
         if (offset === 0x0050) {
-          const setByte = (decorated: IMemoryAccessor, value: number) => {
-            this.bootRomEnabled = false;
-            decorated.byte = value;
-          };
-
-          const setWord = (decorated: IMemoryAccessor, value: number) => {
-            this.bootRomEnabled = false;
-            decorated.word = value;
-          };
-
-          return new MemoryAccessorDecorator(obj.get(0x0050), { setByte, setWord });
+          this.bootRomEnabled = false;
         }
 
-        return obj.get(offset);
+        // Still update the value stored in memory
+        decorated.setByte(offset, value);
       }
-    );
+    });
 
     // Empty HRAM (127B)
     this.hram = new MemorySegment(HRAM_LENGTH);
@@ -204,7 +224,7 @@ export class AddressBus {
     // Set the interrupt callback on the joypad
     // to catch button presses
     this.joypad.setInterruptCallback(() => {
-      this.ioRegisters.get(0x000F).byte |=  0x10;
+      this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | 0x10);
     });
   }
 
@@ -220,7 +240,7 @@ export class AddressBus {
     this.bootRom = new MemorySegment(bootRom.byteLength);
     const bootRomView = new DataView(bootRom);
     for (let i = 0; i < bootRom.byteLength; i++) {
-      this.bootRom.get(i).byte = bootRomView.getUint8(i);
+      this.bootRom.setByte(i, bootRomView.getUint8(i));
     }
   }
 
@@ -399,4 +419,9 @@ export class AddressBus {
       `Invalid address 0x${address.toString(16).toUpperCase()}: Memory addresses must not exceed 0xFFFF`
     );
   }
+}
+
+enum JOYPAD_MODE {
+  DIRECTIONS,
+  BUTTONS
 }

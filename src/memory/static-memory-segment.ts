@@ -1,6 +1,4 @@
 import { IMemorySegment } from './memory-segment';
-import { StaticMemoryAccessor } from './static-memory-accessor';
-import { IMemoryAccessor } from './memory-accessor';
 
 /**
  * Usage:
@@ -8,27 +6,36 @@ import { IMemoryAccessor } from './memory-accessor';
  *   const segment = new StaticMemorySegment({ byte: 0x12, word: 0x1234 });
  *
  *   // Writing does nothing
- *   segment.get(0).byte = 0xAB;
- *   segment.get(1).byte = 0xCD;
- *   segment.get(2).word = 0xEFGH;
+ *   segment.setByte(0, 0xAB);
+ *   segment.setByte(1, 0xCD);
+ *   segment.setWord(2, 0xEFGH);
  *
  *   // Reading always return the given values
- *   const b0 = segment.get(0).byte; // 0x12
- *   const b1 = segment.get(1).byte; // 0x12
- *   const w2 = segment.get(2).word; // 0x1234
+ *   const b0 = segment.getByte(0); // 0x12
+ *   const b1 = segment.getByte(1); // 0x12
+ *   const w2 = segment.getWord(2); // 0x1234
  */
 export class StaticMemorySegment implements IMemorySegment {
-  private readonly accessor: IMemoryAccessor;
+  private readonly filledWith: {byte: number, word: number};
 
   public constructor(filledWith: {byte: number, word: number}) {
-    this.accessor = new StaticMemoryAccessor({
-      byte: filledWith.byte,
-      word: filledWith.word
-    });
+    this.filledWith = filledWith;
   }
 
-  public get(offset: number) {
-    return this.accessor;
+  public getByte(offset: number) {
+    return this.filledWith.byte;
+  }
+
+  public setByte(offset: number, value: number) {
+    // NOP
+  }
+
+  public getWord(offset: number) {
+    return this.filledWith.word;
+  }
+
+  public setWord(offset: number, value: number) {
+    // NOP
   }
 }
 

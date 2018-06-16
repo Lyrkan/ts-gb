@@ -10,8 +10,7 @@ describe('Joypad', () => {
     joypad = new Joypad();
   });
 
-  it('should return 0b1 for all buttons by default', () => {
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1111);
+  it('All buttons should be released by default', () => {
     expect(joypad.isPressed(BUTTON.A)).to.equal(false);
     expect(joypad.isPressed(BUTTON.B)).to.equal(false);
     expect(joypad.isPressed(BUTTON.START)).to.equal(false);
@@ -23,68 +22,74 @@ describe('Joypad', () => {
   });
 
   it('should behave correctly', () => {
-    // Select direction mode
-    joypad.memoryAccesor.byte = 0x20;
 
     // Press directions
     joypad.down(BUTTON.DOWN);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0111);
+    expect(joypad.isPressed(BUTTON.DOWN)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(1);
 
     joypad.down(BUTTON.UP);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0011);
+    expect(joypad.isPressed(BUTTON.UP)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(2);
 
     joypad.down(BUTTON.LEFT);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0001);
+    expect(joypad.isPressed(BUTTON.LEFT)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(3);
 
     joypad.down(BUTTON.RIGHT);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0000);
-
-    // Select buttons mode
-    joypad.memoryAccesor.byte = 0x10;
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1111);
+    expect(joypad.isPressed(BUTTON.RIGHT)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(4);
 
     // Press buttons
     joypad.down(BUTTON.START);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0111);
+    expect(joypad.isPressed(BUTTON.START)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(5);
 
     joypad.down(BUTTON.SELECT);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0011);
+    expect(joypad.isPressed(BUTTON.SELECT)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(6);
 
     joypad.down(BUTTON.B);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0001);
+    expect(joypad.isPressed(BUTTON.B)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(7);
 
     joypad.down(BUTTON.A);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0000);
+    expect(joypad.isPressed(BUTTON.A)).to.equal(true);
+    expect(joypad.pressedButtons.size).to.equal(8);
 
     // Release buttons
     joypad.up(BUTTON.START);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1000);
+    expect(joypad.isPressed(BUTTON.START)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(7);
 
     joypad.up(BUTTON.SELECT);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1100);
+    expect(joypad.isPressed(BUTTON.SELECT)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(6);
 
     joypad.up(BUTTON.B);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1110);
+    expect(joypad.isPressed(BUTTON.B)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(5);
 
     joypad.up(BUTTON.A);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1111);
-
-    // Select directions mode
-    joypad.memoryAccesor.byte = 0x20;
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b0000);
+    expect(joypad.isPressed(BUTTON.A)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(4);
 
     // Release directions
     joypad.up(BUTTON.DOWN);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1000);
+    expect(joypad.isPressed(BUTTON.DOWN)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(3);
 
     joypad.up(BUTTON.UP);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1100);
+    expect(joypad.isPressed(BUTTON.UP)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(2);
 
     joypad.up(BUTTON.LEFT);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1110);
+    expect(joypad.isPressed(BUTTON.LEFT)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(1);
 
     joypad.up(BUTTON.RIGHT);
-    expect(joypad.memoryAccesor.byte & 0b1111).to.equal(0b1111);
+    expect(joypad.isPressed(BUTTON.RIGHT)).to.equal(false);
+    expect(joypad.pressedButtons.size).to.equal(0);
   });
 
   it('should call the interrupt callback whenever a button is pressed/released', () => {

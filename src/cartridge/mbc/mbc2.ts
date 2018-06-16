@@ -1,8 +1,6 @@
 import { IGameCartridgeMBC, CARTRIDGE_ROM_BANK_LENGTH } from '../game-cartridge';
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
-import { MemoryAccessorDecorator } from '../../memory/memory-accessor-decorator';
-import { STATIC_FFFF_ACCESSOR } from '../../memory/static-memory-accessor';
 
 export class MBC2 implements IGameCartridgeMBC {
   private romBanks: IMemorySegment[];
@@ -49,35 +47,31 @@ export class MBC2 implements IGameCartridgeMBC {
       }
     };
 
-    this.romBanks = romBanks.map((bank, index) => new MemorySegmentDecorator(
-      bank,
-      (obj, offset) => {
+    this.romBanks = romBanks.map((bank, index) => new MemorySegmentDecorator(bank, {
+      setByte: (decorated, offset, value) => {
         if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
         }
 
-        return new MemoryAccessorDecorator(obj.get(offset), {
-          setByte: (decorated, value) => { romWriteTrap(index, offset, value); },
-          setWord: (decorated, value) => { romWriteTrap(index, offset, value); }
-        });
+        romWriteTrap(index, offset, value);
       }
-    ));
+    }));
 
-    this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, (obj, offset) => {
-      // If RAM is not enabled return a static accessor
-      if (!this.enabledRam) {
-        return STATIC_FFFF_ACCESSOR;
-      }
-
-      // Only the lower 4 bits are used
-      return new MemoryAccessorDecorator(obj.get(offset), {
-        setByte: (decorated, value) => {
-          decorated.byte = value & 0x0F;
-        },
-        setWord: (decorated, value) => {
-          decorated.word = value & 0x0F0F;
+    this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, {
+      getByte: (decorated, offset) => {
+        if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
+          throw new RangeError(`Invalid address "${offset}"`);
         }
-      });
+
+        if (!this.enabledRam) {
+          return 0xFF;
+        }
+
+        return decorated.getByte(offset);
+      },
+      setByte: (decorated, offset, value) => {
+        decorated.setByte(offset, value & 0x0F);
+      }
     }));
   }
 

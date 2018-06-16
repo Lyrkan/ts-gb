@@ -42,7 +42,7 @@ export class Display {
     // Update current line every 114 ticks
     if ((this.clock > 0) && ((this.clock % 114) === 0)) {
       this.currentLine = (this.currentLine + 1) % 154;
-      this.addressBus.get(0xFF44).byte = this.currentLine;
+      this.addressBus.setByte(0xFF44, this.currentLine);
     }
 
     // Scanline (access to OAM) in progress
@@ -85,20 +85,21 @@ export class Display {
     this.currentMode = mode;
 
     // Switch mode in LCD Status Register
-    const lcdsRegister = this.addressBus.get(0xFF41);
-    lcdsRegister.byte = (lcdsRegister.byte & 0xFC) | mode;
+    const lcdsRegister = (this.addressBus.getByte(0xFF41) & 0xFC) | mode;
+    this.addressBus.setByte(0xFF41, lcdsRegister);
 
     // Trigger VBLANK interrupt if needed
     if (mode === GPU_MODE.VBLANK) {
-      this.addressBus.get(0xFF0F).byte |= 1;
+      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | 1);
     }
 
     // Check if the LCDC Status Interrupt should be triggered:
     // H-Blank Interrupt (Mode 0) = bit 3
     // V-Blank Interrupt (Mode 1) = bit 4
     // OAM Interrupt (Mode 2) = bit 5
-    if ((mode !== GPU_MODE.PIXEL_TRANSFER) && (lcdsRegister.byte & (1 << (3 + mode))) > 0) {
-      this.addressBus.get(0xFF0F).byte |= 2;
+    if ((mode !== GPU_MODE.PIXEL_TRANSFER)
+      && (lcdsRegister & (1 << (3 + mode))) > 0) {
+      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | 2);
     }
   }
 }

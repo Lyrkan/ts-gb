@@ -1,7 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
 import { MemorySegment } from '../../src/memory/memory-segment';
-import { MemoryAccessor } from '../../src/memory/memory-accessor';
 
 describe('MemorySegment', () => {
   let memorySegment: MemorySegment;
@@ -10,18 +9,26 @@ describe('MemorySegment', () => {
     memorySegment = new MemorySegment(4);
   });
 
-  describe('Memory access', () => {
-    it('should return a MemoryAccessor when using array notation', () => {
-      expect(memorySegment.get(0)).to.be.an.instanceof(MemoryAccessor);
-      expect(memorySegment.get(1)).to.be.an.instanceof(MemoryAccessor);
-      expect(memorySegment.get(2)).to.be.an.instanceof(MemoryAccessor);
-      expect(memorySegment.get(3)).to.be.an.instanceof(MemoryAccessor);
-    });
+  it('should allow to read/write bytes', () => {
+    memorySegment.setByte(0, 0x12);
+    memorySegment.setByte(1, 0x34);
+    memorySegment.setWord(2, 0x5678);
+
+    expect(memorySegment.getByte(0)).to.equal(0x12);
+    expect(memorySegment.getByte(1)).to.equal(0x34);
   });
 
-  describe('Errors handling', () => {
-    it('should not allow to access an invalid address', () => {
-      expect(() => { memorySegment.get(-1); }).to.throw('Invalid address');
-    });
+  it('should allow to read/write words', () => {
+    memorySegment.setWord(0, 0x1234);
+    memorySegment.setWord(2, 0x5678);
+
+    expect(memorySegment.getWord(0)).to.equal(0x1234);
+    expect(memorySegment.getWord(2)).to.equal(0x5678);
+
+    // Check little-endian
+    expect(memorySegment.getByte(0)).to.equal(0x34);
+    expect(memorySegment.getByte(1)).to.equal(0x12);
+    expect(memorySegment.getByte(2)).to.equal(0x78);
+    expect(memorySegment.getByte(3)).to.equal(0x56);
   });
 });

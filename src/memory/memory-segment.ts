@@ -1,38 +1,48 @@
-import { MemoryAccessor, IMemoryAccessor } from './memory-accessor';
-
 /**
  * Usage:
  *
- *   const segment = new MemorySegment({ byteLength: 4 });
+ *   const segment = new MemorySegment(4);
  *
  *   // Write values
- *   segment.get(0).byte = 0x12;
- *   segment.get(1).byte = 0x34;
- *   segment.get(2).word = 0x5678;
+ *   segment.setByte(0, 0x12);
+ *   segment.setByte(1, 0x34);
+ *   segment.setWord(2, 0x5678);
  *
  *   // Read values
- *   const b0 = segment.get(0).byte;
- *   const b1 = segment.get(1).byte;
- *   const w2 = segment.get(2).word;
+ *   const b0 = segment.getByte(0);
+ *   const b1 = segment.getByte(1);
+ *   const w2 = segment.getWord(2);
  */
 export class MemorySegment implements IMemorySegment {
-  public readonly data: ArrayBuffer;
-  public readonly view: DataView;
+  public readonly data: Uint8Array;
 
   public constructor(byteLength: number) {
-    this.data = new ArrayBuffer(byteLength);
-    this.view = new DataView(this.data);
+    this.data = new Uint8Array(
+      new ArrayBuffer(byteLength)
+    );
   }
 
-  public get(offset: number) {
-    if (offset < 0 || offset >= this.data.byteLength) {
-      throw new RangeError(`Invalid address "0x${offset.toString(16).toUpperCase()}"`);
-    }
+  public getByte(offset: number) {
+    return this.data[offset];
+  }
 
-    return new MemoryAccessor(this.view, offset);
+  public setByte(offset: number, value: number) {
+    this.data[offset] = value & 0xFF;
+  }
+
+  public getWord(offset: number) {
+    return (this.data[offset + 1] << 8) | this.data[offset];
+  }
+
+  public setWord(offset: number, value: number) {
+    this.data[offset + 1] = (value & 0xFF00) >> 8;
+    this.data[offset] = value & 0xFF;
   }
 }
 
 export interface IMemorySegment {
-  get(offset: number): IMemoryAccessor;
+  getByte(offset: number): number;
+  setByte(offset: number, value: number): void;
+  getWord(offset: number): number;
+  setWord(offset: number, value: number): void;
 }

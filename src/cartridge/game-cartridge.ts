@@ -62,7 +62,7 @@ export class GameCartridge implements IGameCartridge {
           break;
         }
 
-        banks[i].get(j).byte = dataView.getUint8((i * CARTRIDGE_ROM_BANK_LENGTH) + j);
+        banks[i].setByte(j, dataView.getUint8((i * CARTRIDGE_ROM_BANK_LENGTH) + j));
       }
     }
 

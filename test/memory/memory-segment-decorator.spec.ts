@@ -11,20 +11,51 @@ describe('MemorySegmentDecorator', () => {
   });
 
   it('allows to change the behavior related to an address', () => {
-    const decoratedSegment = new MemorySegmentDecorator(memorySegment, (obj, offset) => {
-      // Change behavior for address 0x00FF
-      if (offset === 0x00FF) {
-        return { byte: 0xFF, word: 0xFFFF };
-      }
+    const decoratedSegment = new MemorySegmentDecorator(memorySegment, {
+      getByte: (decorated, offset) => {
+        if (offset === 0x00FF) {
+          return 0xFF;
+        }
 
-      // Use default behavior
-      return obj.get(offset);
+        return decorated.getByte(offset);
+      },
+      setByte: (decorated, offset, value) => {
+        if (offset === 0x0002) {
+          // Don't do anything
+          return;
+        }
+
+        if (offset === 0x0012) {
+          // Replace value at 0x0001 by 0xAB
+          decorated.setByte(0x0001, 0xAB);
+        }
+
+        // Default behavior
+        decorated.setByte(offset, value);
+      }
     });
 
-    decoratedSegment.get(0x0001).byte = 0x12;
-    decoratedSegment.get(0x00FF).byte = 0x34;
+    // Check bytes
+    decoratedSegment.setByte(0x0001, 0x12);
+    decoratedSegment.setByte(0x0002, 0x34);
+    decoratedSegment.setByte(0x00FF, 0x56);
 
-    expect(decoratedSegment.get(0x0001).byte).to.equal(0x12);
-    expect(decoratedSegment.get(0x00FF).byte).to.equal(0xFF);
+    expect(decoratedSegment.getByte(0x0001)).to.equal(0x12);
+    expect(decoratedSegment.getByte(0x0002)).to.equal(0x00);
+    expect(decoratedSegment.getByte(0x00FF)).to.equal(0xFF);
+
+    decoratedSegment.setByte(0x0012, 0xFF);
+    expect(decoratedSegment.getByte(0x0001)).to.equal(0xAB);
+
+    // Check words
+    decoratedSegment.setWord(0x0000, 0x1234);
+    expect(decoratedSegment.getByte(0x0000)).to.equal(0x34);
+    expect(decoratedSegment.getByte(0x0001)).to.equal(0x12);
+    expect(decoratedSegment.getWord(0x0000)).to.equal(0x1234);
+
+    decoratedSegment.setWord(0x0002, 0x5678);
+    expect(decoratedSegment.getByte(0x0002)).to.equal(0x00);
+    expect(decoratedSegment.getByte(0x0003)).to.equal(0x56);
+    expect(decoratedSegment.getWord(0x0002)).to.equal(0x5600);
   });
 });

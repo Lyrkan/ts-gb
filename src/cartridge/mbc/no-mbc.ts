@@ -2,7 +2,6 @@ import { IGameCartridgeMBC } from '../game-cartridge';
 import { IMemorySegment } from '../../memory/memory-segment';
 import { STATIC_FFFF_SEGMENT } from '../../memory/static-memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
-import { MemoryAccessorDecorator } from '../../memory/memory-accessor-decorator';
 
 export class NoMBC implements IGameCartridgeMBC {
   public readonly ramBank: IMemorySegment;
@@ -12,12 +11,9 @@ export class NoMBC implements IGameCartridgeMBC {
     // Make sure nothing can write into ROM banks.
     // This can lead to issues with some games such as Tetris.
     this.romBanks = romBanks.slice(0, 2).map(bank =>
-      new MemorySegmentDecorator(bank, (obj, offset) =>
-        new MemoryAccessorDecorator(obj.get(offset), {
-          setByte: () => { /* Do nothing */ },
-          setWord: () => { /* Do nothing */ },
-        })
-      )
+      new MemorySegmentDecorator(bank, {
+        setByte: () => {  /* Do nothing */ }
+      })
     );
 
     while (this.romBanks.length < 2) {

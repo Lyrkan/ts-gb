@@ -38,17 +38,17 @@ describe('AddressBus', () => {
       addressBus.loadBootRom(bootRomBuffer);
 
       // Not effective until address bus reset
-      expect(addressBus.get(0x0000).byte).to.equal(0x00);
-      expect(addressBus.get(0x0000).byte).to.equal(0x00);
-      expect(addressBus.get(0x00FE).byte).to.equal(0x00);
-      expect(addressBus.get(0x00FF).byte).to.equal(0x00);
+      expect(addressBus.getByte(0x0000)).to.equal(0x00);
+      expect(addressBus.getByte(0x0000)).to.equal(0x00);
+      expect(addressBus.getByte(0x00FE)).to.equal(0x00);
+      expect(addressBus.getByte(0x00FF)).to.equal(0x00);
 
       addressBus.reset();
 
-      expect(addressBus.get(0x0000).byte).to.equal(0x12);
-      expect(addressBus.get(0x0001).byte).to.equal(0x34);
-      expect(addressBus.get(0x00FE).byte).to.equal(0x56);
-      expect(addressBus.get(0x00FF).byte).to.equal(0x78);
+      expect(addressBus.getByte(0x0000)).to.equal(0x12);
+      expect(addressBus.getByte(0x0001)).to.equal(0x34);
+      expect(addressBus.getByte(0x00FE)).to.equal(0x56);
+      expect(addressBus.getByte(0x00FF)).to.equal(0x78);
     });
 
     it('should disable the boot ROM if a write occurs on 0xFF50', () => {
@@ -60,13 +60,13 @@ describe('AddressBus', () => {
       addressBus.loadBootRom(bootRomBuffer);
       addressBus.reset();
 
-      expect(addressBus.get(0x0000).byte).to.equal(0x12);
-      expect(addressBus.get(0x0001).byte).to.equal(0x34);
+      expect(addressBus.getByte(0x0000)).to.equal(0x12);
+      expect(addressBus.getByte(0x0001)).to.equal(0x34);
 
-      addressBus.get(0xFF50).byte = 0x01;
+      addressBus.setByte(0xFF50, 0x01);
 
-      expect(addressBus.get(0x0000).byte).to.equal(0x00);
-      expect(addressBus.get(0x0001).byte).to.equal(0x00);
+      expect(addressBus.getByte(0x0000)).to.equal(0x00);
+      expect(addressBus.getByte(0x0001)).to.equal(0x00);
     });
   });
 
@@ -88,9 +88,9 @@ describe('AddressBus', () => {
     });
 
     it('should be able to access cartridge static ROM bank', () => {
-      addressBus.get(0x0000);
-      addressBus.get(0x2000);
-      addressBus.get(0x3FFF);
+      addressBus.getByte(0x0000);
+      addressBus.getByte(0x2000);
+      addressBus.getByte(0x3FFF);
 
       expect(staticRomBankSpy.get.callCount).to.equal(3);
       expect(switchableRomBankSpy.get.callCount).to.equal(0);
@@ -98,9 +98,9 @@ describe('AddressBus', () => {
     });
 
     it('should be able to access cartridge switchable ROM bank', () => {
-      addressBus.get(0x4000);
-      addressBus.get(0x6000);
-      addressBus.get(0x7FFF);
+      addressBus.getByte(0x4000);
+      addressBus.getByte(0x6000);
+      addressBus.getByte(0x7FFF);
 
       expect(staticRomBankSpy.get.callCount).to.equal(0);
       expect(switchableRomBankSpy.get.callCount).to.equal(3);
@@ -108,9 +108,9 @@ describe('AddressBus', () => {
     });
 
     it('should be able to access cartridge RAM bank', () => {
-      addressBus.get(0xA000);
-      addressBus.get(0xB000);
-      addressBus.get(0xBFFF);
+      addressBus.getByte(0xA000);
+      addressBus.getByte(0xB000);
+      addressBus.getByte(0xBFFF);
 
       expect(staticRomBankSpy.get.callCount).to.equal(0);
       expect(switchableRomBankSpy.get.callCount).to.equal(0);
@@ -120,119 +120,119 @@ describe('AddressBus', () => {
 
   describe('Video RAM', () => {
     it('should be able to read/write from/into Video RAM', () => {
-      addressBus.get(0x8000).byte = 0x12;
-      addressBus.get(0x8ABC).word = 0x5678;
-      addressBus.get(0x9FFF).byte = 0x9A;
+      addressBus.setByte(0x8000, 0x12);
+      addressBus.setWord(0x8ABC, 0x5678);
+      addressBus.setByte(0x9FFF, 0x9A);
 
-      expect(addressBus.get(0x8000).byte).to.equal(0x12);
-      expect(addressBus.get(0x8ABC).byte).to.equal(0x78);
-      expect(addressBus.get(0x8ABD).byte).to.equal(0x56);
-      expect(addressBus.get(0x8ABC).word).to.equal(0x5678);
-      expect(addressBus.get(0x9FFF).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0x8000)).to.equal(0x12);
+      expect(addressBus.getByte(0x8ABC)).to.equal(0x78);
+      expect(addressBus.getByte(0x8ABD)).to.equal(0x56);
+      expect(addressBus.getWord(0x8ABC)).to.equal(0x5678);
+      expect(addressBus.getByte(0x9FFF)).to.equal(0x9A);
     });
   });
 
   describe('Internal RAM', () => {
     it('should be able to read/write from/into internal RAM', () => {
-      addressBus.get(0xC000).byte = 0x12;
-      addressBus.get(0xCDD2).word = 0x5678;
-      addressBus.get(0xDFFF).byte = 0x9A;
+      addressBus.setByte(0xC000, 0x12);
+      addressBus.setWord(0xCDD2, 0x5678);
+      addressBus.setByte(0xDFFF, 0x9A);
 
-      expect(addressBus.get(0xC000).byte).to.equal(0x12);
-      expect(addressBus.get(0xCDD2).byte).to.equal(0x78);
-      expect(addressBus.get(0xCDD3).byte).to.equal(0x56);
-      expect(addressBus.get(0xCDD2).word).to.equal(0x5678);
-      expect(addressBus.get(0xDFFF).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0xC000)).to.equal(0x12);
+      expect(addressBus.getByte(0xCDD2)).to.equal(0x78);
+      expect(addressBus.getByte(0xCDD3)).to.equal(0x56);
+      expect(addressBus.getWord(0xCDD2)).to.equal(0x5678);
+      expect(addressBus.getByte(0xDFFF)).to.equal(0x9A);
     });
   });
 
   describe('Echo of internal RAM', () => {
     it('should be able to read/write from/into echo of internal RAM', () => {
-      addressBus.get(0xE000).byte = 0x12;
-      addressBus.get(0xEDD2).word = 0x5678;
-      addressBus.get(0xFDFF).byte = 0x9A;
+      addressBus.setByte(0xE000, 0x12);
+      addressBus.setWord(0xEDD2, 0x5678);
+      addressBus.setByte(0xFDFF, 0x9A);
 
-      expect(addressBus.get(0xE000).byte).to.equal(0x12);
-      expect(addressBus.get(0xEDD2).byte).to.equal(0x78);
-      expect(addressBus.get(0xEDD3).byte).to.equal(0x56);
-      expect(addressBus.get(0xeDD2).word).to.equal(0x5678);
-      expect(addressBus.get(0xFDFF).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0xE000)).to.equal(0x12);
+      expect(addressBus.getByte(0xEDD2)).to.equal(0x78);
+      expect(addressBus.getByte(0xEDD3)).to.equal(0x56);
+      expect(addressBus.getWord(0xeDD2)).to.equal(0x5678);
+      expect(addressBus.getByte(0xFDFF)).to.equal(0x9A);
     });
 
     it('should be able to write into RAM and retrieve the value from the echo', () => {
-      addressBus.get(0xC000).byte = 0x12;
-      addressBus.get(0xCDD2).word = 0x5678;
-      addressBus.get(0xDDFF).byte = 0x9A;
+      addressBus.setByte(0xC000, 0x12);
+      addressBus.setWord(0xCDD2, 0x5678);
+      addressBus.setByte(0xDDFF, 0x9A);
 
-      expect(addressBus.get(0xE000).byte).to.equal(0x12);
-      expect(addressBus.get(0xEDD2).byte).to.equal(0x78);
-      expect(addressBus.get(0xEDD3).byte).to.equal(0x56);
-      expect(addressBus.get(0xeDD2).word).to.equal(0x5678);
-      expect(addressBus.get(0xFDFF).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0xE000)).to.equal(0x12);
+      expect(addressBus.getByte(0xEDD2)).to.equal(0x78);
+      expect(addressBus.getByte(0xEDD3)).to.equal(0x56);
+      expect(addressBus.getWord(0xeDD2)).to.equal(0x5678);
+      expect(addressBus.getByte(0xFDFF)).to.equal(0x9A);
     });
 
     it('should be able to write into the echo and retrieve the value from the RAM', () => {
-      addressBus.get(0xE000).byte = 0x12;
-      addressBus.get(0xEDD2).word = 0x5678;
-      addressBus.get(0xFDFF).byte = 0x9A;
+      addressBus.setByte(0xE000, 0x12);
+      addressBus.setWord(0xEDD2, 0x5678);
+      addressBus.setByte(0xFDFF, 0x9A);
 
-      expect(addressBus.get(0xC000).byte).to.equal(0x12);
-      expect(addressBus.get(0xCDD2).byte).to.equal(0x78);
-      expect(addressBus.get(0xCDD3).byte).to.equal(0x56);
-      expect(addressBus.get(0xCDD2).word).to.equal(0x5678);
-      expect(addressBus.get(0xDDFF).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0xC000)).to.equal(0x12);
+      expect(addressBus.getByte(0xCDD2)).to.equal(0x78);
+      expect(addressBus.getByte(0xCDD3)).to.equal(0x56);
+      expect(addressBus.getWord(0xCDD2)).to.equal(0x5678);
+      expect(addressBus.getByte(0xDDFF)).to.equal(0x9A);
     });
   });
 
   describe('Sprite attribute table (OAM)', () => {
     it('should be able to read/write from/into OAM', () => {
-      addressBus.get(0xFE00).byte = 0x12;
-      addressBus.get(0xFE34).word = 0x5678;
-      addressBus.get(0xFE9F).byte = 0x9A;
+      addressBus.setByte(0xFE00, 0x12);
+      addressBus.setWord(0xFE34, 0x5678);
+      addressBus.setByte(0xFE9F, 0x9A);
 
-      expect(addressBus.get(0xFE00).byte).to.equal(0x12);
-      expect(addressBus.get(0xFE34).byte).to.equal(0x78);
-      expect(addressBus.get(0xFE35).byte).to.equal(0x56);
-      expect(addressBus.get(0xFE34).word).to.equal(0x5678);
-      expect(addressBus.get(0xFE9F).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0xFE00)).to.equal(0x12);
+      expect(addressBus.getByte(0xFE34)).to.equal(0x78);
+      expect(addressBus.getByte(0xFE35)).to.equal(0x56);
+      expect(addressBus.getWord(0xFE34)).to.equal(0x5678);
+      expect(addressBus.getByte(0xFE9F)).to.equal(0x9A);
     });
   });
 
   describe('Reserved memory', () => {
     it('should not be able to use addresses from 0xFEA0 to 0xFEFF', () => {
-      addressBus.get(0xFEA0).byte = 0x12;
-      addressBus.get(0xFECD).byte = 0x34;
-      addressBus.get(0xFEFF).byte = 0x56;
+      addressBus.setByte(0xFEA0, 0x12);
+      addressBus.setByte(0xFECD, 0x34);
+      addressBus.setByte(0xFEFF, 0x56);
 
-      expect(addressBus.get(0xFEA0).byte).to.equal(0x00);
-      expect(addressBus.get(0xFEA0).word).to.equal(0x00);
+      expect(addressBus.getByte(0xFEA0)).to.equal(0x00);
+      expect(addressBus.getWord(0xFEA0)).to.equal(0x00);
 
-      expect(addressBus.get(0xFECD).byte).to.equal(0x00);
-      expect(addressBus.get(0xFECD).word).to.equal(0x00);
+      expect(addressBus.getByte(0xFECD)).to.equal(0x00);
+      expect(addressBus.getWord(0xFECD)).to.equal(0x00);
 
-      expect(addressBus.get(0xFEFF).byte).to.equal(0x00);
-      expect(addressBus.get(0xFEFF).word).to.equal(0x00);
+      expect(addressBus.getByte(0xFEFF)).to.equal(0x00);
+      expect(addressBus.getWord(0xFEFF)).to.equal(0x00);
     });
   });
 
   describe('High RAM', () => {
     it('should be able to read/write from/into HRAM', () => {
-      addressBus.get(0xFF80).byte = 0x12;
-      addressBus.get(0xFFAB).word = 0x5678;
-      addressBus.get(0xFFFE).byte = 0x9A;
+      addressBus.setByte(0xFF80, 0x12);
+      addressBus.setWord(0xFFAB, 0x5678);
+      addressBus.setByte(0xFFFE, 0x9A);
 
-      expect(addressBus.get(0xFF80).byte).to.equal(0x12);
-      expect(addressBus.get(0xFFAB).byte).to.equal(0x78);
-      expect(addressBus.get(0xFFAC).byte).to.equal(0x56);
-      expect(addressBus.get(0xFFAB).word).to.equal(0x5678);
-      expect(addressBus.get(0xFFFE).byte).to.equal(0x9A);
+      expect(addressBus.getByte(0xFF80)).to.equal(0x12);
+      expect(addressBus.getByte(0xFFAB)).to.equal(0x78);
+      expect(addressBus.getByte(0xFFAC)).to.equal(0x56);
+      expect(addressBus.getWord(0xFFAB)).to.equal(0x5678);
+      expect(addressBus.getByte(0xFFFE)).to.equal(0x9A);
     });
   });
 
   describe('Interrupts Enable Registers', () => {
     it('should be able to read/write from/into Interrupts Enable Registers', () => {
-      addressBus.get(0xFFFF).byte = 0x12;
-      expect(addressBus.get(0xFFFF).byte).to.equal(0x12);
+      addressBus.setByte(0xFFFF, 0x12);
+      expect(addressBus.getByte(0xFFFF)).to.equal(0x12);
     });
   });
 
@@ -242,19 +242,19 @@ describe('AddressBus', () => {
       const cartridgeResetSpy = sinon.spy(cartridge, 'reset');
       addressBus.loadCartridge(cartridge);
 
-      addressBus.get(0x8000).byte = 0x12;
-      addressBus.get(0xC000).byte = 0x12;
-      addressBus.get(0xFE00).byte = 0x12;
-      addressBus.get(0xFF80).byte = 0x12;
-      addressBus.get(0xFFFF).byte = 0x12;
+      addressBus.setByte(0x8000, 0x12);
+      addressBus.setByte(0xC000, 0x12);
+      addressBus.setByte(0xFE00, 0x12);
+      addressBus.setByte(0xFF80, 0x12);
+      addressBus.setByte(0xFFFF, 0x12);
 
       addressBus.reset();
 
-      expect(addressBus.get(0x8000).byte).to.equal(0x00);
-      expect(addressBus.get(0xC000).byte).to.equal(0x00);
-      expect(addressBus.get(0xFE00).byte).to.equal(0x00);
-      expect(addressBus.get(0xFF80).byte).to.equal(0x00);
-      expect(addressBus.get(0xFFFF).byte).to.equal(0x00);
+      expect(addressBus.getByte(0x8000)).to.equal(0x00);
+      expect(addressBus.getByte(0xC000)).to.equal(0x00);
+      expect(addressBus.getByte(0xFE00)).to.equal(0x00);
+      expect(addressBus.getByte(0xFF80)).to.equal(0x00);
+      expect(addressBus.getByte(0xFFFF)).to.equal(0x00);
 
       expect(cartridgeResetSpy.calledOnce).to.equal(true);
     });
@@ -263,11 +263,11 @@ describe('AddressBus', () => {
   describe('Errors handling', () => {
     it('should not allow to access invalid addresses', () => {
       expect(() => {
-        addressBus.get(-1);
+        addressBus.getByte(-1);
       }).to.throw('Invalid address');
 
       expect(() => {
-        addressBus.get(0x10000);
+        addressBus.getByte(0x10000);
       }).to.throw('Invalid address');
     });
   });

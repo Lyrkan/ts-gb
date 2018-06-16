@@ -79,10 +79,10 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // RLC (HL)
   0x06: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.rlc(
-      addressBus.get(registers.HL).byte
+      addressBus.getByte(registers.HL)
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -177,10 +177,10 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // RRC (HL)
   0x0E: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.rrc(
-      addressBus.get(registers.HL).byte
+      addressBus.getByte(registers.HL)
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -293,11 +293,11 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // RL (HL)
   0x16: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.rl(
-      addressBus.get(registers.HL).byte,
+      addressBus.getByte(registers.HL),
       registers.flags.C
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -413,11 +413,11 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // RR (HL)
   0x1E: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.rr(
-      addressBus.get(registers.HL).byte,
+      addressBus.getByte(registers.HL),
       registers.flags.C
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -515,10 +515,10 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // SLA (HL)
   0x26: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.sla(
-      addressBus.get(registers.HL).byte
+      addressBus.getByte(registers.HL)
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -613,10 +613,10 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // SRA (HL)
   0x2E: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.sra(
-      addressBus.get(registers.HL).byte
+      addressBus.getByte(registers.HL)
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -711,10 +711,10 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // SWAP (HL)
   0x36: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z } = ALU.swap(
-      addressBus.get(registers.HL).byte
+      addressBus.getByte(registers.HL)
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.N = 0;
     registers.flags.H = 0;
@@ -809,10 +809,10 @@ export const OPCODES_0XCB: IOpcodesMap = {
   // SRL (HL)
   0x3E: (registers: CpuRegisters, addressBus: AddressBus) => {
     const { value, Z, H, N, C } = ALU.srl(
-      addressBus.get(registers.HL).byte
+      addressBus.getByte(registers.HL)
     );
 
-    addressBus.get(registers.HL).byte = value;
+    addressBus.setByte(registers.HL, value);
     registers.flags.Z = Z;
     registers.flags.H = H;
     registers.flags.N = N;
@@ -894,7 +894,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 0,(HL)
   0x46: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(0, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(0, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -974,7 +974,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 1,(HL)
   0x4E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(1, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(1, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1054,7 +1054,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 2,(HL)
   0x56: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(2, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(2, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1134,7 +1134,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 3,(HL)
   0x5E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(3, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(3, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1214,7 +1214,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 4,(HL)
   0x66: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(4, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(4, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1294,7 +1294,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 5,(HL)
   0x6E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(5, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(5, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1374,7 +1374,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 6,(HL)
   0x76: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(6, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(6, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1454,7 +1454,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // BIT 7,(HL)
   0x7E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    const { Z, N, H } = ALU.bit(7, addressBus.get(registers.HL).byte);
+    const { Z, N, H } = ALU.bit(7, addressBus.getByte(registers.HL));
 
     registers.flags.Z = Z;
     registers.flags.N = N;
@@ -1510,7 +1510,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 0,(HL)
   0x86: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(0, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(0, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1558,7 +1558,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 1,(HL)
   0x8E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(1, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(1, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1606,7 +1606,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 2,(HL)
   0x96: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(2, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(2, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1654,7 +1654,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 3,(HL)
   0x9E: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(3, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(3, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1702,7 +1702,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 4,(HL)
   0xA6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(4, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(4, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1750,7 +1750,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 5,(HL)
   0xAE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(5, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(5, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1798,7 +1798,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 6,(HL)
   0xB6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(6, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(6, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1846,7 +1846,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // RES 7,(HL)
   0xBE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.res(7, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.res(7, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1894,7 +1894,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 0,(HL)
   0xC6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(0, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(0, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1942,7 +1942,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 1,(HL)
   0xCE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(1, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(1, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -1990,7 +1990,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 2,(HL)
   0xD6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(2, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(2, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -2038,7 +2038,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 3,(HL)
   0xDE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(3, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(3, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -2086,7 +2086,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 4,(HL)
   0xE6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(4, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(4, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -2134,7 +2134,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 5,(HL)
   0xEE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(5, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(5, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -2182,7 +2182,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 6,(HL)
   0xF6: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(6, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(6, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
@@ -2230,7 +2230,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
 
   // SET 7,(HL)
   0xFE: (registers: CpuRegisters, addressBus: AddressBus) => {
-    addressBus.get(registers.HL).byte = ALU.set(7, addressBus.get(registers.HL).byte).value;
+    addressBus.setByte(registers.HL, ALU.set(7, addressBus.getByte(registers.HL)).value);
     return 4;
   },
 
