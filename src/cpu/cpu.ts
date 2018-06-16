@@ -148,7 +148,7 @@ export class CPU {
     // Check if there is at least one pending interrupt
     const interruptFlagsRegister = this.addressBus.get(0xFF0F);
     const interruptFlags = interruptFlagsRegister.byte;
-    if ((interruptFlags && 0x1F) === 0) {
+    if ((interruptFlags & 0x1F) === 0) {
       return;
     }
 
