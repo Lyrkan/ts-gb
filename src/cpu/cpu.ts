@@ -115,25 +115,27 @@ export class CPU {
     // globally enabled, check if an enabled interrupt
     // has been triggered. This won't execute the
     // interrupt but will make the CPU leave that state.
-    if (this.halted && !this.interruptsEnabled) {
-      // Check if an interrupt is enabled
-      const interruptFlags = this.addressBus.get(0xFF0F).byte;
-      if ((interruptFlags & 0x1F) === 0) {
-        return;
-      }
+    if (this.halted) {
+      if (!this.interruptsEnabled) {
+        // Check if an interrupt is enabled
+        const interruptFlags = this.addressBus.get(0xFF0F).byte;
+        if ((interruptFlags & 0x1F) === 0) {
+          return;
+        }
 
-      // Check if an enabled interrupt has been triggered
-      const ieRegister = this.addressBus.get(0xFFFF).byte;
-      for (let bit = 0; bit < 5; bit++) {
-        if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
-          // If interrupts are globally disabled we need
-          // to know that the last instruction was an
-          // HALT to emulate the HALT bug (repeated
-          // instruction due to PC not being incremented
-          // properly)
-          this.halted = false;
-          this.haltedLastCycle = true;
-          break;
+        // Check if an enabled interrupt has been triggered
+        const ieRegister = this.addressBus.get(0xFFFF).byte;
+        for (let bit = 0; bit < 5; bit++) {
+          if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+            // If interrupts are globally disabled we need
+            // to know that the last instruction was an
+            // HALT to emulate the HALT bug (repeated
+            // instruction due to PC not being incremented
+            // properly)
+            this.halted = false;
+            this.haltedLastCycle = true;
+            break;
+          }
         }
       }
 
