@@ -1,6 +1,6 @@
 {
   "name": "ts-gb",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "TypeScript Game Boy emulator",
   "author": "Vincent Le Biannic",
   "license": "MIT",
@@ -15,7 +15,6 @@
     "nsp": "nsp check",
     "precommit": "yarn run lint",
     "prepush": "yarn run nsp && yarn run lint && yarn run test",
-    "publish": "yarn run build && npm publish",
     "start": "yarn build && electron dist/electron/main.js",
     "test": "mocha -t 30000 -r ts-node/register \"./test/**/*.spec.ts\""
   },
