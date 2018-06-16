@@ -19,7 +19,7 @@ export class CPU {
   private firstCycle: boolean;
 
   // How many cycles the CPU should skip
-  private skipCyles: number;
+  private skipCycles: number;
 
   // Callbacks that can be used by opcodes
   private cpuCallbacks: ICPUCallbacks;
@@ -63,7 +63,7 @@ export class CPU {
   public reset(): void {
     this.registers = new CpuRegisters();
     this.timer.reset();
-    this.skipCyles = 0;
+    this.skipCycles = 0;
     this.firstCycle = true;
     this.stopped = false;
     this.halted = false;
@@ -92,13 +92,17 @@ export class CPU {
 
     // Skip the current cycle if needed
     // (but still update the timer)
-    if (this.skipCyles > 0) {
-      this.skipCyles--;
+    if (this.skipCycles > 0) {
+      this.skipCycles--;
       return;
     }
 
     // Execute pending interrupts (if enabled)
     this.executeInterrupts();
+    if (this.skipCycles > 0) {
+      this.skipCycles--;
+      return;
+    }
 
     // Do nothing if stopped
     if (this.stopped) {
@@ -136,38 +140,46 @@ export class CPU {
   }
 
   private executeInterrupts(): void {
-    // Check if there are pending interrupts and
-    // interrupts are globally enabled.
-    if (this.interruptsEnabled && ((this.addressBus.get(0xFF0F).byte && 0x1F) > 0)) {
-      // Check each interrupt state
-      const ieRegister = this.addressBus.get(0xFFFF).byte;
-      const interruptFlags = this.addressBus.get(0xFF0F).byte;
-      for (let bit = 0; bit < 5; bit++) {
-        if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
-          // An interrupt takes 5 cycles to dispatch
-          this.skipCyles = 5;
+    // Check if interrupts are globally enabled
+    if (!this.interruptsEnabled) {
+      return;
+    }
 
-          // Disable further interrupts.
-          this.interruptsEnabled = false;
+    // Check if there is at least one pending interrupt
+    const interruptFlagsRegister = this.addressBus.get(0xFF0F);
+    const interruptFlags = interruptFlagsRegister.byte;
+    if ((interruptFlags && 0x1F) === 0) {
+      return;
+    }
 
-          // Disable halt
-          // It takes one more cycle
-          if (this.halted) {
-            this.halted = false;
-            this.skipCyles += 1;
-          }
+    // Check each interrupt state
+    const ieRegister = this.addressBus.get(0xFFFF).byte;
 
-          // Push PC into stack
-          this.registers.SP -= 2;
-          this.addressBus.get(this.registers.SP).word = this.registers.PC;
+    for (let bit = 0; bit < 5; bit++) {
+      if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+        // An interrupt takes 5 cycles to dispatch
+        this.skipCycles = 5;
 
-          // Jump to the interrupt address
-          this.registers.PC = 0x0040 + (8 * bit);
+        // Disable further interrupts.
+        this.interruptsEnabled = false;
 
-          // Disable this interrupt
-          this.addressBus.get(0xFF0F).byte = this.addressBus.get(0xFF0F).byte & ~(1 << bit);
-          return;
+        // Disable halt
+        // It takes one more cycle
+        if (this.halted) {
+          this.halted = false;
+          this.skipCycles += 1;
         }
+
+        // Push PC into stack
+        this.registers.SP -= 2;
+        this.addressBus.get(this.registers.SP).word = this.registers.PC;
+
+        // Jump to the interrupt address
+        this.registers.PC = 0x0040 + (8 * bit);
+
+        // Disable this interrupt
+        interruptFlagsRegister.byte = interruptFlags & ~(1 << bit);
+        return;
       }
     }
   }
@@ -189,7 +201,7 @@ export class CPU {
     if (opcodeIndex in OPCODES) {
       // Change the current opcode map
       opcodesMap = OPCODES[opcodeIndex];
-      this.skipCyles += 1;
+      this.skipCycles += 1;
 
       opcodePrefix = opcodeIndex;
       opcodeIndex = this.addressBus.get(this.registers.PC++).byte;
@@ -209,7 +221,7 @@ export class CPU {
     }
 
     // Run the opcode
-    this.skipCyles += opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
+    this.skipCycles += opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
   }
 }
 
