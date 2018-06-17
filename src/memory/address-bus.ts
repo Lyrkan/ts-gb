@@ -275,8 +275,9 @@ export class AddressBus {
 
   /**
    * Return the memory segment associated to the
-   * video RAM. It avoids creating a lot of accessors
-   * during rendering.
+   * video RAM. It avoids doing many calls to
+   * getByte/getWord and unecessary lookups during
+   * video rendering.
    */
   public getVideoRamSegment(): MemorySegment {
     return this.videoRam;
@@ -284,8 +285,8 @@ export class AddressBus {
 
   /**
    * Return the memory segment associated to the
-   * OAM in order to avoid creating a lot of accessors
-   * during rendering.
+   * OAM. It avoids doing many calls to getByte/getWord
+   * and unecessary lookups during video rendering.
    */
   public getOamSegment(): MemorySegment {
     return this.oam;

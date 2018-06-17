@@ -118,6 +118,8 @@ export const PPU = {
 
     // Render current line
     for (let i = 0; i < SCREEN_WIDTH; i++) {
+      const isWindowPixel = lcdControl.windowEnabled && (winPosY <= line) && (winPosX <= i);
+      const isBackgroundPixel = lcdControl.backgroundEnabled && !isWindowPixel;
       const screenBufferIndex = (line * SCREEN_WIDTH) + i;
 
       // Check if a sprite should be rendered
@@ -156,7 +158,7 @@ export const PPU = {
       }
 
       // Render background
-      if (lcdControl.backgroundEnabled) {
+      if (isBackgroundPixel) {
         const mapPosX = Math.floor((bgScrollX + i) / 8) % 32;
         const mapPosY = Math.floor((bgScrollY + line) / 8) % 32;
 
@@ -180,7 +182,7 @@ export const PPU = {
       }
 
       // Render window
-      if (lcdControl.windowEnabled && (lcdPositions.windowPositionY <= line) && (winPosX <= i)) {
+      if (isWindowPixel) {
         const mapPosX = Math.floor((i - winPosX) / 8) % 32;
         const mapPosY = Math.floor((line - winPosY) / 8) % 32;
 
