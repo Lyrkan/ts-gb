@@ -13,6 +13,9 @@ const crypto = require('crypto');
 // the CPU/MMU/...
 const system = new System();
 
+// Expose system globally
+(global as any).GAME_BOY = system;
+
 // Find the canvas that represents the LCD screen
 const canvas = document.getElementById('lcd');
 const canvasContext = canvas ? (canvas as HTMLCanvasElement).getContext('2d') : null;
