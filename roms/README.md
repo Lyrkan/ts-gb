@@ -11,3 +11,7 @@ Test ROMs by Blargg (http://blargg.8bitalley.com/):
 * `09-op r,r.gb`
 * `10-bit ops.gb`
 * `11-op a,(hl).gb`
+
+Test ROMs by Shonumi (https://github.com/shonumi):
+
+* `lyc.gb`

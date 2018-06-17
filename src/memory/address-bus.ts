@@ -165,22 +165,20 @@ export class AddressBus {
         return decorated.getByte(offset);
       },
       setByte: (decorated, offset, value) => {
-        // Joypad update
-        // Mostly used to switch between directions and buttons modes.
         if (offset === 0x0000) {
+          // Joypad update
+          // Mostly used to switch between directions and buttons modes.
           if ((value & 0x10) === 0) {
             joypadMode = JOYPAD_MODE.DIRECTIONS;
           } else if ((value & 0x20) === 0) {
             joypadMode = JOYPAD_MODE.BUTTONS;
           }
-        }
-
-        // LY update.
-        // When that happens it should also change the value of LYC
-        // and eventually trigger an interrupt.
-        if (offset === 0x0044) {
+        } else if (offset === 0x0044) {
+          // LY update.
+          // When that happens it should also change the value of LYC
+          // and eventually trigger an interrupt.
           const lcdsRegister = decorated.getByte(0x0041);
-          const ly = decorated.getByte(0x0044);
+          const ly = value;
           const lyc =  decorated.getByte(0x0045);
 
           if (ly === lyc) {
@@ -193,20 +191,16 @@ export class AddressBus {
           } else {
             decorated.setByte(0x0041, lcdsRegister & ~(1 << 2));
           }
-        }
-
-        // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
-        // Note that this is really inaccurate since it should
-        // normally take 160 * 4 + 4 cycles to complete.
-        if (offset === 0x0046) {
+        } else if (offset === 0x0046) {
+          // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
+          // Note that this is really inaccurate since it should
+          // normally take 160 * 4 + 4 cycles to complete.
           const fromAddress = (value & 0xFF) << 8;
           for (let i = 0; i < OAM_LENGTH; i++) {
             this.setByte(0xFE00 + i, this.getByte(fromAddress + i));
           }
-        }
-
-        // Writes on 0x0050 (=0xFF50) disable the boot rom
-        if (offset === 0x0050) {
+        } else if (offset === 0x0050) {
+          // Writes on 0x0050 (=0xFF50) disable the boot rom
           this.bootRomEnabled = false;
         }
 

@@ -110,4 +110,12 @@ describe('Functional tests', () => {
       checkScreenBuffer('a8e5e245319af47449a8e3bf6a5e06e91a98bb82');
     });
   });
+
+  describe('Shonumi\'s test ROMs', () => {
+    it('lyc.gb (LY=LYC check)', () => {
+      loadGame('../roms/lyc.gb');
+      runTicks(1 * CPU_CLOCK_FREQUENCY);
+      checkScreenBuffer('85f5434db90bbb3c413551d102e4d4121096ab67');
+    });
+  });
 });
