@@ -55,7 +55,7 @@ export const PPU = {
     };
   },
 
-  retrieveSprites: (attributes: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
+  retrieveSprites: (oamData: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
     const sprites: ISprite[] = [];
 
     for (let i = 0; i < 40; i++) {
@@ -66,17 +66,17 @@ export const PPU = {
         break;
       }
 
-      const yPos = attributes[i * 4] - 16;
-      const xPos = attributes[(i * 4) + 1] - 8;
+      const yPos = oamData[i * 4] - 16;
+      const xPos = oamData[(i * 4) + 1] - 8;
 
       // Filter sprites based on the current line
       if ((yPos <= line) && (yPos + spritesHeight > line)) {
-        const spriteFlags = attributes[(i * 4) + 3];
+        const spriteFlags = oamData[(i * 4) + 3];
 
         sprites.push({
           y: yPos,
           x: xPos,
-          tile: attributes[(i * 4) + 2],
+          tile: oamData[(i * 4) + 2],
           priority: (spriteFlags >> 7) & 1,
           yFlip: ((spriteFlags >> 6) & 1) === 1,
           xFlip: ((spriteFlags >> 5) & 1) === 1,
@@ -101,8 +101,6 @@ export const PPU = {
     const lcdPositions = PPU.readPosRegisters(addressBus);
     const palettes = PPU.readPaletteRegisters(addressBus);
 
-    const spriteAttributeTable = oamData.slice(0, 0xA0);
-
     const bgMapOffset = (lcdControl.backgroundTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
     const winMapOffset = (lcdControl.windowTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
 
@@ -115,7 +113,7 @@ export const PPU = {
     // Retrieve sprites for the current line
     let sprites: ISprite[] = [];
     if (lcdControl.spritesEnabled) {
-      sprites = PPU.retrieveSprites(spriteAttributeTable, line, lcdControl.spritesHeight);
+      sprites = PPU.retrieveSprites(oamData, line, lcdControl.spritesHeight);
     }
 
     // Render current line
