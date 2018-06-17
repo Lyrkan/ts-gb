@@ -97,8 +97,7 @@ export class Display {
     // H-Blank Interrupt (Mode 0) = bit 3
     // V-Blank Interrupt (Mode 1) = bit 4
     // OAM Interrupt (Mode 2) = bit 5
-    if ((mode !== GPU_MODE.PIXEL_TRANSFER)
-      && (lcdsRegister & (1 << (3 + mode))) > 0) {
+    if ((mode !== GPU_MODE.PIXEL_TRANSFER) && (lcdsRegister & (1 << (3 + mode))) > 0) {
       this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | 2);
     }
   }

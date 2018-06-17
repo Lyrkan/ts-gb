@@ -1,6 +1,10 @@
-import { IGameCartridgeMBC, CARTRIDGE_ROM_BANK_LENGTH } from '../game-cartridge';
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
+import {
+  IGameCartridgeMBC,
+  CARTRIDGE_ROM_BANK_LENGTH,
+  CARTRIDGE_RAM_BANK_LENGTH
+} from '../game-cartridge';
 
 export class MBC1 implements IGameCartridgeMBC {
   private romBanks: IMemorySegment[];
@@ -72,7 +76,7 @@ export class MBC1 implements IGameCartridgeMBC {
 
     this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, {
       getByte: (decorated, offset) => {
-        if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
+        if (offset < 0 || offset >= CARTRIDGE_RAM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
         }
 
