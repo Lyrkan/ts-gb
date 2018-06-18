@@ -21,43 +21,37 @@ export class MBC2 implements IGameCartridgeMBC {
 
     this.enabledRam = true;
 
-    // Create a trap that will be called when something
-    // tries to write into the ROM banks.
-    const romWriteTrap = (bankIndex: number, offset: number, value: number) => {
-      // Only keep the 8 lower bits so we have the
-      // same behavior between .byte and .word
-      value = value & 0xFF;
-
-      // Only addresses from 0x0000 to 0x3FFF (bank #0)
-      // have an effect.
-      if (bankIndex === 0) {
-        if (offset < 0x2000) {
-          // Enable/disable RAM
-          // Should only work if the least significant bit
-          // of the upper address is set to 0.
-          if (((0 >> 8) & 1) === 0) {
-            this.enabledRam = (value & 0b1111) === 0x0A;
-          }
-        } else if (offset < 0x4000) {
-          // ROM Bank switch
-          // If the value is equal to 0x00 it is changed
-          // to 0x01.
-          // Should only work if the least significant bit
-          // of the upper address is set to 1.
-          if (((0 >> 8) & 1) === 1) {
-            this.currentRomBank = (value & 0b1111) || 1;
-          }
-        }
-      }
-    };
-
-    this.romBanks = romBanks.map((bank, index) => new MemorySegmentDecorator(bank, {
+    this.romBanks = romBanks.map((bank, bankIndex) => new MemorySegmentDecorator(bank, {
       setByte: (decorated, offset, value) => {
         if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
         }
 
-        romWriteTrap(index, offset, value);
+        // Only keep the 8 lower bits so we have the
+        // same behavior between .byte and .word
+        value = value & 0xFF;
+
+        // Only addresses from 0x0000 to 0x3FFF (bank #0)
+        // have an effect.
+        if (bankIndex === 0) {
+          if (offset < 0x2000) {
+            // Enable/disable RAM
+            // Should only work if the least significant bit
+            // of the upper address is set to 0.
+            if (((0 >> 8) & 1) === 0) {
+              this.enabledRam = (value & 0b1111) === 0x0A;
+            }
+          } else if (offset < 0x4000) {
+            // ROM Bank switch
+            // If the value is equal to 0x00 it is changed
+            // to 0x01.
+            // Should only work if the least significant bit
+            // of the upper address is set to 1.
+            if (((0 >> 8) & 1) === 1) {
+              this.currentRomBank = (value & 0b1111) || 1;
+            }
+          }
+        }
       }
     }));
 
