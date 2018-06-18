@@ -3,6 +3,7 @@ import { STATIC_FFFF_SEGMENT } from '../memory/static-memory-segment';
 import { NoMBC } from './mbc/no-mbc';
 import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
+import { MBC3 } from './mbc/mbc3';
 import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
 
 export class GameCartridge implements IGameCartridge {
@@ -101,7 +102,7 @@ export class GameCartridge implements IGameCartridge {
       case MBC_TYPE.MBC2:
         return new MBC2(romBanks, ramBanks);
       case MBC_TYPE.MBC3:
-        throw new Error('MBC Type 3 is not implemented yet');
+        return new MBC3(romBanks, ramBanks, cartridgeInfo.hasTimer);
       case MBC_TYPE.MBC5:
         throw new Error('MBC Type 5 is not implemented yet');
     }
