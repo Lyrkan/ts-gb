@@ -5,6 +5,7 @@ import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
 import { MBC3 } from './mbc/mbc3';
 import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
+import { MBC5 } from './mbc/mbc5';
 
 export class GameCartridge implements IGameCartridge {
   public static readCartridgeInfo(data: ArrayBuffer): IGameCartridgeInfo {
@@ -93,8 +94,6 @@ export class GameCartridge implements IGameCartridge {
     ramBanks: IMemorySegment[]
   ): IGameCartridgeMBC {
     switch (cartridgeInfo.mbcType) {
-      // If there is no MBC, directly use all the
-      // banks created above
       case MBC_TYPE.NONE:
         return new NoMBC(romBanks, ramBanks);
       case MBC_TYPE.MBC1:
@@ -104,7 +103,7 @@ export class GameCartridge implements IGameCartridge {
       case MBC_TYPE.MBC3:
         return new MBC3(romBanks, ramBanks, cartridgeInfo.hasTimer);
       case MBC_TYPE.MBC5:
-        throw new Error('MBC Type 5 is not implemented yet');
+        return new MBC5(romBanks, ramBanks);
     }
 
     throw new Error(`MBC type ${cartridgeInfo.mbcType} is not implemented yet`);
