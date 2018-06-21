@@ -7,6 +7,8 @@ import {
 } from '../game-cartridge';
 
 export class MBC5 implements IGameCartridgeMBC {
+  public readonly staticRomBank: IMemorySegment;
+
   private romBanks: IMemorySegment[];
   private ramBanks: IMemorySegment[];
 
@@ -21,32 +23,35 @@ export class MBC5 implements IGameCartridgeMBC {
 
     this.enabledRam = false;
 
-    this.romBanks = romBanks.map((bank, bankIndex) => new MemorySegmentDecorator(bank, {
+    this.staticRomBank = new MemorySegmentDecorator(romBanks[0], {
       setByte: (decorated, offset, value) => {
         if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
         }
 
-        // Change the behavior based on whether the
-        // write occurs on the static or the switchable
-        // banks.
-        if (bankIndex === 0) {
-          if (offset < 0x2000) {
-            // Enable/disable RAM
-            this.enabledRam = (value === 0x0A);
-          } else if (offset < 0x3000) {
-            // ROM Bank switch (lower 8 bits)
-            this.currentRomBank = (this.currentRomBank & (~0xFF)) | (value & 0xFF);
-          } else if (offset < 0x4000) {
-            // ROM Bank switch (9th bith)
-            this.currentRomBank = (this.currentRomBank & 0xFF) | (value & 1) << 7;
-          }
-        } else {
-          if (offset < 0x2000) {
-            // RAM Bank switch
-            if (value <= 0x0F) {
-              this.currentRamBank = value;
-            }
+        if (offset < 0x2000) {
+          // Enable/disable RAM
+          this.enabledRam = (value === 0x0A);
+        } else if (offset < 0x3000) {
+          // ROM Bank switch (lower 8 bits)
+          this.currentRomBank = (this.currentRomBank & (~0xFF)) | (value & 0xFF);
+        } else if (offset < 0x4000) {
+          // ROM Bank switch (9th bith)
+          this.currentRomBank = (this.currentRomBank & 0xFF) | (value & 1) << 7;
+        }
+      }
+    });
+
+    this.romBanks = romBanks.map(bank => new MemorySegmentDecorator(bank, {
+      setByte: (decorated, offset, value) => {
+        if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
+          throw new RangeError(`Invalid address "${offset}"`);
+        }
+
+        if (offset < 0x2000) {
+          // RAM Bank switch
+          if (value <= 0x0F) {
+            this.currentRamBank = value;
           }
         }
       }
@@ -78,11 +83,6 @@ export class MBC5 implements IGameCartridgeMBC {
         return decorated.setByte(offset, value);
       },
     }));
-  }
-
-  public get staticRomBank() {
-    // Static ROM bank always targets bank #0
-    return this.romBanks[0];
   }
 
   public get switchableRomBank() {
