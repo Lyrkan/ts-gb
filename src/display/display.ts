@@ -90,7 +90,7 @@ export class Display {
 
     // Trigger VBLANK interrupt if needed
     if (mode === GPU_MODE.VBLANK) {
-      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | 1);
+      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 0));
     }
 
     // Check if the LCDC Status Interrupt should be triggered:
@@ -98,7 +98,7 @@ export class Display {
     // V-Blank Interrupt (Mode 1) = bit 4
     // OAM Interrupt (Mode 2) = bit 5
     if ((mode !== GPU_MODE.PIXEL_TRANSFER) && (lcdsRegister & (1 << (3 + mode))) > 0) {
-      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | 2);
+      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 1));
     }
   }
 }

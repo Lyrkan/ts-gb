@@ -106,9 +106,14 @@ export class CPU {
       return;
     }
 
-    // Do nothing if stopped
+    // Do nothing if stopped until a button
+    // is pressed.
     if (this.stopped) {
-      return;
+      if (!checkBit(4, this.addressBus.getByte(0xFF0F))) {
+        return;
+      }
+
+      this.stopped = false;
     }
 
     // If the CPU is halted but interrupts are not

@@ -68,7 +68,7 @@ export class CpuTimer {
 
     // Triggers interrupt and reset to modulo in case of an overflow
     if (newValue === 0) {
-      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | 0b100);
+      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 2));
       newValue = this.addressBus.getByte(0xFF06);
     }
 

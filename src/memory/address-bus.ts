@@ -186,7 +186,7 @@ export class AddressBus {
 
             // Check if we should trigger the LCDC Status Interrupt
             if ((lcdsRegister & 0x40) > 0) {
-              this.setByte(0xFF0F, this.getByte(0xFF0F) | 2);
+              this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
             }
           } else {
             decorated.setByte(0x0041, lcdsRegister & ~(1 << 2));
@@ -218,7 +218,7 @@ export class AddressBus {
     // Set the interrupt callback on the joypad
     // to catch button presses
     this.joypad.setInterruptCallback(() => {
-      this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | 0x10);
+      this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | (0 << 4));
     });
   }
 
