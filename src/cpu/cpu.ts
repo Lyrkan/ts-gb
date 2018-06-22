@@ -79,6 +79,10 @@ export class CPU {
       // If there isn't any boot ROM, directly
       // jump to 0x0100.
       if (!this.addressBus.hasBootRom()) {
+        this.registers.AF = 0x01B0;
+        this.registers.BC = 0x0013;
+        this.registers.DE = 0x00D8;
+        this.registers.HL = 0x014D;
         this.registers.SP = 0xFFFE;
         this.registers.PC = 0x0100;
       }
