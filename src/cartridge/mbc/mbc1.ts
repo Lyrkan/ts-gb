@@ -98,6 +98,9 @@ export class MBC1 implements IGameCartridgeMBC {
       index |= (this.currentRamBank & 0b11) << 5;
     }
 
+    // Avoid out of bounds reads/writes
+    index = index % this.romBanks.length;
+
     return this.romBanks[index];
   }
 
