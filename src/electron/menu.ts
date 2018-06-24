@@ -1,4 +1,5 @@
 import { dialog, Menu } from 'electron';
+import { DEBUGGER_MODE } from './debugger';
 
 export const buildMenu = (window: Electron.BrowserWindow) => {
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -42,21 +43,24 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
       submenu: [
         {
           label: 'Pause emulation',
-          click: () => {
-            window.webContents.send('pauseEmulation');
-          }
+          click: () => window.webContents.send('pauseEmulation')
         },
         {
           label: 'Resume emulation',
-          click: () => {
-            window.webContents.send('resumeEmulation');
-          }
+          click: () => window.webContents.send('resumeEmulation')
         },
         {
           label: 'Restart emulation',
-          click: () => {
-            window.webContents.send('restartEmulation');
-          }
+          click: () => window.webContents.send('restartEmulation')
+        },
+      ]
+    },
+    {
+      label: 'Display',
+      submenu: [
+        {
+          label: 'Toggle stats',
+          click: () => window.webContents.send('toggleStats')
         },
       ]
     },
@@ -64,36 +68,54 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
       label: 'Debug',
       submenu: [
         {
-          label: 'Toggle stats',
-          click: () => {
-            window.webContents.send('toggleStats');
-          }
+          label: 'Debugger mode',
+          submenu: [
+            {
+              label: 'Normal',
+              click: () => window.webContents.send('setDebuggerMode', DEBUGGER_MODE.NORMAL),
+            },
+            {
+              label: 'Trace',
+              click: () => window.webContents.send('setDebuggerMode', DEBUGGER_MODE.TRACE),
+            },
+            {
+              label: 'Detailled',
+              click: () => window.webContents.send('setDebuggerMode', DEBUGGER_MODE.DETAILLED),
+            },
+          ]
         },
         {
-          label: 'Dump registers',
-          click: () => {
-            window.webContents.send('dumpRegisters');
-          }
+          label: 'Run',
+          submenu: [
+            {
+              label: 'Run single tick',
+              accelerator: 'CmdOrCtrl+Enter',
+              click: () => window.webContents.send('runSingleTick'),
+            },
+            {
+              label: 'Run single step',
+              accelerator: 'CmdOrCtrl+Space',
+              click: () => window.webContents.send('runSingleStep'),
+            },
+          ]
         },
         {
-          label: 'Dump VRAM',
-          click: () => {
-            window.webContents.send('dumpVram');
-          }
-        },
-        {
-          label: 'Run single tick',
-          accelerator: 'CmdOrCtrl+Enter',
-          click: () => {
-            window.webContents.send('runSingleTick');
-          }
-        },
-        {
-          label: 'Print screen buffer SHA-1',
-          click: () => {
-            window.webContents.send('getScreenBufferSha1');
-          }
-        },
+          label: 'Dump state',
+          submenu: [
+            {
+              label: 'Dump registers',
+              click: () => window.webContents.send('dumpRegisters'),
+            },
+            {
+              label: 'Dump VRAM',
+              click: () => window.webContents.send('dumpVram'),
+            },
+            {
+              label: 'Print screen buffer SHA-1',
+              click: () => window.webContents.send('getScreenBufferSha1'),
+            },
+          ]
+        }
       ]
     }
   ];

@@ -1,4 +1,4 @@
-import { IOpcodesMap, ICPUCallbacks } from '../opcodes';
+import { IOpcodesMap, ICPUCallbacks, IOpcodesNamesMap } from '../opcodes';
 import { CpuRegisters } from '../cpu-registers';
 import { AddressBus } from '../../memory/address-bus';
 import { ALU } from '../alu';
@@ -2312,7 +2312,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 };
 
-export const OPCODES_DEFAULT_NAMES: { [index: number]: string } = {
+export const OPCODES_DEFAULT_NAMES: IOpcodesNamesMap = {
   0x00: 'NOP',
   0x01: 'LD BC,d16',
   0x02: 'LD (BC),A',

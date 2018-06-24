@@ -1,4 +1,4 @@
-import { IOpcodesMap } from '../opcodes';
+import { IOpcodesMap, IOpcodesNamesMap } from '../opcodes';
 import { CpuRegisters } from '../cpu-registers';
 import { AddressBus } from '../../memory/address-bus';
 import { ALU } from '../alu';
@@ -2241,7 +2241,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
   },
 };
 
-export const OPCODES_0XCB_NAMES: { [index: number]: string }  = {
+export const OPCODES_0XCB_NAMES: IOpcodesNamesMap  = {
   0x00: 'RLC B',
   0x01: 'RLC C',
   0x02: 'RLC D',

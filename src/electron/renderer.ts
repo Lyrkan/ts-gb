@@ -5,6 +5,7 @@ import { CPU_CLOCK_FREQUENCY } from '../cpu/cpu';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../display/display';
 import { COLOR_PALETTE, WINDOW_SCALING, COLOR_OFF_SCREEN } from './constants';
 import { BUTTON } from '../controls/joypad';
+import { Debugger, DEBUGGER_MODE } from './debugger';
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -12,6 +13,9 @@ const crypto = require('crypto');
 // Create the system object which contains
 // the CPU/MMU/...
 const system = new System();
+
+// Init debugger
+const systemDebugger = new Debugger(system.cpu, system.memory);
 
 // Expose system globally
 (global as any).GAME_BOY = system;
@@ -34,8 +38,6 @@ canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WIND
 
 // Status flags
 let gameRomLoaded = false;
-let emulationPaused = false;
-let statsDisplayed = false;
 
 // Events handling
 const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
@@ -52,7 +54,7 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
     }
   },
 
-  loadGame: (event: any, filename: any) => {
+  loadGame: (event: any, filename: string) => {
     console.log(`Loading game: ${filename}`);
     const fileBuffer = fs.readFileSync(filename);
     if (fileBuffer) {
@@ -70,13 +72,11 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
   },
 
   pauseEmulation: () => {
-    console.log('Pausing emulation');
-    emulationPaused = true;
+    systemDebugger.pause();
   },
 
   resumeEmulation: () => {
-    console.log('Resuming emulation');
-    emulationPaused = false;
+    systemDebugger.unpause();
   },
 
   restartEmulation: () => {
@@ -85,30 +85,44 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
   },
 
   dumpRegisters: () => {
-    const registers = system.cpu.getRegisters();
-    console.log(`
-      A=0x${registers.A.toString(16)}, F=0x${registers.F.toString(16)},
-      B=0x${registers.B.toString(16)}, C=0x${registers.C.toString(16)},
-      D=0x${registers.D.toString(16)}, E=0x${registers.E.toString(16)},
-      H=0x${registers.H.toString(16)}, L=0x${registers.L.toString(16)},
-      PC=0x${registers.PC.toString(16)}, SP=0x${registers.SP.toString(16)}
-      Z=${registers.flags.Z}, N=${registers.flags.N}, H=${registers.flags.H}, C=${registers.flags.C}
-    `);
+    systemDebugger.dumpRegisters();
   },
 
   dumpVram: () => {
-    console.log(new Uint8Array(system.memory.getVideoRamSegment().data));
+    systemDebugger.dumpVram();
+  },
+
+  setDebuggerMode: (event: any, mode: DEBUGGER_MODE) => {
+    systemDebugger.setMode(mode);
   },
 
   toggleStats: () => {
-    statsDisplayed = !statsDisplayed;
+    const fpsCounterElement = document.getElementById('fps-counter');
+    if (fpsCounterElement) {
+      const currentDisplay = fpsCounterElement.style.display;
+      fpsCounterElement.style.display = (currentDisplay === 'none') ? 'block' : 'none';
+    }
   },
 
   runSingleTick: () => {
-    const oldPC = system.cpu.getRegisters().PC;
     system.tick();
-    console.log(`PC: 0x${oldPC.toString(16)} => 0x${system.cpu.getRegisters().PC.toString(16)}`);
-    WINDOW_EVENTS.dumpRegisters();
+    systemDebugger.tick();
+  },
+
+  runSingleStep: () => {
+    const initialPC = system.cpu.getRegisters().PC;
+
+    let i = 0;
+    while ((system.cpu.getRegisters().PC === initialPC) && (i < 1000)) {
+      system.tick();
+      i++;
+    }
+
+    if (i >= 1000) {
+      console.log(`CPU didn\'t change state after ${i} ticks... maybe it\'s halted/paused?`);
+    }
+
+    systemDebugger.tick();
   },
 
   getScreenBufferSha1: () => {
@@ -131,14 +145,10 @@ let tps: number = 0;
 const printFps = () => {
   const fpsCounterElement = document.getElementById('fps-counter');
   if (fpsCounterElement) {
-    if (statsDisplayed) {
-      fpsCounterElement.innerText = `
-        FPS: ${fps},
-        CPU: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz
-      `;
-    } else {
-      fpsCounterElement.innerText = '';
-    }
+    fpsCounterElement.innerText = `
+      FPS: ${fps},
+      CPU: ${(tps / CPU_CLOCK_FREQUENCY).toFixed(2)}Mhz
+    `;
   }
 
   fps = 0;
@@ -178,12 +188,18 @@ const gameLoop = (loopTime: number) => {
     deltaTime = loopTime - lastLoopTime;
   }
 
-  if (!emulationPaused && gameRomLoaded && deltaTime) {
+  if (gameRomLoaded && deltaTime) {
     // Run as many CPU ticks as needed based on the time
     // the previous frame took to process.
     const ticks = (CPU_CLOCK_FREQUENCY * deltaTime) / 1000;
     for (let i = 0; i < ticks; i++) {
+      // Test if a breakpoint has been triggered
+      if (systemDebugger.isPaused()) {
+        break;
+      }
+
       system.tick();
+      systemDebugger.tick();
       tps++;
     }
   }
