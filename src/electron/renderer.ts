@@ -182,6 +182,9 @@ window.addEventListener('keyup', event => {
 
 // Game loop
 let lastLoopTime: number|null = null;
+const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
+const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 const gameLoop = (loopTime: number) => {
   let deltaTime: number|null = null;
   if (lastLoopTime != null) {
@@ -208,8 +211,6 @@ const gameLoop = (loopTime: number) => {
     // Draw buffer
     const buffer = system.display.getFrontBuffer();
 
-    const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
-
     for (let line = 0; line < SCREEN_HEIGHT; line++) {
       for (let column = 0; column < SCREEN_WIDTH; column++) {
         const colorIndex = buffer[line * SCREEN_WIDTH + column];
@@ -225,7 +226,6 @@ const gameLoop = (loopTime: number) => {
       }
     }
 
-    const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
     createImageBitmap(imageData).then(bitmap => {
       canvasContext.drawImage(
         bitmap,
