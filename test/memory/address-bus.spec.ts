@@ -3,13 +3,15 @@ import * as sinon from 'sinon';
 import { expect } from 'chai';
 import { AddressBus } from '../../src/memory/address-bus';
 import { GameCartridge } from '../../src/cartridge/game-cartridge';
-import { Joypad } from '../../src/controls/joypad';
+import { Joypad, BUTTON } from '../../src/controls/joypad';
 
 describe('AddressBus', () => {
   let addressBus: AddressBus;
+  let joypad: Joypad;
 
   beforeEach(() => {
-    addressBus = new AddressBus(new Joypad());
+    joypad = new Joypad();
+    addressBus = new AddressBus(joypad);
   });
 
   describe('Bootstrap ROM', () => {
@@ -257,6 +259,150 @@ describe('AddressBus', () => {
       expect(addressBus.getByte(0xFFFF)).to.equal(0x00);
 
       expect(cartridgeResetSpy.calledOnce).to.equal(true);
+    });
+  });
+
+  describe('Joypad', () => {
+    it('should ignore writes to buttons/directions bits', () => {
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      addressBus.setByte(0xFF00, 0x00);
+
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+    });
+
+    it('should return the status of buttons', () => {
+      // Select button keys mode
+      addressBus.setByte(0xFF00, ~0x20);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      // Test button keys presses
+      joypad.down(BUTTON.START);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x7);
+
+      joypad.down(BUTTON.SELECT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x3);
+
+      joypad.down(BUTTON.B);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x1);
+
+      joypad.down(BUTTON.A);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x0);
+
+      // Test buttons keys releases
+      joypad.up(BUTTON.START);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x8);
+
+      joypad.up(BUTTON.SELECT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xC);
+
+      joypad.up(BUTTON.B);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xE);
+
+      joypad.up(BUTTON.A);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      // Check that direction keys have no effect
+      joypad.down(BUTTON.RIGHT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      joypad.down(BUTTON.LEFT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      joypad.down(BUTTON.UP);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      joypad.down(BUTTON.DOWN);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+    });
+
+    it('should return the status of direction keys', () => {
+      // Select direction keys mode
+      addressBus.setByte(0xFF00, ~0x10);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      // Test button keys presses
+      joypad.down(BUTTON.DOWN);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x7);
+
+      joypad.down(BUTTON.UP);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x3);
+
+      joypad.down(BUTTON.LEFT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x1);
+
+      joypad.down(BUTTON.RIGHT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x0);
+
+      // Test buttons keys releases
+      joypad.up(BUTTON.DOWN);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x8);
+
+      joypad.up(BUTTON.UP);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xC);
+
+      joypad.up(BUTTON.LEFT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xE);
+
+      joypad.up(BUTTON.RIGHT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      // Check that direction keys have no effect
+      joypad.down(BUTTON.A);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      joypad.down(BUTTON.B);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      joypad.down(BUTTON.SELECT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      joypad.down(BUTTON.START);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+    });
+
+    it('should work when both direction and button keys modes are selected', () => {
+      // Select both button and direction keys modes
+      addressBus.setByte(0xFF00, ~0x30);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
+
+      // Push Start/Select (button keys) + Down/Up (direction keys)
+      // They have the same mapping so it should enable bits 2 and 3.
+      joypad.down(BUTTON.START);
+      joypad.down(BUTTON.SELECT);
+      joypad.down(BUTTON.DOWN);
+      joypad.down(BUTTON.UP);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x3);
+
+      // Release Start and Up... it should still give the same
+      // enabled bits.
+      joypad.up(BUTTON.START);
+      joypad.up(BUTTON.UP);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x3);
+
+      // Push B/A (button keys) + Left/Right (direction keys)
+      // They have the same mapping so it should enable bits 0 and 1.
+      joypad.down(BUTTON.B);
+      joypad.down(BUTTON.A);
+      joypad.down(BUTTON.LEFT);
+      joypad.down(BUTTON.RIGHT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x0);
+
+      // Release B and Right... it should still give the same
+      // enabled bits.
+      joypad.up(BUTTON.B);
+      joypad.up(BUTTON.RIGHT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0x0);
+
+      // Release Select and Down
+      joypad.up(BUTTON.SELECT);
+      joypad.up(BUTTON.DOWN);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xC);
+
+      // Release A and LEFT
+      joypad.up(BUTTON.A);
+      joypad.up(BUTTON.LEFT);
+      expect(addressBus.getByte(0xFF00) & 0x0F).to.equal(0xF);
     });
   });
 
