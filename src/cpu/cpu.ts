@@ -30,7 +30,7 @@ export class CPU {
 
   // Whether or not the processor is halted.
   private halted: boolean;
-  private haltedLastCycle: boolean;
+  private haltBug: boolean;
 
   // Whether or not interrupts are enabled.
   private interruptsEnabled: boolean;
@@ -49,7 +49,30 @@ export class CPU {
     this.timer = new CpuTimer(this.addressBus);
     this.cpuCallbacks = {
       stop: () => { this.stopped = true; },
-      halt: () => { this.halted = true; },
+      halt: () => {
+        if (this.interruptsEnabled) {
+          // If the interrupt master flag is true, the HALT
+          // is executed normally.
+          this.halted = true;
+        } else {
+          const interruptFlags = this.addressBus.getByte(0xFF0F);
+          const ieRegister = this.addressBus.getByte(0xFFFF);
+          if ((interruptFlags & ieRegister & 0x1F) === 0) {
+            // If the interrupt master flag if false and no interrupt
+            // is currently triggered, HALT mode is entered.
+            // It will exit once an enabled interrupt is triggered but
+            // the interrupt will not be serviced and the interrupt flag
+            // will not be cleared.
+            this.halted = true;
+          } else {
+            // If the interrupt master flag is false and an enabled
+            // interrupt is triggered then the HALT mode is not entered
+            // but the CPU will encounter the HALT bug (PC not incremented
+            // for the 1st byte of the next instruction).
+            this.haltBug = true;
+          }
+        }
+      },
       enableInterrupts: () => { this.interruptsEnabled = true; },
       disableInterrupts: () => { this.interruptsEnabled = false; },
     };
@@ -67,7 +90,7 @@ export class CPU {
     this.firstCycle = true;
     this.stopped = false;
     this.halted = false;
-    this.haltedLastCycle = false;
+    this.haltBug = false;
     this.interruptsEnabled = false;
   }
 
@@ -142,7 +165,6 @@ export class CPU {
             // instruction due to PC not being incremented
             // properly)
             this.halted = false;
-            this.haltedLastCycle = true;
             break;
           }
         }
@@ -215,9 +237,9 @@ export class CPU {
     let opcodeIndex = this.addressBus.getByte(this.registers.PC++);
 
     // HALT bug
-    if (this.haltedLastCycle) {
+    if (this.haltBug) {
       this.registers.PC--;
-      this.haltedLastCycle = false;
+      this.haltBug = false;
     }
 
     if (opcodeIndex in OPCODES) {
