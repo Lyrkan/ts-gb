@@ -139,40 +139,35 @@ export class AddressBus {
     this.oam = new MemorySegment(OAM_LENGTH);
 
     // Empty I/O Registers (128B)
-    let joypadMode = JOYPAD_MODE.DIRECTIONS;
     this.ioRegisters = new MemorySegmentDecorator(new MemorySegment(IOREGISTERS_LENGTH), {
       getByte: (decorated, offset) => {
-        if (offset === 0x0000) {
-          let value = 0xFF;
+        let value = decorated.getByte(offset);
 
-          if (joypadMode === JOYPAD_MODE.BUTTONS) {
-            value &= ~0x10;
-            value &= this.joypad.isPressed(BUTTON.START) ? ~0x08 : 0xFF;
-            value &= this.joypad.isPressed(BUTTON.SELECT) ? ~0x04 : 0xFF;
-            value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
-            value &= this.joypad.isPressed(BUTTON.A) ? ~0x01 : 0xFF;
-          } else {
-            value &= ~0x20;
+        if (offset === 0x0000) {
+          value |= 0xF;
+
+          if ((value & 0x10) === 0) {
             value &= this.joypad.isPressed(BUTTON.DOWN) ? ~0x08 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.UP) ? ~0x04 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.LEFT) ? ~0x02 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.RIGHT) ? ~0x01 : 0xFF;
           }
 
-          return value;
+          if ((value & 0x20) === 0) {
+            value &= this.joypad.isPressed(BUTTON.START) ? ~0x08 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.SELECT) ? ~0x04 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
+            value &= this.joypad.isPressed(BUTTON.A) ? ~0x01 : 0xFF;
+          }
         }
 
-        return decorated.getByte(offset);
+        return value;
       },
       setByte: (decorated, offset, value) => {
         if (offset === 0x0000) {
           // Joypad update
-          // Mostly used to switch between directions and buttons modes.
-          if ((value & 0x10) === 0) {
-            joypadMode = JOYPAD_MODE.DIRECTIONS;
-          } else if ((value & 0x20) === 0) {
-            joypadMode = JOYPAD_MODE.BUTTONS;
-          }
+          // Bits 0 to 3 are read-only
+          value = value & 0xF0;
         } else if (offset === 0x0044) {
           // LY update.
           // When that happens it should also change the value of LYC
@@ -414,9 +409,4 @@ export class AddressBus {
       `Invalid address 0x${address.toString(16).toUpperCase()}: Memory addresses must not exceed 0xFFFF`
     );
   }
-}
-
-enum JOYPAD_MODE {
-  DIRECTIONS,
-  BUTTONS
 }
