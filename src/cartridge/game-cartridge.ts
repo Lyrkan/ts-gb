@@ -4,8 +4,9 @@ import { NoMBC } from './mbc/no-mbc';
 import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
 import { MBC3 } from './mbc/mbc3';
-import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
 import { MBC5 } from './mbc/mbc5';
+import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
+import { IGameCartridgeMBC } from './mbc/abstract-mbc';
 
 export class GameCartridge implements IGameCartridge {
   public static readCartridgeInfo(data: ArrayBuffer): IGameCartridgeInfo {
@@ -95,15 +96,15 @@ export class GameCartridge implements IGameCartridge {
   ): IGameCartridgeMBC {
     switch (cartridgeInfo.mbcType) {
       case MBC_TYPE.NONE:
-        return new NoMBC(romBanks, ramBanks);
+        return new NoMBC(cartridgeInfo, romBanks, ramBanks);
       case MBC_TYPE.MBC1:
-        return new MBC1(romBanks, ramBanks);
+        return new MBC1(cartridgeInfo, romBanks, ramBanks);
       case MBC_TYPE.MBC2:
-        return new MBC2(romBanks, ramBanks);
+        return new MBC2(cartridgeInfo, romBanks, ramBanks);
       case MBC_TYPE.MBC3:
-        return new MBC3(romBanks, ramBanks, cartridgeInfo.hasTimer);
+        return new MBC3(cartridgeInfo, romBanks, ramBanks);
       case MBC_TYPE.MBC5:
-        return new MBC5(romBanks, ramBanks);
+        return new MBC5(cartridgeInfo, romBanks, ramBanks);
     }
 
     throw new Error(`MBC type ${cartridgeInfo.mbcType} is not implemented yet`);
@@ -112,6 +113,7 @@ export class GameCartridge implements IGameCartridge {
   public readonly cartridgeInfo: IGameCartridgeInfo;
   private data: ArrayBuffer;
   private mbc: IGameCartridgeMBC;
+  private ramChangedListener: OnRamChangedCallback | null;
 
   public constructor(data: ArrayBuffer) {
     // Save initial data so we can reset te whole thing later on
@@ -143,6 +145,21 @@ export class GameCartridge implements IGameCartridge {
       GameCartridge.createRomBanks(this.cartridgeInfo, this.data),
       GameCartridge.createRamBanks(this.cartridgeInfo)
     );
+
+    this.mbc.setRamChangedListener(this.ramChangedListener);
+  }
+
+  public getRamContent() {
+    return this.mbc.getRamContent();
+  }
+
+  public loadRamContent(data: Uint8Array) {
+    this.mbc.loadRamContent(data);
+  }
+
+  public setRamChangedListener(ramChangeListener: OnRamChangedCallback | null) {
+    this.ramChangedListener = ramChangeListener;
+    this.mbc.setRamChangedListener(ramChangeListener);
   }
 }
 
@@ -164,10 +181,9 @@ export interface IGameCartridge {
   switchableRomBank: IMemorySegment;
   ramBank: IMemorySegment;
   reset(): void;
+  getRamContent(): Uint8Array;
+  loadRamContent(data: Uint8Array): void;
+  setRamChangedListener(callback: OnRamChangedCallback | null): void;
 }
 
-export interface IGameCartridgeMBC {
-  staticRomBank: IMemorySegment;
-  switchableRomBank: IMemorySegment;
-  ramBank: IMemorySegment;
-}
+export type OnRamChangedCallback = (bankIndex: number, offset: number, value: number) => void;

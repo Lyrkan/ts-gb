@@ -64,10 +64,37 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
       );
 
       system.loadGame(arrayBuffer);
-      gameRomLoaded = true;
 
-      const cartridgeInfo = system.memory.getCartridgeInfo();
-      console.log(`Loaded game: ${cartridgeInfo.gameTitle}`);
+      const cartridgeInfo = system.cartridge.cartridgeInfo;
+      console.log('Loaded game', cartridgeInfo);
+
+      if (cartridgeInfo.hasBattery) {
+        const saveFilename = `${filename}.save`;
+
+        // Load previous save
+        if (fs.existsSync(saveFilename)) {
+          const saveDataBuffer = fs.readFileSync(saveFilename);
+          system.cartridge.loadRamContent(saveDataBuffer);
+          console.log(`Loaded savefile ${saveFilename}`);
+        }
+
+        // Set save handler
+        // Since the listener is called everytime
+        // something writes into the RAM don't forget
+        // to debounce it...
+        let debounceTimeout: NodeJS.Timer | null = null;
+        system.cartridge.setRamChangedListener(() => {
+          if (debounceTimeout !== null) {
+            clearTimeout(debounceTimeout);
+          }
+
+          debounceTimeout = setTimeout(() => {
+            fs.writeFileSync(saveFilename, system.cartridge.getRamContent());
+          }, 500);
+        });
+      }
+
+      gameRomLoaded = true;
     }
   },
 

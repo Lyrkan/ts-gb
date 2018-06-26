@@ -7,16 +7,17 @@ import {
 } from './index';
 
 export class System {
-  public readonly cpu: CPU;
-  public readonly memory: AddressBus;
-  public readonly display: Display;
-  public readonly joypad: Joypad;
+  private _cpu: CPU;
+  private _memory: AddressBus;
+  private _display: Display;
+  private _joypad: Joypad;
+  private _cartridge: GameCartridge;
 
   public constructor() {
-    this.joypad = new Joypad();
-    this.memory = new AddressBus(this.joypad);
-    this.display = new Display(this.memory);
-    this.cpu = new CPU(this.memory, this.display);
+    this._joypad = new Joypad();
+    this._memory = new AddressBus(this._joypad);
+    this._display = new Display(this._memory);
+    this._cpu = new CPU(this._memory, this._display);
   }
 
   /**
@@ -25,7 +26,7 @@ export class System {
    * @param path Bootstrap ROM path
    */
   public loadBootRom(buffer: ArrayBuffer): void {
-    this.memory.loadBootRom(buffer);
+    this._memory.loadBootRom(buffer);
 
     // Reset everything
     this.reset();
@@ -37,8 +38,8 @@ export class System {
    * @param path Game ROM path
    */
   public loadGame(buffer: ArrayBuffer): void {
-    const cartridge = new GameCartridge(buffer);
-    this.memory.loadCartridge(cartridge);
+    this._cartridge = new GameCartridge(buffer);
+    this._memory.loadCartridge(this._cartridge);
 
     // Reset everything
     this.reset();
@@ -48,15 +49,50 @@ export class System {
    * Reset all components.
    */
   public reset(): void {
-    this.cpu.reset();
-    this.memory.reset();
-    this.display.reset();
+    this._cpu.reset();
+    this._memory.reset();
+    this._display.reset();
   }
 
   /**
    * Run a single CPU cycle.
    */
   public tick(): void {
-    this.cpu.tick();
+    this._cpu.tick();
+  }
+
+  /**
+   * Return the cpu component.
+   */
+  public get cpu(): CPU {
+    return this._cpu;
+  }
+
+  /**
+   * Return the memory component.
+   */
+  public get memory(): AddressBus {
+    return this._memory;
+  }
+
+  /**
+   * Return the display component.
+   */
+  public get display(): Display {
+    return this._display;
+  }
+
+  /**
+   * Return the joypad component.
+   */
+  public get joypad(): Joypad {
+    return this._joypad;
+  }
+
+  /**
+   * Return the current cartridge.
+   */
+  public get cartridge(): GameCartridge {
+    return this._cartridge;
   }
 }

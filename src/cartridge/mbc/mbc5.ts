@@ -1,29 +1,31 @@
 import { IMemorySegment } from '../../memory/memory-segment';
 import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
-import {
-  IGameCartridgeMBC,
-  CARTRIDGE_ROM_BANK_LENGTH,
-  CARTRIDGE_RAM_BANK_LENGTH
-} from '../game-cartridge';
+import { AbstractMBC } from './abstract-mbc';
+import { CARTRIDGE_ROM_BANK_LENGTH, CARTRIDGE_RAM_BANK_LENGTH } from '../game-cartridge';
+import { IGameCartridgeInfo } from '../game-cartridge-info';
 
-export class MBC5 implements IGameCartridgeMBC {
-  public readonly staticRomBank: IMemorySegment;
-
-  private romBanks: IMemorySegment[];
-  private ramBanks: IMemorySegment[];
+export class MBC5 extends AbstractMBC {
+  private decoratedStaticRomBank: IMemorySegment;
+  private decoratedRomBanks: IMemorySegment[];
+  private decoratedRamBanks: IMemorySegment[];
 
   private currentRomBank: number;
   private currentRamBank: number;
 
   private enabledRam: boolean;
 
-  public constructor(romBanks: IMemorySegment[], ramBanks: IMemorySegment[]) {
+  public constructor(
+    cartridgeInfo: IGameCartridgeInfo,
+    romBanks: IMemorySegment[],
+    ramBanks: IMemorySegment[]
+  ) {
+    super(cartridgeInfo, romBanks, ramBanks);
+
     this.currentRomBank = 0;
     this.currentRamBank = 0;
-
     this.enabledRam = false;
 
-    this.staticRomBank = new MemorySegmentDecorator(romBanks[0], {
+    this.decoratedStaticRomBank = new MemorySegmentDecorator(this.romBanks[0], {
       setByte: (decorated, offset, value) => {
         if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
@@ -42,7 +44,7 @@ export class MBC5 implements IGameCartridgeMBC {
       }
     });
 
-    this.romBanks = romBanks.map(bank => new MemorySegmentDecorator(bank, {
+    this.decoratedRomBanks = this.romBanks.map(bank => new MemorySegmentDecorator(bank, {
       setByte: (decorated, offset, value) => {
         if (offset < 0 || offset >= CARTRIDGE_ROM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
@@ -57,7 +59,7 @@ export class MBC5 implements IGameCartridgeMBC {
       }
     }));
 
-    this.ramBanks = ramBanks.map(bank => new MemorySegmentDecorator(bank, {
+    this.decoratedRamBanks = this.ramBanks.map((bank, index) => new MemorySegmentDecorator(bank, {
       getByte: (decorated, offset) => {
         if (offset < 0 || offset >= CARTRIDGE_RAM_BANK_LENGTH) {
           throw new RangeError(`Invalid address "${offset}"`);
@@ -80,16 +82,24 @@ export class MBC5 implements IGameCartridgeMBC {
           return;
         }
 
+        if (this.ramChangeListener !== null) {
+          this.ramChangeListener(index, offset, value);
+        }
+
         return decorated.setByte(offset, value);
       },
     }));
   }
 
+  public get staticRomBank() {
+    return this.decoratedStaticRomBank;
+  }
+
   public get switchableRomBank() {
-    return this.romBanks[this.currentRomBank];
+    return this.decoratedRomBanks[this.currentRomBank];
   }
 
   public get ramBank() {
-    return this.ramBanks[this.currentRamBank];
+    return this.decoratedRamBanks[this.currentRamBank];
   }
 }

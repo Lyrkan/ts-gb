@@ -72,7 +72,10 @@ describe('Opcodes - Default table', () => {
       staticRomBank: new MemorySegment(CARTRIDGE_ROM_BANK_LENGTH),
       switchableRomBank: new MemorySegment(CARTRIDGE_ROM_BANK_LENGTH),
       ramBank: new MemorySegment(CARTRIDGE_ROM_BANK_LENGTH),
-      reset: () => { /* NOP */ }
+      reset: () => { /* NOP */ },
+      getRamContent: () => new Uint8Array(CARTRIDGE_RAM_BANK_LENGTH),
+      loadRamContent: () => { /* NOP */ },
+      setRamChangedListener: () => { /* NOP */ },
     });
   });
 
