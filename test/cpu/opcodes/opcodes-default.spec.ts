@@ -61,6 +61,7 @@ describe('Opcodes - Default table', () => {
     addressBus.loadCartridge({
       cartridgeInfo: {
         gameTitle: 'TEST',
+        hasBattery: true,
         hasRam: true,
         hasRumble: false,
         hasTimer: false,
