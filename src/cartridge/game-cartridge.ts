@@ -100,7 +100,7 @@ export class GameCartridge implements IGameCartridge {
       case MBC_TYPE.MBC1:
         return new MBC1(cartridgeInfo, romBanks, ramBanks);
       case MBC_TYPE.MBC2:
-        return new MBC2(cartridgeInfo, romBanks, ramBanks);
+        return new MBC2(cartridgeInfo, romBanks);
       case MBC_TYPE.MBC3:
         return new MBC3(cartridgeInfo, romBanks, ramBanks);
       case MBC_TYPE.MBC5:

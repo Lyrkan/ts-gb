@@ -90,6 +90,7 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
 
           debounceTimeout = setTimeout(() => {
             fs.writeFileSync(saveFilename, system.cartridge.getRamContent());
+            debounceTimeout = null;
           }, 500);
         });
       }
