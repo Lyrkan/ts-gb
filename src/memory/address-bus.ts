@@ -4,6 +4,7 @@ import { STATIC_0000_SEGMENT } from './static-memory-segment';
 import { MemorySegmentDecorator } from './memory-segment-decorator';
 import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
 import { Joypad, BUTTON } from '../controls/joypad';
+import { DMAHandler } from './dma-handler';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -66,11 +67,18 @@ export class AddressBus {
   // Joypad (used by the I/O Register)
   private joypad: Joypad;
 
+  // Handles DMA transfers.
+  // This is not required but if missing an
+  // OAM DMA transfer will be completed in a
+  // single cycle instead of 161.
+  private dmaHandler?: DMAHandler;
+
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor(joypad: Joypad) {
+  public constructor(joypad: Joypad, dmaHandler?: DMAHandler) {
     this.joypad = joypad;
+    this.dmaHandler = dmaHandler;
     this.reset();
   }
 
@@ -188,11 +196,18 @@ export class AddressBus {
           }
         } else if (offset === 0x0046) {
           // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
-          // Note that this is really inaccurate since it should
-          // normally take 160 * 4 + 4 cycles to complete.
           const fromAddress = (value & 0xFF) << 8;
-          for (let i = 0; i < OAM_LENGTH; i++) {
-            this.setByte(0xFE00 + i, this.getByte(fromAddress + i));
+
+          if (this.dmaHandler) {
+            // Start the DMA transfer using the DMAHandler if one
+            // was provided to the AddressBus.
+            this.dmaHandler.startTransfer(this, fromAddress);
+          } else {
+            // If no DMAHandler has been provided the OAM DMA transfer
+            // will be executed in a single machine cycle instead of 161.
+            for (let i = 0; i < OAM_LENGTH; i++) {
+              this.setByte(0xFE00 + i, this.getByte(fromAddress + i));
+            }
           }
         } else if (offset === 0x0050) {
           // Writes on 0x0050 (=0xFF50) disable the boot rom

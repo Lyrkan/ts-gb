@@ -2,12 +2,14 @@ import {
   AddressBus,
   CPU,
   Display,
+  DMAHandler,
   GameCartridge,
   Joypad
 } from './index';
 
 export class System {
   private _cpu: CPU;
+  private _dmaHandler: DMAHandler;
   private _memory: AddressBus;
   private _display: Display;
   private _joypad: Joypad;
@@ -15,9 +17,10 @@ export class System {
 
   public constructor() {
     this._joypad = new Joypad();
-    this._memory = new AddressBus(this._joypad);
+    this._dmaHandler = new DMAHandler();
+    this._memory = new AddressBus(this._joypad, this._dmaHandler);
     this._display = new Display(this._memory);
-    this._cpu = new CPU(this._memory, this._display);
+    this._cpu = new CPU(this._memory);
   }
 
   /**
@@ -52,12 +55,15 @@ export class System {
     this._cpu.reset();
     this._memory.reset();
     this._display.reset();
+    this._dmaHandler.reset();
   }
 
   /**
    * Run a single CPU cycle.
    */
   public tick(): void {
+    this._dmaHandler.tick();
+    this._display.tick();
     this._cpu.tick();
   }
 

@@ -29,43 +29,35 @@ $ yarn add ts-gb
 
 
 ```ts
-import {
-  AddressBus,
-  CPU,
-  Display,
-  GameCartridge,
-  Joypad
-} from 'ts-gb';
+import { System } from 'ts-gb/system';
 
-// Initializing main components
-const joypad = new Joypad();
-const memory = new AddressBus(joypad);
-const display = new Display(memory);
-const cpu = new CPU(memory, display);
+// Initializing a System instance that holds
+// all the necessary components. You can also
+// initialize each one of them manually if you
+// want to.
+const sytem = new System();
 
 // Loading an optional bootrom
-memory.loadBootRom(arrayBuffer);
+system.loadBootRom(arrayBuffer);
 
-// Loading a cartridge
-const cartridge = new GameCartridge(arrayBuffer);
-memory.loadCartridge(cartridge);
+// Loading a game
+system.loadGame(arrayBuffer);
 
 // If you decide to change ROMs after
 // initializing everything don't forget
-// to reset the CPU, the memory and the
-// display components:
-cpu.reset();
-display.reset();
-memory.reset();
+// to reset all the components (CPU,
+// memory, display, DMA handler)
+system.reset();
 ```
 
 Once that's done you'll have to handle the following things:
 
-* When a button is pressed you'll have to call `joypad.down(button)`
-  followed by `joypad.up(button)` when it is released
-* The `cpu.tick()` method will need to be called at a 1Mhz frequency
+* When a button is pressed you'll have to call `system.joypad.down(button)`
+  followed by `system.joypad.up(button)` when it is released
+* The `system.tick()` method will have to be called at a
+  frequency of 1MHz.
 
-You'll then be able to call `display.getFrontBuffer()` everytime
+You'll then be able to call `system.display.getFrontBuffer()` everytime
 you want to refresh your screen (the closer from 59.7 FPS the
 better).
 
