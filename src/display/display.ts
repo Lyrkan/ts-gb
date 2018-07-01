@@ -6,7 +6,7 @@ export const SCREEN_HEIGHT = 144;
 
 export class Display {
   private addressBus: AddressBus;
-  private buffers: Uint8Array[];
+  private buffers: Uint8ClampedArray[];
   private currentBuffer: number;
   private currentMode: GPU_MODE;
   private currentLine: number;
@@ -19,8 +19,8 @@ export class Display {
 
   public reset(): void {
     this.buffers = [
-      new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT),
-      new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT),
+      new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
+      new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
     ];
     this.currentBuffer = 0;
     this.currentMode = GPU_MODE.OAM_SEARCH;
@@ -28,11 +28,11 @@ export class Display {
     this.clock = 0;
   }
 
-  public getFrontBuffer(): Uint8Array {
+  public getFrontBuffer(): Uint8ClampedArray {
     return this.buffers[this.currentBuffer];
   }
 
-  public getBackBuffer(): Uint8Array {
+  public getBackBuffer(): Uint8ClampedArray {
     return this.buffers[~this.currentBuffer & 1];
   }
 

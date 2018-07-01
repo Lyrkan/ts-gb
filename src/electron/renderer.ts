@@ -3,9 +3,9 @@ import { ipcRenderer } from 'electron';
 import { System } from '../system';
 import { CPU_CLOCK_FREQUENCY } from '../cpu/cpu';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../display/display';
-import { COLOR_PALETTE, WINDOW_SCALING, COLOR_OFF_SCREEN } from './constants';
 import { BUTTON } from '../controls/joypad';
 import { Debugger, DEBUGGER_MODE } from './debugger';
+import { WINDOW_SCALING } from './constants';
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -33,7 +33,7 @@ canvas.style.height = `${SCREEN_HEIGHT * WINDOW_SCALING}px` ;
 canvasContext.canvas.width = SCREEN_WIDTH * WINDOW_SCALING;
 canvasContext.canvas.height = SCREEN_HEIGHT * WINDOW_SCALING;
 canvasContext.imageSmoothingEnabled = false;
-canvasContext.fillStyle = COLOR_OFF_SCREEN;
+canvasContext.fillStyle = '#EDEDED';
 canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WINDOW_SCALING);
 
 // Status flags
@@ -100,10 +100,12 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
   },
 
   pauseEmulation: () => {
+    console.log('Pausing emulation');
     systemDebugger.pause();
   },
 
   resumeEmulation: () => {
+    console.log('Resuming emulation');
     systemDebugger.unpause();
   },
 
@@ -241,16 +243,11 @@ const gameLoop = (loopTime: number) => {
 
     for (let line = 0; line < SCREEN_HEIGHT; line++) {
       for (let column = 0; column < SCREEN_WIDTH; column++) {
-        const colorIndex = buffer[line * SCREEN_WIDTH + column];
-        const color = COLOR_PALETTE[colorIndex];
-
-        if (color) {
-          const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
-          imageDataBuffer[startIndex] = color[0];
-          imageDataBuffer[startIndex + 1] = color[1];
-          imageDataBuffer[startIndex + 2] = color[2];
-          imageDataBuffer[startIndex + 3] = 255;
-        }
+        const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
+        imageDataBuffer[startIndex] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3)];
+        imageDataBuffer[startIndex + 1] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 1];
+        imageDataBuffer[startIndex + 2] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 2];
+        imageDataBuffer[startIndex + 3] = 255;
       }
     }
 

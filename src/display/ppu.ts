@@ -93,7 +93,7 @@ export const PPU = {
     return sprites;
   },
 
-  renderLine: (addressBus: AddressBus, screenBuffer: Uint8Array, line: number): void => {
+  renderLine: (addressBus: AddressBus, screenBuffer: Uint8ClampedArray, line: number): void => {
     const vramData = addressBus.getVideoRamSegment().data;
     const oamData = addressBus.getOamSegment().data;
 
@@ -120,7 +120,7 @@ export const PPU = {
     for (let i = 0; i < SCREEN_WIDTH; i++) {
       const isWindowPixel = lcdControl.windowEnabled && (winPosY <= line) && (winPosX <= i);
       const isBackgroundPixel = lcdControl.backgroundEnabled && !isWindowPixel;
-      const screenBufferIndex = (line * SCREEN_WIDTH) + i;
+      const screenBufferIndex = (line * (SCREEN_WIDTH * 3)) + (i * 3);
 
       let pixelDrawn = false;
 
@@ -181,7 +181,9 @@ export const PPU = {
         const color2 = (vramData[tileOffset + 1] >> (7 - tileColumn)) & 1;
         const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
 
-        screenBuffer[screenBufferIndex] = pixelColor;
+        screenBuffer[screenBufferIndex] = DMG_COLORS[pixelColor];
+        screenBuffer[screenBufferIndex + 1] = DMG_COLORS[pixelColor];
+        screenBuffer[screenBufferIndex + 2] = DMG_COLORS[pixelColor];
         pixelDrawn = true;
       }
 
@@ -207,7 +209,9 @@ export const PPU = {
         const color2 = (vramData[tileOffset + 1] >> (7 - tileColumn)) & 1;
         const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
 
-        screenBuffer[screenBufferIndex] = pixelColor;
+        screenBuffer[screenBufferIndex] = DMG_COLORS[pixelColor];
+        screenBuffer[screenBufferIndex + 1] = DMG_COLORS[pixelColor];
+        screenBuffer[screenBufferIndex + 2] = DMG_COLORS[pixelColor];
         pixelDrawn = true;
       }
 
@@ -221,14 +225,18 @@ export const PPU = {
         const pixelIsFree = (screenBuffer[screenBufferIndex] === 0);
 
         if (spriteIsAbove || pixelIsFree) {
-          screenBuffer[screenBufferIndex] = spriteColor;
+          screenBuffer[screenBufferIndex] = DMG_COLORS[spriteColor];
+          screenBuffer[screenBufferIndex + 1] = DMG_COLORS[spriteColor];
+          screenBuffer[screenBufferIndex + 2] = DMG_COLORS[spriteColor];
           pixelDrawn = true;
         }
       }
 
       // If nothing has been drawn yet, reset the current pixel
       if (!pixelDrawn) {
-        screenBuffer[screenBufferIndex] = 0;
+        screenBuffer[screenBufferIndex] = DMG_COLORS[0];
+        screenBuffer[screenBufferIndex + 1] = DMG_COLORS[0];
+        screenBuffer[screenBufferIndex + 2] = DMG_COLORS[0];
       }
     }
   }
@@ -258,3 +266,5 @@ export interface ISprite {
   xFlip: boolean;
   palette: number;
 }
+
+const DMG_COLORS = [230, 160, 80, 20];

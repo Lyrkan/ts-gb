@@ -47,67 +47,67 @@ describe('Functional tests', () => {
     it('01-special.gb', () => {
       loadGame('../roms/01-special.gb');
       runTicks(3 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('21efc7402a70a2f091d9623541ec481f048c4559');
+      checkScreenBuffer('04b205c35e21532ef79028aa0322688c0ebf99c0');
     });
 
     it('02-interrupts.gb', () => {
       loadGame('../roms/02-interrupts.gb');
       runTicks(CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('24210fc58676ab499e343ae549655d420c5d4866');
+      checkScreenBuffer('4436a31dcc3e959e1554b3d82da209419cf5455f');
     });
 
     it('03-op sp,hl.gb', () => {
       loadGame('../roms/03-op sp,hl.gb');
       runTicks(3 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('cb43782004d3cc1448e6c9ffe0acbeeefc4a9065');
+      checkScreenBuffer('e656fda95592f75fab3f31db77d9e0fc93286e7d');
     });
 
     it('04-op r,imm.gb', () => {
       loadGame('../roms/04-op r,imm.gb');
       runTicks(3 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('bf95a77649cc66b16eb8494d7d49e068f7645c8b');
+      checkScreenBuffer('a0b87340951b4d34394f2a5c57605eba164961f5');
     });
 
     it('05-op rp.gb', () => {
       loadGame('../roms/05-op rp.gb');
       runTicks(4 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('352e769cadf597211f31e85df53d77698225dd5f');
+      checkScreenBuffer('8a985cb44540c381aa453d87ee91a0c975e9da0e');
     });
 
     it('06-ld r,r.gb', () => {
       loadGame('../roms/06-ld r,r.gb');
       runTicks(CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('6a46a37c9d6ec7ce8dd7b89ef64546b1c974ca69');
+      checkScreenBuffer('634af929cf8434627ff59cac64e43721154d9e4f');
     });
 
     it('07-jr,jp,call,ret,rst.gb', () => {
       loadGame('../roms/07-jr,jp,call,ret,rst.gb');
       runTicks(CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('f240334be5418d2de6dc5a09e5a520e3a4d1eb28');
+      checkScreenBuffer('4e0d58e67a374a571df5f11e5fe457b25ad3ec32');
     });
 
     it('08-misc instrs.gb', () => {
       loadGame('../roms/08-misc instrs.gb');
       runTicks(CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('0e189b3633b0c66ba04a61685b618925510e5bde');
+      checkScreenBuffer('99fe8304f58c4740994b3cc60184c676358407a2');
     });
 
     it('09-op r,r.gb', () => {
       loadGame('../roms/09-op r,r.gb');
       runTicks(10 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('e9ad3ea39e54f9e125a30bece2e3b38ebd9b243a');
+      checkScreenBuffer('7284d05eb66ed25088171316ec9aa975e4fd5b60');
     });
 
     it('10-bit ops.gb', () => {
       loadGame('../roms/10-bit ops.gb');
       runTicks(14 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('4d163c095aa60b92ca94701591fa0dd5928cdf10');
+      checkScreenBuffer('42470410d08c1811ce1c48ae952a96bf62556319');
     });
 
     it('11-op a,(hl).gb', () => {
       loadGame('../roms/11-op a,(hl).gb');
       runTicks(18 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('a8e5e245319af47449a8e3bf6a5e06e91a98bb82');
+      checkScreenBuffer('d085eb1221eecdac8736995f39c110a744d431ab');
     });
   });
 
@@ -115,7 +115,7 @@ describe('Functional tests', () => {
     it('lyc.gb (LY=LYC check)', () => {
       loadGame('../roms/lyc.gb');
       runTicks(1 * CPU_CLOCK_FREQUENCY);
-      checkScreenBuffer('85f5434db90bbb3c413551d102e4d4121096ab67');
+      checkScreenBuffer('e6e5e99fdc74711390c53e9d1c23713bcc448d4f');
     });
   });
 });
