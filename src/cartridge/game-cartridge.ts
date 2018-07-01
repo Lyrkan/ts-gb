@@ -33,6 +33,7 @@ export class GameCartridge implements IGameCartridge {
     // Build info object
     return {
       gameTitle: String.fromCharCode(...titleCodes),
+      cgbFlag: dataView.getUint8(0x143),
       romSize: (32 << dataView.getUint8(0x0148)) * 1024,
       ramSize: CARTRIDGE_RAM_MAP[dataView.getUint8(0x0149)],
       ...partialCartridgeInfo,

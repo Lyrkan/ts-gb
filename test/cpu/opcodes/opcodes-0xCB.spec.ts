@@ -10,6 +10,7 @@ import {
   CARTRIDGE_ROM_BANK_LENGTH,
   CARTRIDGE_RAM_BANK_LENGTH
 } from '../../../src/cartridge/game-cartridge';
+import { DMAHandler } from '../../../src/memory/dma/dma-handler';
 
 describe('Opcodes - 0xCB table', () => {
   let cpuRegisters: CpuRegisters;
@@ -44,10 +45,11 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.PC = 0x0000;
     cpuRegisters.SP = 0xFFFE;
 
-    addressBus = new AddressBus(new Joypad());
+    addressBus = new AddressBus(new Joypad(), new DMAHandler());
     addressBus.loadCartridge({
       cartridgeInfo: {
         gameTitle: 'TEST',
+        cgbFlag: 0x00,
         hasBattery: true,
         hasRam: true,
         hasRumble: false,

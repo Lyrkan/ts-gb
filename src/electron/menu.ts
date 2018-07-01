@@ -24,7 +24,7 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
           accelerator: 'CmdOrCtrl+O',
           click: () => {
             dialog.showOpenDialog(
-              { filters: [{ name: 'gb', extensions: ['gb'] }] },
+              { filters: [{ name: 'gb', extensions: ['gb', 'gbc'] }] },
               (filepaths?: string[]) => {
                 if (filepaths !== undefined) {
                   window.webContents.send('loadGame', filepaths[0]);

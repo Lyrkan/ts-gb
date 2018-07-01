@@ -64,7 +64,10 @@ export class System {
   public tick(): void {
     this._dmaHandler.tick();
     this._display.tick();
-    this._cpu.tick();
+
+    if (!this._dmaHandler.isHdmaTransferActive()) {
+      this._cpu.tick();
+    }
   }
 
   /**

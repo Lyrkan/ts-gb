@@ -6,7 +6,7 @@ export abstract class AbstractMBC implements IGameCartridgeMBC {
   protected cartridgeInfo: IGameCartridgeInfo;
   protected romBanks: IMemorySegment[];
   protected ramBanks: IMemorySegment[];
-  protected ramChangeListener?: OnRamChangedCallback | null;
+  private ramChangedListener?: OnRamChangedCallback | null;
 
   public constructor(
     cartridgeInfo: IGameCartridgeInfo,
@@ -45,13 +45,13 @@ export abstract class AbstractMBC implements IGameCartridgeMBC {
     }
   }
 
-  public setRamChangedListener(ramChangeListener: OnRamChangedCallback | null) {
-    this.ramChangeListener = ramChangeListener;
+  public setRamChangedListener(ramChangedListener: OnRamChangedCallback | null) {
+    this.ramChangedListener = ramChangedListener;
   }
 
   protected notifyRamChanged(bankIndex: number, offset: number, value: number) {
-    if (this.ramChangeListener) {
-      this.ramChangeListener(bankIndex, offset, value);
+    if (this.ramChangedListener) {
+      this.ramChangedListener(bankIndex, offset, value);
     }
   }
 

@@ -1,6 +1,6 @@
 import { IOpcodesMap, ICPUCallbacks, IOpcodesNamesMap } from '../opcodes';
 import { CpuRegisters } from '../cpu-registers';
-import { AddressBus } from '../../memory/address-bus';
+import { AddressBus, EMULATION_MODE } from '../../memory/address-bus';
 import { ALU } from '../alu';
 import { uint8ToInt8 } from '../../utils';
 
@@ -144,7 +144,19 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   // STOP 0
   0x10: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     registers.PC++;
-    cpuCallbacks.stop();
+
+    // In CGB mode the STOP instruction can be used to toggle the
+    // CPU double speed mode. It requires the mode switch to be prepared
+    // by setting the bit #0 of the 0xFF4D register to 1.
+    const doubleSpeedRegister = addressBus.getByte(0xFF4D);
+    const isInCgbMode = (addressBus.getEmulationMode() === EMULATION_MODE.CGB);
+    if (isInCgbMode && (doubleSpeedRegister & 1) === 1) {
+      addressBus.setByte(0xFF4D, doubleSpeedRegister & 0xFE);
+      addressBus.toggleDoubleSpeedMode();
+    } else {
+      cpuCallbacks.stop();
+    }
+
     return 1;
   },
 

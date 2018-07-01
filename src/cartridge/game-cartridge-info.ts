@@ -40,6 +40,7 @@ export interface IPartialCartridgeInfo {
 
 export interface IGameCartridgeInfo extends IPartialCartridgeInfo {
   gameTitle: string;
+  cgbFlag: number;
   romSize: number;
   ramSize: number;
 }

@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { AddressBus } from '../../src/memory/address-bus';
 import { GameCartridge } from '../../src/cartridge/game-cartridge';
 import { Joypad, BUTTON } from '../../src/controls/joypad';
+import { DMAHandler } from '../../src/memory/dma/dma-handler';
 
 describe('AddressBus', () => {
   let addressBus: AddressBus;
@@ -11,7 +12,7 @@ describe('AddressBus', () => {
 
   beforeEach(() => {
     joypad = new Joypad();
-    addressBus = new AddressBus(joypad);
+    addressBus = new AddressBus(joypad, new DMAHandler());
   });
 
   describe('Bootstrap ROM', () => {

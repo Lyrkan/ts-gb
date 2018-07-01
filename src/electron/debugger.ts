@@ -104,7 +104,9 @@ export class Debugger {
   }
 
   public dumpVram(): void {
-    console.log(new Uint8Array(this.addressBus.getVideoRamSegment().data));
+    this.addressBus.getVideoRamBanks().forEach(bank => {
+      console.log(bank.data);
+    });
   }
 }
 

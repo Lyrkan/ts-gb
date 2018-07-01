@@ -1,4 +1,4 @@
-import { AddressBus } from '../memory/address-bus';
+import { AddressBus, EMULATION_MODE } from '../memory/address-bus';
 import { CpuRegisters } from './cpu-registers';
 import { OPCODES, ICPUCallbacks } from './opcodes';
 import { CpuTimer } from './cpu-timer';
@@ -90,17 +90,45 @@ export class CPU {
   }
 
   /**
-   * Run a single CPU cycle.
+   * Run a CPU tick.
+   * This can result in two single ticks if the CPU
+   * is in double speed mode.
    */
   public tick(): void {
+    this.singleTick();
+
+    if (this.addressBus.isDoubleSpeedModeEnabled()) {
+      this.singleTick();
+    }
+  }
+
+  /**
+   * Retrieve CPU registers.
+   */
+  public getRegisters(): CpuRegisters {
+    return this.registers;
+  }
+
+  /**
+   * Run a single CPU cycle.
+   */
+  private singleTick(): void {
     if (this.firstCycle) {
       // If there isn't any boot ROM, directly
       // jump to 0x0100.
       if (!this.addressBus.hasBootRom()) {
-        this.registers.AF = 0x01B0;
-        this.registers.BC = 0x0013;
-        this.registers.DE = 0x00D8;
-        this.registers.HL = 0x014D;
+        if (this.addressBus.getEmulationMode() === EMULATION_MODE.DMG) {
+          this.registers.AF = 0x01B0;
+          this.registers.BC = 0x0013;
+          this.registers.DE = 0x00D8;
+          this.registers.HL = 0x014D;
+        } else {
+          this.registers.AF = 0x1180;
+          this.registers.BC = 0x0000;
+          this.registers.DE = 0xFF56;
+          this.registers.HL = 0x000D;
+        }
+
         this.registers.SP = 0xFFFE;
         this.registers.PC = 0x0100;
       }
@@ -169,13 +197,6 @@ export class CPU {
 
     // Execute the next OPCode
     this.executeOpcode();
-  }
-
-  /**
-   * Retrieve CPU registers.
-   */
-  public getRegisters(): CpuRegisters {
-    return this.registers;
   }
 
   private executeInterrupts(): void {

@@ -5,9 +5,10 @@ import { MemorySegmentDecorator } from './segments/memory-segment-decorator';
 import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
 import { Joypad, BUTTON } from '../controls/joypad';
 import { DMAHandler } from './dma/dma-handler';
+import { HDMA_TRANSFER_MODE } from './dma/hdma-transfer';
 
 export const VRAM_LENGTH = 8 * 1024;
-export const INTERNAL_RAM_LENGTH = 8 * 1024;
+export const INTERNAL_RAM_LENGTH = 4 * 1024;
 export const OAM_LENGTH = 160;
 export const IOREGISTERS_LENGTH = 128;
 export const HRAM_LENGTH = 127;
@@ -41,12 +42,14 @@ export class AddressBus {
 
   // Video RAM
   // 0x8000 to 0x9FFF
-  private videoRam: MemorySegment;
+  private videoRamBanks: MemorySegment[];
+  private currentVideoRamBank: number;
 
   // Internal RAM
   // Real: 0xC000 to 0xDFFF
   // Echo: 0xE000 to 0xFDFF
-  private internalRam: MemorySegment;
+  private internalRamBanks: MemorySegment[];
+  private currentRamBank: number;
 
   // Sprite attribute table (OAM)
   // 0xFE00 to 0xFE9F
@@ -64,6 +67,12 @@ export class AddressBus {
   // 0xFFFF
   private ieRegister: MemorySegment;
 
+  // Color game-boy background palettes data
+  private cgbBackgroundPalettes: number[];
+
+  // Color game-boy sprites palettes data
+  private cgbSpritePalettes: number[];
+
   // Joypad (used by the I/O Register)
   private joypad: Joypad;
 
@@ -71,14 +80,22 @@ export class AddressBus {
   // This is not required but if missing an
   // OAM DMA transfer will be completed in a
   // single cycle instead of 161.
-  private dmaHandler?: DMAHandler;
+  private dmaHandler: DMAHandler;
+
+  // Emulation mode (DMG, CGB with/without DMG compatibility mode)
+  // This is set when a ROM is loaded.
+  private emulationMode: EMULATION_MODE;
+
+  // Double speed mode (available in CGB mode only)
+  private doubleSpeedModeEnabled: boolean;
 
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor(joypad: Joypad, dmaHandler?: DMAHandler) {
+  public constructor(joypad: Joypad, dmaHandler: DMAHandler) {
     this.joypad = joypad;
     this.dmaHandler = dmaHandler;
+    this.emulationMode = EMULATION_MODE.DMG;
     this.reset();
   }
 
@@ -123,6 +140,21 @@ export class AddressBus {
   }
 
   /**
+   * Toggle the double speed status flag.
+   */
+  public toggleDoubleSpeedMode() {
+    this.doubleSpeedModeEnabled = !this.doubleSpeedModeEnabled;
+  }
+
+  /**
+   * Return the current value of the double
+   * speed status flag.
+   */
+  public isDoubleSpeedModeEnabled() {
+    return this.doubleSpeedModeEnabled;
+  }
+
+  /**
    * Empty the whole memory.
    */
   public reset(): void {
@@ -138,13 +170,37 @@ export class AddressBus {
     }
 
     // Empty video RAM (8kB)
-    this.videoRam = new MemorySegment(VRAM_LENGTH);
+    // Only bank #0 is available in DMG mode
+    this.videoRamBanks = [
+      new MemorySegment(VRAM_LENGTH),
+      new MemorySegment(VRAM_LENGTH),
+    ];
 
-    // Empty RAM (8kB)
-    this.internalRam = new MemorySegment(INTERNAL_RAM_LENGTH);
+    this.currentVideoRamBank = 0;
+
+    // Empty RAM (8 * 4kB)
+    // Only banks #0 and #1 are available in DMG mode
+    this.internalRamBanks = [];
+    for (let i = 0; i < 8; i++) {
+      this.internalRamBanks.push(new MemorySegment(INTERNAL_RAM_LENGTH));
+    }
+
+    this.currentRamBank = 1;
 
     // Empty OAM (160B)
     this.oam = new MemorySegment(OAM_LENGTH);
+
+    // Double speed mode is not enabled by default
+    this.doubleSpeedModeEnabled = false;
+
+    // Reset CGB palettes
+    // 8 * 4 colors * 2 bytes/color
+    this.cgbBackgroundPalettes = [];
+    this.cgbSpritePalettes = [];
+    for (let i = 0; i <= 64; i++) {
+      this.cgbBackgroundPalettes.push(0xFF);
+      this.cgbSpritePalettes.push(0xFF);
+    }
 
     // Empty I/O Registers (128B)
     this.ioRegisters = new MemorySegmentDecorator(new MemorySegment(IOREGISTERS_LENGTH), {
@@ -152,6 +208,7 @@ export class AddressBus {
         let value = decorated.getByte(offset);
 
         if (offset === 0x0000) {
+          // Joypad status
           value |= 0xF;
 
           if ((value & 0x10) === 0) {
@@ -166,6 +223,40 @@ export class AddressBus {
             value &= this.joypad.isPressed(BUTTON.SELECT) ? ~0x04 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.A) ? ~0x01 : 0xFF;
+          }
+        } else if (offset === 0x004D) {
+          // Double speed mode flag (CGB mode only)
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            value &= ~(1 << 7);
+            value |= this.doubleSpeedModeEnabled ? (1 << 7) : 0;
+          }
+        } else if (offset === 0x0055) {
+          // HDMA transfer status (CGB mode only)
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            // TODO Not sure about this... gdma and hdma should
+            // be checked separately.
+            if (this.dmaHandler.getHdmaTransfer()) {
+              value |= 1 << 7;
+
+              const transfer = this.dmaHandler.getHdmaTransfer();
+              if (transfer) {
+                value |= (transfer.getRemainingLength() >> 4) + 1;
+              }
+            } else {
+              value |= 0xFF;
+            }
+          }
+        } else if (offset === 0x0069) {
+          // Background palette data (CGB mode only)
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            const paletteIndex = (decorated.getByte(0x0068) & 0b111111);
+            value = this.cgbBackgroundPalettes[paletteIndex];
+          }
+        } else if (offset === 0x006B) {
+          // Sprite palette data (CGB mode only)
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            const paletteIndex = (decorated.getByte(0x006A) & 0b11111);
+            value = this.cgbSpritePalettes[paletteIndex];
           }
         }
 
@@ -198,20 +289,88 @@ export class AddressBus {
           // OAM DMA Transfer triggered by a write on 0x0046 (=0xFF46)
           const fromAddress = (value & 0xFF) << 8;
 
-          if (this.dmaHandler) {
-            // Start the DMA transfer using the DMAHandler if one
-            // was provided to the AddressBus.
-            this.dmaHandler.startOamTransfer(this, fromAddress);
-          } else {
-            // If no DMAHandler has been provided the OAM DMA transfer
-            // will be executed in a single machine cycle instead of 161.
-            for (let i = 0; i < OAM_LENGTH; i++) {
-              this.setByte(0xFE00 + i, this.getByte(fromAddress + i));
-            }
+          // Start the DMA transfer using the DMAHandler if one
+          // was provided to the AddressBus.
+          this.dmaHandler.startOamTransfer(this, fromAddress);
+          return;
+        } else if (offset === 0x004F) {
+          // Writes on 0x004F (=0xFF4F) in CGB mode select
+          // a new VRAM bank.
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            this.currentVideoRamBank = value & 1;
           }
         } else if (offset === 0x0050) {
           // Writes on 0x0050 (=0xFF50) disable the boot rom
           this.bootRomEnabled = false;
+        } else if (offset === 0x0055) {
+          // Writes on 0x0055 (=0xFF55) starts a new HDMA DMA
+          // in CGB mode.
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            const transfer = this.dmaHandler.getHdmaTransfer();
+            const mode = ((value >> 7) & 1);
+            const length = ((value & (~0xFE)) + 1) << 4;
+
+            if (mode === 0) {
+              if (transfer && (transfer.getMode() === HDMA_TRANSFER_MODE.HBLANK)) {
+                // If a HBLANK transfer is in progress, stop it
+                this.dmaHandler.stopHdmaTransfer();
+              } else if (!transfer) {
+                // If no transfer is in progress start a general purpose transfer
+                this.dmaHandler.startHdmaTransfer(this, HDMA_TRANSFER_MODE.GENERAL_PURPOSE, length);
+              }
+            } else {
+              if (transfer && (transfer.getMode() === HDMA_TRANSFER_MODE.HBLANK)) {
+                // If a HBLANK transfer is in progress, restart it
+                transfer.restart();
+              } else if (!transfer) {
+                // If no transfer is in progress, start a new HBLANK one
+                this.dmaHandler.startHdmaTransfer(this, HDMA_TRANSFER_MODE.HBLANK, length);
+              }
+            }
+
+            return;
+          }
+        } else if (offset === 0x0069) {
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            // Writes on 0x0069 (=0xFF69) in CGB mode allows
+            // to change the background palette data using
+            // the index provided by 0xFF68.
+            const bgPalette = decorated.getByte(0x0068);
+            const bgPaletteAutoIncrement = !!((bgPalette >> 7) & 1);
+            const bgPaletteIndex = (bgPalette & 0b111111);
+
+            this.cgbBackgroundPalettes[bgPaletteIndex] = value;
+
+            // If autoincrement is enabled, change the index
+            // stored in 0xFF68.
+            if (bgPaletteAutoIncrement) {
+              decorated.setByte(0x0068, (1 << 7) | ((bgPalette + 1) & 0b111111));
+            }
+          }
+        } else if (offset === 0x006B) {
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            // Writes on 0x006B (=0xFF6B) in CGB mode allows
+            // to change the sprite palette data using
+            // the index provided by 0xFF6A.
+            const spritePalette = decorated.getByte(0x006A);
+            const spritePaletteAutoIncrement = !!((spritePalette >> 7) & 1);
+            const spritePaletteIndex = (spritePalette & 0b111111);
+
+            this.cgbSpritePalettes[spritePaletteIndex] = value;
+
+            // If autoincrement is enabled, change the index
+            // stored in 0xFF68.
+            if (spritePaletteAutoIncrement) {
+              decorated.setByte(0x006A, (1 << 7) | ((spritePalette + 1) & 0b111111));
+            }
+          }
+        } else if (offset === 0x0070) {
+          // Writes on 0x0070 (=0xFF70) in CGB mode select
+          // a new RAM bank. Bank #0 cannot be selected and
+          // is replaced by Bank #1 instead.
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            this.currentRamBank = (value & 0b111) || 1;
+          }
         }
 
         // Still update the value stored in memory
@@ -250,12 +409,21 @@ export class AddressBus {
 
   /**
    * Load the given cartridge ROM banks into memory.
+   * Also sets the emulation mode.
    * Note that this will NOT reset the address bus.
    *
    * @param banks Cartridge ROM banks
    */
-  public loadCartridge(gameCartridge: IGameCartridge): void {
+  public loadCartridge(gameCartridge: IGameCartridge, preferredMode?: EMULATION_MODE): void {
     this.gameCartridge = gameCartridge;
+
+    if (gameCartridge.cartridgeInfo.cgbFlag === 0xC0) {
+      this.emulationMode = EMULATION_MODE.CGB;
+    } else if (gameCartridge.cartridgeInfo.cgbFlag === 0x80) {
+      this.emulationMode = preferredMode ? preferredMode : EMULATION_MODE.CGB;
+    } else {
+      this.emulationMode = EMULATION_MODE.DMG;
+    }
   }
 
   /**
@@ -278,13 +446,13 @@ export class AddressBus {
   }
 
   /**
-   * Return the memory segment associated to the
+   * Return the memory segments associated to the
    * video RAM. It avoids doing many calls to
    * getByte/getWord and unecessary lookups during
    * video rendering.
    */
-  public getVideoRamSegment(): MemorySegment {
-    return this.videoRam;
+  public getVideoRamBanks(): MemorySegment[] {
+    return this.videoRamBanks;
   }
 
   /**
@@ -294,6 +462,27 @@ export class AddressBus {
    */
   public getOamSegment(): MemorySegment {
     return this.oam;
+  }
+
+  /**
+   * Return the current emulation mode.
+   */
+  public getEmulationMode(): EMULATION_MODE {
+    return this.emulationMode;
+  }
+
+  /**
+   * Return the Color Game-Boy background palettes.
+   */
+  public getCgbBackgroundPalettes(): number[] {
+    return this.cgbBackgroundPalettes;
+  }
+
+  /**
+   * Return the Color Game-Boy sprite palettes.
+   */
+  public getCgbSpritePalettes(): number[] {
+    return this.cgbSpritePalettes;
   }
 
   /**
@@ -346,7 +535,7 @@ export class AddressBus {
     // Video RAM
     if (address < 0xA000) {
       return {
-        segment: this.videoRam,
+        segment: this.videoRamBanks[this.currentVideoRamBank],
         offset: 0x8000
       };
     }
@@ -363,19 +552,35 @@ export class AddressBus {
       };
     }
 
-    // Internal RAM
-    if (address < 0xE000) {
+    // Internal RAM (bank #0)
+    if (address < 0xD000) {
       return {
-        segment: this.internalRam,
+        segment: this.internalRamBanks[0],
         offset: 0xC000
       };
     }
 
-    // Internal RAM (mirror)
+    // Internal RAM (bank #1 to #7)
+    if (address < 0xE000) {
+      return {
+        segment: this.internalRamBanks[this.currentRamBank],
+        offset: 0xD000
+      };
+    }
+
+    // Internal RAM (mirror of bank #0)
+    if (address < 0xF000) {
+      return {
+        segment: this.internalRamBanks[0],
+        offset: 0xE000
+      };
+    }
+
+    // Internal RAM (mirror of banks #1 to #7)
     if (address < 0xFE00) {
       return {
-        segment: this.internalRam,
-        offset: 0xE000
+        segment: this.internalRamBanks[this.currentRamBank],
+        offset: 0xF000
       };
     }
 
@@ -424,4 +629,9 @@ export class AddressBus {
       `Invalid address 0x${address.toString(16).toUpperCase()}: Memory addresses must not exceed 0xFFFF`
     );
   }
+}
+
+export enum EMULATION_MODE {
+  DMG,
+  CGB,
 }
