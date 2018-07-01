@@ -1,4 +1,4 @@
-import { IMemorySegment } from '../../memory/memory-segment';
+import { IMemorySegment } from '../../memory/segments/memory-segment';
 import { IGameCartridgeInfo } from '../game-cartridge-info';
 import { CARTRIDGE_RAM_BANK_LENGTH, OnRamChangedCallback } from '../game-cartridge';
 

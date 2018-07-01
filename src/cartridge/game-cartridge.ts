@@ -1,12 +1,12 @@
-import { MemorySegment, IMemorySegment } from '../memory/memory-segment';
-import { STATIC_FFFF_SEGMENT } from '../memory/static-memory-segment';
+import { MemorySegment, IMemorySegment } from '../memory/segments/memory-segment';
+import { STATIC_FFFF_SEGMENT } from '../memory/segments/static-memory-segment';
+import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
+import { IGameCartridgeMBC } from './mbc/abstract-mbc';
 import { NoMBC } from './mbc/no-mbc';
 import { MBC1 } from './mbc/mbc1';
 import { MBC2 } from './mbc/mbc2';
 import { MBC3 } from './mbc/mbc3';
 import { MBC5 } from './mbc/mbc5';
-import { IGameCartridgeInfo, CARTRIDGE_INFO_MAP, MBC_TYPE } from './game-cartridge-info';
-import { IGameCartridgeMBC } from './mbc/abstract-mbc';
 
 export class GameCartridge implements IGameCartridge {
   public static readCartridgeInfo(data: ArrayBuffer): IGameCartridgeInfo {

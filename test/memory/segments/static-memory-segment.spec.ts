@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { StaticMemorySegment } from '../../src/memory/static-memory-segment';
+import { StaticMemorySegment } from '../../../src/memory/segments/static-memory-segment';
 
 describe('StaticMemorySegment', () => {
   it('should return a MemoryAccessor that always read the same value', () => {

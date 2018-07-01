@@ -1,5 +1,5 @@
-import { IMemorySegment } from '../../memory/memory-segment';
-import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
+import { IMemorySegment } from '../../memory/segments/memory-segment';
+import { MemorySegmentDecorator } from '../../memory/segments/memory-segment-decorator';
 import { AbstractMBC } from './abstract-mbc';
 import { CARTRIDGE_ROM_BANK_LENGTH, CARTRIDGE_RAM_BANK_LENGTH } from '../game-cartridge';
 import { IGameCartridgeInfo } from '../game-cartridge-info';

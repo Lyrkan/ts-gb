@@ -5,7 +5,7 @@ import { CpuRegisters } from '../../../src/cpu/cpu-registers';
 import { AddressBus } from '../../../src/memory/address-bus';
 import { Joypad } from '../../../src/controls/joypad';
 import { MBC_TYPE } from '../../../src/cartridge/game-cartridge-info';
-import { MemorySegment } from '../../../src/memory/memory-segment';
+import { MemorySegment } from '../../../src/memory/segments/memory-segment';
 import {
   CARTRIDGE_ROM_BANK_LENGTH,
   CARTRIDGE_RAM_BANK_LENGTH

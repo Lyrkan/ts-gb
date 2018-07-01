@@ -1,10 +1,10 @@
-import { MemorySegment, IMemorySegment } from './memory-segment';
+import { MemorySegment, IMemorySegment } from './segments/memory-segment';
 import { IGameCartridge } from '../cartridge/game-cartridge';
-import { STATIC_0000_SEGMENT } from './static-memory-segment';
-import { MemorySegmentDecorator } from './memory-segment-decorator';
+import { STATIC_0000_SEGMENT } from './segments/static-memory-segment';
+import { MemorySegmentDecorator } from './segments/memory-segment-decorator';
 import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
 import { Joypad, BUTTON } from '../controls/joypad';
-import { DMAHandler } from './dma-handler';
+import { DMAHandler } from './dma/dma-handler';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 8 * 1024;
@@ -201,7 +201,7 @@ export class AddressBus {
           if (this.dmaHandler) {
             // Start the DMA transfer using the DMAHandler if one
             // was provided to the AddressBus.
-            this.dmaHandler.startTransfer(this, fromAddress);
+            this.dmaHandler.startOamTransfer(this, fromAddress);
           } else {
             // If no DMAHandler has been provided the OAM DMA transfer
             // will be executed in a single machine cycle instead of 161.

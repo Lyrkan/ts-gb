@@ -1,7 +1,7 @@
-import { CpuRegisters } from './cpu-registers';
-import { AddressBus } from '../memory/address-bus';
-import { OPCODES_0XCB, OPCODES_0XCB_NAMES } from './opcodes/opcodes-0xCB';
-import { OPCODES_DEFAULT, OPCODES_DEFAULT_NAMES } from './opcodes/opcodes-default';
+import { CpuRegisters } from '../cpu-registers';
+import { AddressBus } from '../../memory/address-bus';
+import { OPCODES_0XCB, OPCODES_0XCB_NAMES } from '../opcodes/opcodes-0xCB';
+import { OPCODES_DEFAULT, OPCODES_DEFAULT_NAMES } from '../opcodes/opcodes-default';
 
 export const OPCODES: { [index: string]: IOpcodesMap } = {
   default: OPCODES_DEFAULT,

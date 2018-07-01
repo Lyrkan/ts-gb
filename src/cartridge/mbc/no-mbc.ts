@@ -1,7 +1,7 @@
 import { AbstractMBC } from './abstract-mbc';
-import { IMemorySegment } from '../../memory/memory-segment';
-import { STATIC_FFFF_SEGMENT } from '../../memory/static-memory-segment';
-import { MemorySegmentDecorator } from '../../memory/memory-segment-decorator';
+import { IMemorySegment } from '../../memory/segments/memory-segment';
+import { STATIC_FFFF_SEGMENT } from '../../memory/segments/static-memory-segment';
+import { MemorySegmentDecorator } from '../../memory/segments/memory-segment-decorator';
 import { IGameCartridgeInfo } from '../game-cartridge-info';
 
 export class NoMBC extends AbstractMBC {

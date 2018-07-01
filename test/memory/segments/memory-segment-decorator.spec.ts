@@ -1,7 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
-import { MemorySegment } from '../../src/memory/memory-segment';
-import { MemorySegmentDecorator } from '../../src/memory/memory-segment-decorator';
+import { MemorySegment } from '../../../src/memory/segments/memory-segment';
+import { MemorySegmentDecorator } from '../../../src/memory/segments/memory-segment-decorator';
 
 describe('MemorySegmentDecorator', () => {
   let memorySegment: MemorySegment;
