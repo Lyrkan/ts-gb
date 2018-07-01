@@ -83,10 +83,7 @@ export class MBC2 extends AbstractMBC {
           return;
         }
 
-        if (this.ramChangeListener !== null) {
-          this.ramChangeListener(index, offset, value);
-        }
-
+        this.notifyRamChanged(index, offset, value);
         decorated.setByte(offset, value & 0x0F);
       }
     }));
