@@ -122,6 +122,8 @@ export const PPU = {
       const isBackgroundPixel = lcdControl.backgroundEnabled && !isWindowPixel;
       const screenBufferIndex = (line * SCREEN_WIDTH) + i;
 
+      let pixelDrawn = false;
+
       // Check if a sprite should be rendered
       let hasVisibleSprite = false;
       let spriteColor = 0;
@@ -178,7 +180,9 @@ export const PPU = {
         const color1 = (vramData[tileOffset] >> (7 - tileColumn)) & 1;
         const color2 = (vramData[tileOffset + 1] >> (7 - tileColumn)) & 1;
         const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
+
         screenBuffer[screenBufferIndex] = pixelColor;
+        pixelDrawn = true;
       }
 
       // Render window
@@ -202,7 +206,9 @@ export const PPU = {
         const color1 = (vramData[tileOffset] >> (7 - tileColumn)) & 1;
         const color2 = (vramData[tileOffset + 1] >> (7 - tileColumn)) & 1;
         const pixelColor = palettes.backgroundPalette[(color2 << 1) | color1];
+
         screenBuffer[screenBufferIndex] = pixelColor;
+        pixelDrawn = true;
       }
 
       // Render sprite if there is one and if one of the two
@@ -213,9 +219,16 @@ export const PPU = {
       if (hasVisibleSprite) {
         const spriteIsAbove = (spritePriority === SPRITE_PRIORITY.ABOVE_BG);
         const pixelIsFree = (screenBuffer[screenBufferIndex] === 0);
+
         if (spriteIsAbove || pixelIsFree) {
           screenBuffer[screenBufferIndex] = spriteColor;
+          pixelDrawn = true;
         }
+      }
+
+      // If nothing has been drawn yet, reset the current pixel
+      if (!pixelDrawn) {
+        screenBuffer[screenBufferIndex] = 0;
       }
     }
   }
