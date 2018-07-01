@@ -162,7 +162,7 @@ export const PPU = {
 
           const tileOffset = tileStartOffset + (tileLine * 2);
 
-          const vramSpriteData = isCgbMode ? vramData[0] : vramData[sprite.vramBank];
+          const vramSpriteData = isCgbMode ? vramData[sprite.vramBank] : vramData[0];
           const color1 = (vramSpriteData[tileOffset] >> (7 - tileColumn)) & 1;
           const color2 = (vramSpriteData[tileOffset + 1] >> (7 - tileColumn)) & 1;
           const colorIndex = (color2 << 1) | color1;
