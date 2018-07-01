@@ -157,9 +157,9 @@ export class GameCartridge implements IGameCartridge {
     this.mbc.loadRamContent(data);
   }
 
-  public setRamChangedListener(ramChangeListener: OnRamChangedCallback | null) {
-    this.ramChangedListener = ramChangeListener;
-    this.mbc.setRamChangedListener(ramChangeListener);
+  public setRamChangedListener(ramChangedListener: OnRamChangedCallback | null) {
+    this.ramChangedListener = ramChangedListener;
+    this.mbc.setRamChangedListener(ramChangedListener);
   }
 }
 
