@@ -156,7 +156,7 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
   },
 
   getScreenBufferSha1: () => {
-    const buffer = system.display.getFrontBuffer();
+    const buffer = Buffer.from(system.display.getFrontBuffer().buffer);
     const sha1 = crypto.createHash('sha1');
     sha1.update(buffer);
     console.log(sha1.digest('hex'));

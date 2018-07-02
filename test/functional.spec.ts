@@ -33,7 +33,9 @@ describe('Functional tests', () => {
   };
 
   const checkScreenBuffer = (hash: string) =>  {
-    const buffer = system.display.getFrontBuffer();
+    const buffer = Buffer.from(system.display.getFrontBuffer().buffer);
+    expect(buffer).not.to.equal(null);
+
     const sha1 = crypto.createHash('sha1');
     sha1.update(buffer);
     expect(sha1.digest('hex')).to.equal(hash);
