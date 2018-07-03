@@ -233,18 +233,12 @@ export class AddressBus {
         } else if (offset === 0x0055) {
           // HDMA transfer status (CGB mode only)
           if (this.emulationMode === EMULATION_MODE.CGB) {
-            // TODO Not sure about this... gdma and hdma should
-            // be checked separately.
-            if (this.dmaHandler.getHdmaTransfer()) {
-              value |= 1 << 7;
+            const transfer = this.dmaHandler.getHdmaTransfer();
+            const isInProgress = transfer && !transfer.hasEnded() && !transfer.isStopped();
+            const remainingLength = transfer ? transfer.getRemainingLength() : 0;
 
-              const transfer = this.dmaHandler.getHdmaTransfer();
-              if (transfer) {
-                value |= (transfer.getRemainingLength() >> 4) + 1;
-              }
-            } else {
-              value |= 0xFF;
-            }
+            value = (isInProgress ? 1 : 0) << 7;
+            value |= (remainingLength > 0) ? ((remainingLength >> 4) - 1) : 0xFF;
           }
         } else if (offset === 0x0069) {
           // Background palette data (CGB mode only)
@@ -307,25 +301,20 @@ export class AddressBus {
           // in CGB mode.
           if (this.emulationMode === EMULATION_MODE.CGB) {
             const transfer = this.dmaHandler.getHdmaTransfer();
-            const mode = ((value >> 7) & 1);
-            const length = ((value & (~0xFE)) + 1) << 4;
+            const mode = (value >> 7) & 1;
+            const length = ((value & 0x7F) + 1) << 4;
 
-            if (mode === 0) {
-              if (transfer && (transfer.getMode() === HDMA_TRANSFER_MODE.HBLANK)) {
-                // If a HBLANK transfer is in progress, stop it
-                this.dmaHandler.stopHdmaTransfer();
-              } else if (!transfer) {
-                // If no transfer is in progress start a general purpose transfer
-                this.dmaHandler.startHdmaTransfer(this, HDMA_TRANSFER_MODE.GENERAL_PURPOSE, length);
-              }
+            if (transfer && !transfer.hasEnded() && (mode === 0)) {
+              // If there is a transfer in progress, try to stop it.
+              // This does not work for general purpose DMA.
+              transfer.stop();
             } else {
-              if (transfer && (transfer.getMode() === HDMA_TRANSFER_MODE.HBLANK)) {
-                // If a HBLANK transfer is in progress, restart it
-                transfer.restart();
-              } else if (!transfer) {
-                // If no transfer is in progress, start a new HBLANK one
-                this.dmaHandler.startHdmaTransfer(this, HDMA_TRANSFER_MODE.HBLANK, length);
-              }
+              // If no transfer is in progress, start a new one.
+              this.dmaHandler.startHdmaTransfer(
+                this,
+                (mode === 0) ? HDMA_TRANSFER_MODE.GENERAL_PURPOSE : HDMA_TRANSFER_MODE.HBLANK,
+                length
+              );
             }
 
             return;

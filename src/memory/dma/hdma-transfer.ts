@@ -7,8 +7,8 @@ export class HDMATransfer {
   private toAddress: number;
   private length: number;
   private currentByte: number;
-  private ended: boolean;
   private ticks: number;
+  private stopped: boolean;
 
   constructor(
     addressBus: AddressBus,
@@ -23,8 +23,8 @@ export class HDMATransfer {
     this.toAddress = toAddress;
     this.length = length;
     this.currentByte = 0;
-    this.ended = false;
     this.ticks = 0;
+    this.stopped = false;
   }
 
   public tick(): void {
@@ -36,17 +36,19 @@ export class HDMATransfer {
       );
 
       this.currentByte++;
-
-      if (this.currentByte > length) {
-        this.ended = true;
-      }
     }
 
     this.ticks++;
   }
 
+  public stop(): void {
+    if (this.mode === HDMA_TRANSFER_MODE.HBLANK) {
+      this.stopped = true;
+    }
+  }
+
   public isActive(): boolean {
-    if (this.ended) {
+    if (this.isStopped() || this.hasEnded()) {
       return false;
     }
 
@@ -58,22 +60,16 @@ export class HDMATransfer {
     return (lcdStatusRegister & 0b11) === 0;
   }
 
+  public isStopped(): boolean {
+    return this.stopped;
+  }
+
   public hasEnded(): boolean {
-    return this.ended;
+    return this.currentByte >= this.length;
   }
 
   public getRemainingLength(): number {
     return this.length - this.currentByte;
-  }
-
-  public getMode(): HDMA_TRANSFER_MODE {
-    return this.mode;
-  }
-
-  public restart(): void {
-    this.currentByte = 0;
-    this.ended = false;
-    this.ticks = 0;
   }
 }
 
