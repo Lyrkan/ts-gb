@@ -111,6 +111,12 @@ describe('Functional tests', () => {
       runTicks(18 * CPU_CLOCK_FREQUENCY);
       checkScreenBuffer('7ade30acc5ebce74ddc124bd96ae15d259369bb4');
     });
+
+    it('halt_bug.gb', () => {
+      loadGame('../roms/halt_bug.gb');
+      runTicks(2 * CPU_CLOCK_FREQUENCY);
+      checkScreenBuffer('d952f9fe3c58e9df619c2807870c177d069b1925');
+    });
   });
 
   describe('Shonumi\'s test ROMs', () => {

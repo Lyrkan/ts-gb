@@ -224,11 +224,22 @@ export class AddressBus {
             value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.A) ? ~0x01 : 0xFF;
           }
+        } else if (offset === 0x000F) {
+          // Interrupt flags: Unused bits are always set to 1
+          value |= 0xE0;
+        } else if (offset === 0x0041) {
+          // LCD Status: bit 7 is always set to 1
+          value |= 1 << 7;
         } else if (offset === 0x004D) {
           // Double speed mode flag (CGB mode only)
           if (this.emulationMode === EMULATION_MODE.CGB) {
-            value &= ~(1 << 7);
-            value |= this.doubleSpeedModeEnabled ? (1 << 7) : 0;
+            value |= 0x7E;
+
+            if (this.doubleSpeedModeEnabled) {
+              value |= 1 << 7;
+            } else {
+              value &= ~(1 << 7);
+            }
           }
         } else if (offset === 0x0055) {
           // HDMA transfer status (CGB mode only)
@@ -261,6 +272,13 @@ export class AddressBus {
           // Joypad update
           // Bits 0 to 3 are read-only
           value = value & 0xF0;
+        } else if (offset === 0x0041) {
+          // LCD Status update
+          // Check if we should trigger the LCDC Status Interrupt
+          // for LY=LYC.
+          if ((value & 0x40) > 0 && (value & 4) > 0) {
+            this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
+          }
         } else if (offset === 0x0044) {
           // LY update.
           // When that happens it should also change the value of LYC
@@ -271,11 +289,6 @@ export class AddressBus {
 
           if (ly === lyc) {
             decorated.setByte(0x0041, lcdsRegister | (1 << 2));
-
-            // Check if we should trigger the LCDC Status Interrupt
-            if ((lcdsRegister & 0x40) > 0) {
-              this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
-            }
           } else {
             decorated.setByte(0x0041, lcdsRegister & ~(1 << 2));
           }
@@ -378,6 +391,28 @@ export class AddressBus {
     this.joypad.setInterruptCallback(() => {
       this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | (0 << 4));
     });
+
+    // Set default values
+    // Based on http://bgb.bircd.org/pandocs.htm#powerupsequence)
+    this.ioRegisters.setByte(0x0010, 0x80); // NR10
+    this.ioRegisters.setByte(0x0011, 0xBF); // NR11
+    this.ioRegisters.setByte(0x0012, 0xF3); // NR12
+    this.ioRegisters.setByte(0x0014, 0xBF); // NR14
+    this.ioRegisters.setByte(0x0016, 0x3F); // NR21
+    this.ioRegisters.setByte(0x0019, 0xBF); // NR24
+    this.ioRegisters.setByte(0x001A, 0x7F); // NR30
+    this.ioRegisters.setByte(0x001B, 0xFF); // NR31
+    this.ioRegisters.setByte(0x001C, 0x9F); // NR32
+    this.ioRegisters.setByte(0x001E, 0xBF); // NR33
+    this.ioRegisters.setByte(0x0020, 0xFF); // NR41
+    this.ioRegisters.setByte(0x0023, 0xBF); // NR30
+    this.ioRegisters.setByte(0x0024, 0x77); // NR50
+    this.ioRegisters.setByte(0x0025, 0xF3); // NR51
+    this.ioRegisters.setByte(0x0026, 0xF1); // NR52
+    this.ioRegisters.setByte(0x0040, 0x91); // LCDC
+    this.ioRegisters.setByte(0x0047, 0xFC); // BGP
+    this.ioRegisters.setByte(0x0048, 0xFF); // OBP0
+    this.ioRegisters.setByte(0x0049, 0xFF); // OBP1
   }
 
   /**
