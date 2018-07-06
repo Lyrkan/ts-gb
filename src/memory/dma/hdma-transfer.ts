@@ -7,7 +7,6 @@ export class HDMATransfer {
   private toAddress: number;
   private length: number;
   private currentByte: number;
-  private ticks: number;
   private stopped: boolean;
 
   constructor(
@@ -23,22 +22,20 @@ export class HDMATransfer {
     this.toAddress = toAddress;
     this.length = length;
     this.currentByte = 0;
-    this.ticks = 0;
     this.stopped = false;
   }
 
   public tick(): void {
-    // TODO Not sure about timings there...
-    if (this.isActive() && ((this.ticks % 2) === 0)) {
-      this.addressBus.setByte(
-        this.toAddress + this.currentByte,
-        this.addressBus.getByte(this.fromAddress + this.currentByte)
-      );
+    if (this.isActive()) {
+      for (let i = 0; i < 2; i++) {
+        this.addressBus.setByte(
+          this.toAddress + this.currentByte,
+          this.addressBus.getByte(this.fromAddress + this.currentByte)
+        );
 
-      this.currentByte++;
+        this.currentByte++;
+      }
     }
-
-    this.ticks++;
   }
 
   public stop(): void {
