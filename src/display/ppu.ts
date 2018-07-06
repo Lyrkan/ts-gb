@@ -87,11 +87,6 @@ export const PPU = {
       }
     }
 
-    // Sort by x position to avoid doing it later.
-    sprites.sort((a, b) => {
-      return a.x - b.x;
-    });
-
     return sprites;
   },
 
@@ -130,6 +125,14 @@ export const PPU = {
     let sprites: ISprite[] = [];
     if (lcdControl.spritesEnabled) {
       sprites = PPU.retrieveSprites(oamData, line, lcdControl.spritesHeight);
+
+      if (!isCgbMode) {
+        // In Non-CGB mode sprites are sorted on
+        // their x position coordinate.
+        sprites.sort((a, b) => {
+          return a.x - b.x;
+        });
+      }
     }
 
     // Render current line
