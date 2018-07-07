@@ -33,8 +33,8 @@ export class MBC3 extends AbstractMBC {
     this.currentRamBank = 0;
     this.enabledRam = false;
 
-    this.timerStartValue = Math.round((new Date()).getTime() / 1000);
-    this.timerUpdatedAt = this.timerStartValue;
+    this.timerStartValue = 0;
+    this.timerUpdatedAt = Math.floor((new Date()).getTime() / 1000);
     this.timerStopped = false;
 
     this.latchActivationFlag = false;
@@ -207,13 +207,64 @@ export class MBC3 extends AbstractMBC {
     return this.decoratedRamBanks[index];
   }
 
+  public getRamContent(): Uint8Array {
+    const baseBuffer = super.getRamContent();
+    const timerValue = this.getTimerValue();
+
+    // Add an additional 14 bytes at the end of the save
+    // buffer to hold RTC data.
+    const buffer = new Uint8Array(baseBuffer.length + 14);
+    for (let i = 0; i < baseBuffer.length; i++) {
+      buffer[i] = baseBuffer[i];
+    }
+
+    buffer[baseBuffer.length] = timerValue.seconds;
+    buffer[baseBuffer.length + 1] = timerValue.minutes;
+    buffer[baseBuffer.length + 2] = timerValue.hours;
+    buffer[baseBuffer.length + 3] = timerValue.days;
+    buffer[baseBuffer.length + 4] = timerValue.daysOverflow ? 1 : 0;
+    buffer[baseBuffer.length + 5] = this.timerStopped ? 1 : 0;
+
+    const now = Math.floor((new Date()).getTime() / 1000);
+    for (let i = 0; i < 8; i++) {
+      buffer[baseBuffer.length + 6 + i] = (now >> (8 * i)) & 0xFF;
+    }
+
+    return buffer;
+  }
+
+  public loadRamContent(data: Uint8Array) {
+    super.loadRamContent(data);
+
+    // Read the additional 14 bytes that contain
+    // the RTC data.
+    const timerDataOffset = CARTRIDGE_RAM_BANK_LENGTH * this.ramBanks.length;
+    if (data.length >= timerDataOffset + 14) {
+      this.setTimerValue({
+        seconds: data[timerDataOffset],
+        minutes: data[timerDataOffset + 1],
+        hours: data[timerDataOffset + 2],
+        days: data[timerDataOffset + 3],
+        daysOverflow: (data[timerDataOffset + 4] !== 0),
+      });
+
+      this.timerStopped = (data[timerDataOffset + 5] !== 0);
+
+      this.timerUpdatedAt = 0;
+      for (let i = 0; i < 8; i++) {
+        this.timerUpdatedAt |= data[timerDataOffset + 6 + i] << (8 * i);
+      }
+    }
+  }
+
   private getTimerValue(): ITimerValue {
     let deltaTime = 0;
     if (!this.timerStopped) {
-        deltaTime = Math.round((new Date()).getTime() / 1000) - this.timerUpdatedAt;
+        deltaTime = Math.floor((new Date()).getTime() / 1000) - this.timerUpdatedAt;
     }
 
     const currentTimestamp = this.timerStartValue + deltaTime;
+
     const seconds = currentTimestamp % 60;
     const minutes = Math.floor(currentTimestamp / 60) % 60;
     const hours = Math.floor(currentTimestamp / 3600) % 24;
@@ -233,7 +284,7 @@ export class MBC3 extends AbstractMBC {
     this.timerStartValue += value.minutes * 60;
     this.timerStartValue += value.hours * 3600;
     this.timerStartValue += value.days * 86400;
-    this.timerUpdatedAt = Math.round((new Date()).getTime() / 1000);
+    this.timerUpdatedAt = Math.floor((new Date()).getTime() / 1000);
   }
 }
 

@@ -33,8 +33,8 @@ export abstract class AbstractMBC implements IGameCartridgeMBC {
 
   public loadRamContent(data: Uint8Array) {
     const expectedLength = CARTRIDGE_RAM_BANK_LENGTH * this.ramBanks.length;
-    if (data.length !== expectedLength) {
-      throw new Error(`Invalid data length: ${data.length} (expected ${expectedLength})`);
+    if (data.length < expectedLength) {
+      throw new Error(`Invalid data length: ${data.length} (expected at least ${expectedLength})`);
     }
 
     for (let bankIndex = 0; bankIndex < this.ramBanks.length; bankIndex++) {
