@@ -231,9 +231,14 @@ const gameLoop = (loopTime: number) => {
         break;
       }
 
-      system.tick();
-      systemDebugger.tick();
-      tps++;
+      try {
+        system.tick();
+        systemDebugger.tick();
+        tps++;
+      } catch (e) {
+        console.error(e);
+        systemDebugger.pause();
+      }
     }
   }
 
