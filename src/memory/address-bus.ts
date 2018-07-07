@@ -272,13 +272,6 @@ export class AddressBus {
           // Joypad update
           // Bits 0 to 3 are read-only
           value = value & 0xF0;
-        } else if (offset === 0x0041) {
-          // LCD Status update
-          // Check if we should trigger the LCDC Status Interrupt
-          // for LY=LYC.
-          if ((value & 0x40) > 0 && (value & 4) > 0) {
-            this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
-          }
         } else if (offset === 0x0044) {
           // LY update.
           // When that happens it should also change the value of LYC
@@ -289,6 +282,11 @@ export class AddressBus {
 
           if (ly === lyc) {
             decorated.setByte(0x0041, lcdsRegister | (1 << 2));
+
+            // Check if we should trigger the LCDC Status Interrupt
+            if ((lcdsRegister & 0x40) > 0) {
+              this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
+            }
           } else {
             decorated.setByte(0x0041, lcdsRegister & ~(1 << 2));
           }
