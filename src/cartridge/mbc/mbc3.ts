@@ -13,8 +13,14 @@ export class MBC3 extends AbstractMBC {
 
   private enabledRam: boolean;
 
-  private latchedTimer: boolean;
+  private timerSegment: IMemorySegment;
+  private timerStartValue: number;
+  private timerUpdatedAt: number;
+  private timerStopped: boolean;
+
   private latchActivationFlag: boolean;
+  private latchedTimer: boolean;
+  private latchedValue: ITimerValue;
 
   public constructor(
     cartridgeInfo: IGameCartridgeInfo,
@@ -26,8 +32,20 @@ export class MBC3 extends AbstractMBC {
     this.currentRomBank = 1;
     this.currentRamBank = 0;
     this.enabledRam = false;
-    this.latchedTimer = false;
+
+    this.timerStartValue = Math.round((new Date()).getTime() / 1000);
+    this.timerUpdatedAt = this.timerStartValue;
+    this.timerStopped = false;
+
     this.latchActivationFlag = false;
+    this.latchedTimer = false;
+    this.latchedValue = {
+      seconds: 0,
+      minutes: 0,
+      hours: 0,
+      days: 0,
+      daysOverflow: false,
+    };
 
     this.decoratedRomBanks = this.romBanks.map(
       (bank, bankIndex) => new MemorySegmentDecorator(bank, {
@@ -59,8 +77,12 @@ export class MBC3 extends AbstractMBC {
               if (value === 0x00) {
                 this.latchActivationFlag = true;
               } else if ((value === 0x01 && this.latchActivationFlag)) {
-                this.latchedTimer = !this.latchedTimer;
                 this.latchActivationFlag = false;
+
+                this.latchedTimer = !this.latchedTimer;
+                if (this.latchedTimer) {
+                  this.latchedValue = this.getTimerValue();
+                }
               } else {
                 this.latchActivationFlag = false;
               }
@@ -97,6 +119,69 @@ export class MBC3 extends AbstractMBC {
         return decorated.setByte(offset, value);
       },
     }));
+
+    // Handle timer registers
+    // Get the current timestamp for the RTC or the
+    // latched one if the latchedTimer flag is set.
+    const getRtcValue = () => {
+      const timerValue = this.latchedTimer ? this.latchedValue : this.getTimerValue();
+      switch (this.currentRamBank) {
+        case 0x08:
+          return timerValue.seconds;
+        case 0x09:
+          return timerValue.minutes;
+        case 0x0A:
+          return timerValue.hours;
+        case 0x0B:
+          return (timerValue.days & 0xFF);
+        case 0x0C:
+          let value = (timerValue.days >> 8) & 1;
+          value |= this.timerStopped ? (1 << 6) : 0;
+          value |= timerValue.daysOverflow ? (1 << 7) : 0;
+          return value;
+      }
+
+      throw new Error(`Invalid RTC bank 0x${this.currentRamBank.toString(16)}`);
+    };
+
+    const setRtcValue = (value: number) => {
+      const timerValue = this.latchedTimer ? this.latchedValue : this.getTimerValue();
+      switch (this.currentRamBank) {
+        case 0x08:
+          timerValue.seconds = Math.min(value, 59);
+          break;
+        case 0x09:
+          timerValue.minutes = Math.min(value, 59);
+          break;
+        case 0x0A:
+          timerValue.hours = Math.min(value, 23);
+          break;
+        case 0x0B:
+          timerValue.days &= ~0xFF;
+          timerValue.days |= (value & 0xFF);
+          break;
+        case 0x0C:
+          timerValue.days &= ~(1 << 8);
+          timerValue.days |= (value & 1) << 8;
+          timerValue.daysOverflow = (value & (1 << 7)) !== 0;
+          this.timerStopped = (value & (1 << 6)) !== 0;
+          break;
+      }
+
+      if (!this.latchedTimer) {
+        this.setTimerValue(timerValue);
+      }
+    };
+
+    this.timerSegment = {
+      getByte: (offset: number) => getRtcValue(),
+      setByte: (offset: number, value: number) => setRtcValue(value),
+      getWord: (offset: number) => {
+        const val = getRtcValue();
+        return val | (val << 8);
+      },
+      setWord: (offset: number, value: number) => setRtcValue(value & 0xFF),
+    };
   }
 
   public get staticRomBank() {
@@ -113,18 +198,49 @@ export class MBC3 extends AbstractMBC {
   }
 
   public get ramBank() {
-    // TODO Handle timer registers
-    if (this.cartridgeInfo.hasTimer &&
-      (this.currentRamBank >= 0x08 && this.currentRamBank <= 0x0C)) {
-      return {
-        getByte: () => 0x00,
-        setByte: () => { /* NOP */ },
-        getWord: () => 0x0000,
-        setWord: () => { /* NOP */ },
-      };
+    // tslint:disable-next-line:max-line-length
+    if (this.cartridgeInfo.hasTimer && (this.currentRamBank >= 0x08 && this.currentRamBank <= 0x0C)) {
+      return this.timerSegment;
     }
 
     const index = this.decoratedRamBanks[this.currentRamBank] ? this.currentRamBank : 0;
     return this.decoratedRamBanks[index];
   }
+
+  private getTimerValue(): ITimerValue {
+    let deltaTime = 0;
+    if (!this.timerStopped) {
+        deltaTime = Math.round((new Date()).getTime() / 1000) - this.timerUpdatedAt;
+    }
+
+    const currentTimestamp = this.timerStartValue + deltaTime;
+    const seconds = currentTimestamp % 60;
+    const minutes = Math.floor(currentTimestamp / 60) % 60;
+    const hours = Math.floor(currentTimestamp / 3600) % 24;
+    const days = Math.floor(currentTimestamp / 86400);
+
+    return {
+      seconds,
+      minutes,
+      hours,
+      days: days % 511,
+      daysOverflow: days > 511
+    };
+  }
+
+  private setTimerValue(value: ITimerValue): void {
+    this.timerStartValue = value.seconds;
+    this.timerStartValue += value.minutes * 60;
+    this.timerStartValue += value.hours * 3600;
+    this.timerStartValue += value.days * 86400;
+    this.timerUpdatedAt = Math.round((new Date()).getTime() / 1000);
+  }
+}
+
+interface ITimerValue {
+  seconds: number;
+  minutes: number;
+  hours: number;
+  days: number;
+  daysOverflow: boolean;
 }
