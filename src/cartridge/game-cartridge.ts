@@ -140,12 +140,24 @@ export class GameCartridge implements IGameCartridge {
   }
 
   public reset(): void {
+    // Save previous RAM content if there is
+    // a MBC and it has a battery.
+    let previousRamContent: Uint8Array | null = null;
+    if (this.mbc && this.cartridgeInfo.hasBattery) {
+      previousRamContent = this.mbc.getRamContent();
+    }
+
     // Initialize a new MBC
     this.mbc = GameCartridge.createMBC(
       this.cartridgeInfo,
       GameCartridge.createRomBanks(this.cartridgeInfo, this.data),
       GameCartridge.createRamBanks(this.cartridgeInfo)
     );
+
+    // Restore RAM content if available
+    if (previousRamContent) {
+      this.mbc.loadRamContent(previousRamContent);
+    }
 
     this.mbc.setRamChangedListener(this.ramChangedListener);
   }
