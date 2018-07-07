@@ -21,7 +21,7 @@ export class MBC5 extends AbstractMBC {
   ) {
     super(cartridgeInfo, romBanks, ramBanks);
 
-    this.currentRomBank = 0;
+    this.currentRomBank = (romBanks.length > 0) ? 1 : 0;
     this.currentRamBank = 0;
     this.enabledRam = false;
 
