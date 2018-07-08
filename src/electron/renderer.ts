@@ -17,8 +17,9 @@ const system = new System();
 // Init debugger
 const systemDebugger = new Debugger(system.cpu, system.memory);
 
-// Expose system globally
+// Expose system and debugger globally
 (global as any).GAME_BOY = system;
+(global as any).GAME_BOY_DEBUGGER = systemDebugger;
 
 // Find the canvas that represents the LCD screen
 const canvas = document.getElementById('lcd');

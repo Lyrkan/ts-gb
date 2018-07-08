@@ -37,6 +37,13 @@ export class Display {
   }
 
   public tick(): void {
+    const lcdcRegister = this.addressBus.getByte(0xFF40);
+    const isEnabled = ((lcdcRegister >> 7) & 1) === 1;
+
+    if (!isEnabled) {
+      return;
+    }
+
     const hblankOffset = (this.currentLine * 114);
 
     // Update current line every 114 ticks
