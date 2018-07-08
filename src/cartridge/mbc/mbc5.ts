@@ -39,7 +39,7 @@ export class MBC5 extends AbstractMBC {
           this.currentRomBank = (this.currentRomBank & (~0xFF)) | (value & 0xFF);
         } else if (offset < 0x4000) {
           // ROM Bank switch (9th bith)
-          this.currentRomBank = (this.currentRomBank & 0xFF) | (value & 1) << 7;
+          this.currentRomBank = (this.currentRomBank & 0xFF) | (value & 1) << 8;
         }
       }
     });
