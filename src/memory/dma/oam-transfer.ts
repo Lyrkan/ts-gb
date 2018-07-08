@@ -35,7 +35,7 @@ export class OAMTransfer {
       );
 
       this.currentByte++;
-      if (this.currentByte > OAM_LENGTH) {
+      if (this.currentByte >= OAM_LENGTH) {
         this.ended = true;
       }
     }
