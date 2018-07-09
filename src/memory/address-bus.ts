@@ -318,7 +318,8 @@ export class AddressBus {
             decorated.setByte(0x0041, lcdsRegister | (1 << 2));
 
             // Check if we should trigger the LCDC Status Interrupt
-            if (checkBit(6, lcdsRegister)) {
+            const lcdEnabled = !this.display || this.display.getLcdControl().lcdEnabled;
+            if (lcdEnabled && checkBit(6, lcdsRegister)) {
               this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
             }
           } else {

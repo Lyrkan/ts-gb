@@ -33,18 +33,18 @@ export class Display {
       new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
     ];
 
-    addressBus.setDisplay(this);
-
-    this.reset();
-  }
-
-  public reset(): void {
     for (let i = 0; i < 2; i++) {
       for (let j = 0; j < (SCREEN_WIDTH * SCREEN_HEIGHT * 3); j++) {
         this.buffers[i][j] = 255;
       }
     }
 
+    addressBus.setDisplay(this);
+
+    this.reset();
+  }
+
+  public reset(): void {
     this.currentBuffer = 0;
     this.currentMode = GPU_MODE.OAM_SEARCH;
     this.currentLine = 0;
@@ -61,10 +61,6 @@ export class Display {
   }
 
   public tick(): void {
-    if (!this.lcdControl.lcdEnabled) {
-      return;
-    }
-
     const hblankOffset = (this.currentLine * 114);
 
     // Update current line every 114 ticks
@@ -105,9 +101,19 @@ export class Display {
   }
 
   public setLcdControl(lcdControl: ILCDControl) {
-    // If the LCD was turned off, reset the display unit
-    if ((lcdControl.lcdEnabled !== this.lcdControl.lcdEnabled) && !lcdControl.lcdEnabled) {
-      this.reset();
+    if (lcdControl.lcdEnabled !== this.lcdControl.lcdEnabled) {
+      if (!lcdControl.lcdEnabled) {
+        // If the LCD is shutdown, clear both buffers
+        for (let i = 0; i < 2; i++) {
+          for (let j = 0; j < (SCREEN_WIDTH * SCREEN_HEIGHT * 3); j++) {
+            this.buffers[i][j] = 255;
+          }
+        }
+      } else {
+        // If the LCD is re-enabled, reset the display unit
+        // to the first line.
+        this.reset();
+      }
     }
 
     this.lcdControl = lcdControl;
@@ -129,17 +135,20 @@ export class Display {
     const lcdsRegister = (this.addressBus.getByte(0xFF41) & 0xFC) | mode;
     this.addressBus.setByte(0xFF41, lcdsRegister);
 
-    // Trigger VBLANK interrupt if needed
-    if (mode === GPU_MODE.VBLANK) {
-      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 0));
-    }
+    // Interrupts are only triggered when the LCD is enabled
+    if (this.lcdControl.lcdEnabled) {
+      // Trigger VBLANK interrupt if needed
+      if (mode === GPU_MODE.VBLANK) {
+        this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 0));
+      }
 
-    // Check if the LCDC Status Interrupt should be triggered:
-    // H-Blank Interrupt (Mode 0) = bit 3
-    // V-Blank Interrupt (Mode 1) = bit 4
-    // OAM Interrupt (Mode 2) = bit 5
-    if ((mode !== GPU_MODE.PIXEL_TRANSFER) && checkBit(3 + mode, lcdsRegister)) {
-      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 1));
+      // Check if the LCDC Status Interrupt should be triggered:
+      // H-Blank Interrupt (Mode 0) = bit 3
+      // V-Blank Interrupt (Mode 1) = bit 4
+      // OAM Interrupt (Mode 2) = bit 5
+      if ((mode !== GPU_MODE.PIXEL_TRANSFER) && checkBit(3 + mode, lcdsRegister)) {
+        this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 1));
+      }
     }
   }
 }
