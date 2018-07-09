@@ -5,7 +5,7 @@ TS-GB
 
 TypeScript Game Boy emulator (WIP)
 
-![Asterix ran on ts-gb](images/asterix.gif)
+![Asterix ran on ts-gb](images/screenshots.png)
 
 # How to use it
 
