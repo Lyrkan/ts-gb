@@ -1,5 +1,6 @@
 import { AddressBus } from '../memory/address-bus';
-import { PPU } from './ppu';
+import { PPU, TILE_MAP, TILE_AREA } from './ppu';
+import { checkBit } from '../utils';
 
 export const SCREEN_WIDTH = 160;
 export const SCREEN_HEIGHT = 144;
@@ -11,21 +12,44 @@ export class Display {
   private currentMode: GPU_MODE;
   private currentLine: number;
   private clock: number;
+  private lcdControl: ILCDControl;
 
   public constructor(addressBus: AddressBus) {
     this.addressBus = addressBus;
-    this.reset();
-  }
 
-  public reset(): void {
+    this.lcdControl = {
+      backgroundEnabled: true,
+      spritesEnabled: false,
+      spritesHeight: 8,
+      backgroundTileMap: TILE_MAP.MAP_1,
+      backgroundTileArea: TILE_AREA.AREA_2,
+      windowEnabled: false,
+      windowTileMap: TILE_MAP.MAP_1,
+      lcdEnabled: true,
+    };
+
     this.buffers = [
       new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
       new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
     ];
+
+    addressBus.setDisplay(this);
+
+    this.reset();
+  }
+
+  public reset(): void {
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < (SCREEN_WIDTH * SCREEN_HEIGHT * 3); j++) {
+        this.buffers[i][j] = 255;
+      }
+    }
+
     this.currentBuffer = 0;
     this.currentMode = GPU_MODE.OAM_SEARCH;
     this.currentLine = 0;
     this.clock = 0;
+    this.addressBus.setByte(0xFF44, 0);
   }
 
   public getFrontBuffer(): Uint8ClampedArray {
@@ -37,10 +61,7 @@ export class Display {
   }
 
   public tick(): void {
-    const lcdcRegister = this.addressBus.getByte(0xFF40);
-    const isEnabled = ((lcdcRegister >> 7) & 1) === 1;
-
-    if (!isEnabled) {
+    if (!this.lcdControl.lcdEnabled) {
       return;
     }
 
@@ -60,7 +81,7 @@ export class Display {
     // Scanline (access to VRM) in progress
     if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER) && (this.clock >= (hblankOffset + 63))) {
       this.setMode(GPU_MODE.HBLANK);
-      PPU.renderLine(this.addressBus, this.getBackBuffer(), this.currentLine);
+      PPU.renderLine(this, this.addressBus, this.currentLine);
     }
 
     // HBLANK in progress
@@ -81,6 +102,19 @@ export class Display {
     } else {
       this.clock++;
     }
+  }
+
+  public setLcdControl(lcdControl: ILCDControl) {
+    // If the LCD was turned off, reset the display unit
+    if ((lcdControl.lcdEnabled !== this.lcdControl.lcdEnabled) && !lcdControl.lcdEnabled) {
+      this.reset();
+    }
+
+    this.lcdControl = lcdControl;
+  }
+
+  public getLcdControl() {
+    return this.lcdControl;
   }
 
   private switchBuffers(): void {
@@ -104,15 +138,26 @@ export class Display {
     // H-Blank Interrupt (Mode 0) = bit 3
     // V-Blank Interrupt (Mode 1) = bit 4
     // OAM Interrupt (Mode 2) = bit 5
-    if ((mode !== GPU_MODE.PIXEL_TRANSFER) && (lcdsRegister & (1 << (3 + mode))) > 0) {
+    if ((mode !== GPU_MODE.PIXEL_TRANSFER) && checkBit(3 + mode, lcdsRegister)) {
       this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 1));
     }
   }
 }
 
-enum GPU_MODE {
+export enum GPU_MODE {
   HBLANK = 0,
   VBLANK = 1,
   OAM_SEARCH = 2,
   PIXEL_TRANSFER = 3,
+}
+
+export interface ILCDControl {
+  backgroundEnabled: boolean;
+  spritesEnabled: boolean;
+  spritesHeight: number;
+  backgroundTileMap: TILE_MAP;
+  backgroundTileArea: TILE_AREA;
+  windowEnabled: boolean;
+  windowTileMap: TILE_MAP;
+  lcdEnabled: boolean;
 }

@@ -6,6 +6,9 @@ import { IGameCartridgeInfo } from '../cartridge/game-cartridge-info';
 import { Joypad, BUTTON } from '../controls/joypad';
 import { DMAHandler } from './dma/dma-handler';
 import { HDMA_TRANSFER_MODE } from './dma/hdma-transfer';
+import { Display } from '../display/display';
+import { TILE_MAP, TILE_AREA } from '../display/ppu';
+import { checkBit } from '../utils';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 4 * 1024;
@@ -75,6 +78,9 @@ export class AddressBus {
 
   // Joypad (used by the I/O Register)
   private joypad: Joypad;
+
+  // Display unit
+  private display: Display | null;
 
   // Handles DMA transfers.
   // This is not required but if missing an
@@ -211,14 +217,14 @@ export class AddressBus {
           // Joypad status
           value |= 0xF;
 
-          if ((value & 0x10) === 0) {
+          if (!checkBit(4, value)) {
             value &= this.joypad.isPressed(BUTTON.DOWN) ? ~0x08 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.UP) ? ~0x04 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.LEFT) ? ~0x02 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.RIGHT) ? ~0x01 : 0xFF;
           }
 
-          if ((value & 0x20) === 0) {
+          if (!checkBit(5, value)) {
             value &= this.joypad.isPressed(BUTTON.START) ? ~0x08 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.SELECT) ? ~0x04 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
@@ -227,6 +233,19 @@ export class AddressBus {
         } else if (offset === 0x000F) {
           // Interrupt flags: Unused bits are always set to 1
           value |= 0xE0;
+        } else if (offset === 0x0040) {
+          if (this.display) {
+            const lcdControl = this.display.getLcdControl();
+            value = 0;
+            value |= lcdControl.backgroundEnabled ? 1 : 0;
+            value |= lcdControl.spritesEnabled ? (1 << 1) : 0;
+            value |= (lcdControl.spritesHeight === 16) ? (1 << 2) : 0;
+            value |= (lcdControl.backgroundTileMap === TILE_MAP.MAP_2) ? (1 << 3) : 0;
+            value |= (lcdControl.backgroundTileArea === TILE_AREA.AREA_2) ? (1 << 4) : 0;
+            value |= lcdControl.windowEnabled ? (1 << 5) : 0;
+            value |= (lcdControl.windowTileMap === TILE_MAP.MAP_2) ? (1 << 6) : 0;
+            value |= lcdControl.lcdEnabled ? (1 << 7) : 0;
+          }
         } else if (offset === 0x0041) {
           // LCD Status: bit 7 is always set to 1
           value |= 1 << 7;
@@ -272,6 +291,21 @@ export class AddressBus {
           // Joypad update
           // Bits 0 to 3 are read-only
           value = value & 0xF0;
+        } else if (offset === 0x0040) {
+          // LCDC Control Register update
+          // If a display unit is set, notify it.
+          if (this.display) {
+            this.display.setLcdControl({
+              backgroundEnabled: checkBit(0, value),
+              spritesEnabled: checkBit(1, value),
+              spritesHeight: checkBit(2, value) ? 16 : 8,
+              backgroundTileMap: checkBit(3, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
+              backgroundTileArea: checkBit(4, value) ? TILE_AREA.AREA_2 : TILE_AREA.AREA_1,
+              windowEnabled: checkBit(5, value),
+              windowTileMap: checkBit(6, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
+              lcdEnabled: checkBit(7, value),
+            });
+          }
         } else if (offset === 0x0044) {
           // LY update.
           // When that happens it should also change the value of LYC
@@ -284,7 +318,7 @@ export class AddressBus {
             decorated.setByte(0x0041, lcdsRegister | (1 << 2));
 
             // Check if we should trigger the LCDC Status Interrupt
-            if ((lcdsRegister & 0x40) > 0) {
+            if (checkBit(6, lcdsRegister)) {
               this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
             }
           } else {
@@ -505,6 +539,15 @@ export class AddressBus {
    */
   public getCgbSpritePalettes(): number[] {
     return this.cgbSpritePalettes;
+  }
+
+  /**
+   * Set the current display unit.
+   *
+   * @param display Display
+   */
+  public setDisplay(display: Display): void {
+    this.display = display;
   }
 
   /**

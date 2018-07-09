@@ -1,22 +1,8 @@
 import { AddressBus, EMULATION_MODE } from '../memory/address-bus';
-import { SCREEN_WIDTH } from './display';
-import { checkBit, uint8ToInt8 } from '../utils';
+import { SCREEN_WIDTH, Display } from './display';
+import { uint8ToInt8 } from '../utils';
 
 export const PPU = {
-  readLcdcRegister: (addressBus: AddressBus) => {
-    const lcdcRegister = addressBus.getByte(0xFF40);
-    return {
-      backgroundEnabled: checkBit(0, lcdcRegister),
-      spritesEnabled: checkBit(1, lcdcRegister),
-      spritesHeight: checkBit(2, lcdcRegister) ? 16 : 8,
-      backgroundTileMap: checkBit(3, lcdcRegister) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
-      backgroundTileArea: checkBit(4, lcdcRegister) ? TILE_AREA.AREA_2 : TILE_AREA.AREA_1,
-      windowEnabled: checkBit(5, lcdcRegister),
-      windowTileMap: checkBit(6, lcdcRegister) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
-      lcdEnabled: checkBit(7, lcdcRegister),
-    };
-  },
-
   readPosRegisters: (addressBus: AddressBus) => {
     const backgroundScroll = addressBus.getWord(0xFF42);
     const windowPosition = addressBus.getWord(0xFF4A);
@@ -102,13 +88,18 @@ export const PPU = {
     ];
   },
 
-  renderLine: (addressBus: AddressBus, screenBuffer: Uint8ClampedArray, line: number): void => {
+  renderLine: (
+    display: Display,
+    addressBus: AddressBus,
+    line: number
+  ): void => {
+    const lcdControl = display.getLcdControl();
+    const screenBuffer = display.getBackBuffer();
     const isCgbMode = addressBus.getEmulationMode() === EMULATION_MODE.CGB;
 
     const vramData = addressBus.getVideoRamBanks().map(bank => bank.data);
     const oamData = addressBus.getOamSegment().data;
 
-    const lcdControl = PPU.readLcdcRegister(addressBus);
     const lcdPositions = PPU.readPosRegisters(addressBus);
     const palettes = PPU.readPaletteRegisters(addressBus);
 
