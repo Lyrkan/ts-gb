@@ -13,10 +13,15 @@ export class Display {
   private currentLine: number;
   private clock: number;
   private lcdControl: ILCDControl;
+  private lcdEnablingDelay: number;
 
   public constructor(addressBus: AddressBus) {
     this.addressBus = addressBus;
+    addressBus.setDisplay(this);
+    this.reset();
+  }
 
+  public reset(): void {
     this.lcdControl = {
       backgroundEnabled: true,
       spritesEnabled: false,
@@ -33,23 +38,14 @@ export class Display {
       new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
     ];
 
-    for (let i = 0; i < 2; i++) {
-      for (let j = 0; j < (SCREEN_WIDTH * SCREEN_HEIGHT * 3); j++) {
-        this.buffers[i][j] = 255;
-      }
-    }
+    this.clearBuffer(0);
+    this.clearBuffer(1);
 
-    addressBus.setDisplay(this);
-
-    this.reset();
-  }
-
-  public reset(): void {
     this.currentBuffer = 0;
-    this.currentMode = GPU_MODE.OAM_SEARCH;
-    this.currentLine = 0;
     this.clock = 0;
-    this.addressBus.setByte(0xFF44, 0);
+    this.lcdEnablingDelay = 61;
+    this.setMode(GPU_MODE.HBLANK);
+    this.setCurrentLine(0);
   }
 
   public getFrontBuffer(): Uint8ClampedArray {
@@ -61,65 +57,76 @@ export class Display {
   }
 
   public tick(): void {
-    const hblankOffset = (this.currentLine * 114);
+    if (this.lcdControl.lcdEnabled && (this.lcdEnablingDelay <= 0)) {
+      const hblankOffset = (this.currentLine * 114);
 
-    // Update current line every 114 ticks
-    if ((this.clock > 0) && ((this.clock % 114) === 0)) {
-      this.currentLine = (this.currentLine + 1) % 154;
-      this.addressBus.setByte(0xFF44, this.currentLine);
-    }
-
-    // Scanline (access to OAM) in progress
-    if ((this.currentMode === GPU_MODE.OAM_SEARCH) && (this.clock >= (hblankOffset +  20))) {
-      this.setMode(GPU_MODE.PIXEL_TRANSFER);
-    }
-
-    // Scanline (access to VRM) in progress
-    if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER) && (this.clock >= (hblankOffset + 63))) {
-      this.setMode(GPU_MODE.HBLANK);
-      PPU.renderLine(this, this.addressBus, this.currentLine);
-    }
-
-    // HBLANK in progress
-    if ((this.currentMode === GPU_MODE.HBLANK) && (this.clock === (hblankOffset + 114))) {
-      if (this.currentLine < SCREEN_HEIGHT) {
-        this.setMode(GPU_MODE.OAM_SEARCH);
-      } else {
-        // Last line, switch to VBLANK
-        this.setMode(GPU_MODE.VBLANK);
+      // Update current line every 114 ticks
+      if ((this.clock > 0) && ((this.clock % 114) === 0)) {
+        this.setCurrentLine(this.currentLine + 1);
       }
-    }
 
-    // Check for the end of VBLANK
-    if (this.clock >= 17556) {
-      this.clock = 0;
-      this.setMode(GPU_MODE.OAM_SEARCH);
-      this.switchBuffers();
-    } else {
-      this.clock++;
+      // Scanline (access to OAM) in progress
+      if ((this.currentMode === GPU_MODE.OAM_SEARCH) && (this.clock >= (hblankOffset +  20))) {
+        this.setMode(GPU_MODE.PIXEL_TRANSFER);
+      }
+
+      // Scanline (access to VRM) in progress
+      if ((this.currentMode === GPU_MODE.PIXEL_TRANSFER) && (this.clock >= (hblankOffset + 63))) {
+        this.setMode(GPU_MODE.HBLANK);
+        PPU.renderLine(this, this.addressBus, this.currentLine);
+      }
+
+      // HBLANK in progress
+      if ((this.currentMode === GPU_MODE.HBLANK) && (this.clock === (hblankOffset + 114))) {
+        if (this.currentLine < SCREEN_HEIGHT) {
+          this.setMode(GPU_MODE.OAM_SEARCH);
+        } else {
+          // Last line, switch to VBLANK
+          this.setMode(GPU_MODE.VBLANK);
+        }
+      }
+
+      // Check for the end of VBLANK
+      if (this.clock >= 17556) {
+        this.clock = 0;
+        this.setMode(GPU_MODE.OAM_SEARCH);
+        this.switchBuffers();
+      } else {
+        this.clock++;
+      }
+    } else if (this.lcdControl.lcdEnabled) {
+      this.lcdEnablingDelay--;
+
+      if (this.lcdEnablingDelay <= 0) {
+        this.clock = 0;
+        this.setCurrentLine(0);
+        this.setMode(GPU_MODE.OAM_SEARCH);
+      }
     }
   }
 
   public setLcdControl(lcdControl: ILCDControl) {
     if (lcdControl.lcdEnabled !== this.lcdControl.lcdEnabled) {
       if (!lcdControl.lcdEnabled) {
-        // If the LCD is shutdown, clear both buffers
-        for (let i = 0; i < 2; i++) {
-          for (let j = 0; j < (SCREEN_WIDTH * SCREEN_HEIGHT * 3); j++) {
-            this.buffers[i][j] = 255;
-          }
-        }
+        // When the LCD is disabled, empty the current buffer
+        // and reset the current line to the top of the screen
+        // (it shouldn't trigger the LY=LYC interrupt though)
+        this.lcdControl.lcdEnabled = false;
+        this.clearBuffer(this.currentBuffer);
+        this.setCurrentLine(0);
+        this.setMode(GPU_MODE.HBLANK);
       } else {
-        // If the LCD is re-enabled, reset the display unit
-        // to the first line.
-        this.reset();
+        // If the LCD is re-enabled, start the 61 ticks
+        // delay before the first image is displayed.
+        this.lcdControl.lcdEnabled = true;
+        this.lcdEnablingDelay = 61;
       }
     }
 
     this.lcdControl = lcdControl;
   }
 
-  public getLcdControl() {
+  public getLcdControl(): ILCDControl {
     return this.lcdControl;
   }
 
@@ -128,7 +135,17 @@ export class Display {
     this.currentBuffer = ~this.currentBuffer & 1;
   }
 
-  private setMode(mode: GPU_MODE) {
+  private clearBuffer(bufferIndex: number): void {
+    if (bufferIndex > (this.buffers.length - 1)) {
+      throw new Error(`Invalid buffer index ${bufferIndex}`);
+    }
+
+    for (let i = 0; i < (SCREEN_WIDTH * SCREEN_HEIGHT * 3); i++) {
+      this.buffers[bufferIndex][i] = 255;
+    }
+  }
+
+  private setMode(mode: GPU_MODE): void {
     this.currentMode = mode;
 
     // Switch mode in LCD Status Register
@@ -150,6 +167,11 @@ export class Display {
         this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 1));
       }
     }
+  }
+
+  private setCurrentLine(line: number): void {
+    this.currentLine = line % 154;
+    this.addressBus.setByte(0xFF44, this.currentLine);
   }
 }
 
