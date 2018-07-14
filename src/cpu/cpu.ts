@@ -134,10 +134,10 @@ export class CPU {
       }
 
       this.firstCycle = false;
+    } else {
+      // Update timers
+      this.timer.tick();
     }
-
-    // Update timers
-    this.timer.tick();
 
     // Skip the current cycle if needed
     // (but still update the timer)
