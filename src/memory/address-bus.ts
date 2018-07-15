@@ -9,6 +9,8 @@ import { HDMA_TRANSFER_MODE } from './dma/hdma-transfer';
 import { Display } from '../display/display';
 import { TILE_MAP, TILE_AREA } from '../display/ppu';
 import { checkBit } from '../utils';
+import { CPUTimer } from '../cpu/cpu-timer';
+import { CPUInterrupt } from '../cpu/cpu';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 4 * 1024;
@@ -82,6 +84,9 @@ export class AddressBus {
   // Display unit
   private display: Display | null;
 
+  // CPU internal timer
+  private cpuTimer: CPUTimer;
+
   // Handles DMA transfers.
   // This is not required but if missing an
   // OAM DMA transfer will be completed in a
@@ -98,10 +103,15 @@ export class AddressBus {
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor(joypad: Joypad, dmaHandler: DMAHandler) {
+  public constructor(joypad: Joypad, dmaHandler: DMAHandler, cpuTimer: CPUTimer) {
     this.joypad = joypad;
     this.dmaHandler = dmaHandler;
+
+    this.cpuTimer = cpuTimer;
+    this.cpuTimer.setAddressBus(this);
+
     this.emulationMode = EMULATION_MODE.DMG;
+
     this.reset();
   }
 
@@ -230,6 +240,20 @@ export class AddressBus {
             value &= this.joypad.isPressed(BUTTON.B) ? ~0x02 : 0xFF;
             value &= this.joypad.isPressed(BUTTON.A) ? ~0x01 : 0xFF;
           }
+        } else if (offset === 0x0004) {
+          // Timer - DIV Register
+          value = (this.cpuTimer.getCounter() >> 8) & 0xFF;
+        } else if (offset === 0x0005) {
+          // Timer - TIMA
+          value = this.cpuTimer.getTima() & 0xFF;
+        } else if (offset === 0x0006) {
+          // Timer - TMA
+          value = this.cpuTimer.getTma() & 0xFF;
+        } else if (offset === 0x0007) {
+          // Timer - TAC
+          value = 0xF8;
+          value |= this.cpuTimer.isRunning() ? (1 << 2) : 0;
+          value |= this.cpuTimer.getMode() & 0b11;
         } else if (offset === 0x000F) {
           // Interrupt flags: Unused bits are always set to 1
           value |= 0xE0;
@@ -291,6 +315,25 @@ export class AddressBus {
           // Joypad update
           // Bits 0 to 3 are read-only
           value = value & 0xF0;
+        } else if (offset === 0x0004) {
+          // Timer - DIV Register
+          // Any write to that register resets the timer.
+          this.cpuTimer.reset();
+        } else if (offset === 0x0005) {
+          // Timer - TIMA
+          this.cpuTimer.setTima(value & 0xFF);
+        } else if (offset === 0x0006) {
+          // Timer - TMA
+          this.cpuTimer.setTma(value & 0xFF);
+        } else if (offset === 0x0007) {
+          // Timer - TAC
+          if (((value >> 2) & 1) === 1) {
+            this.cpuTimer.start();
+          } else {
+            this.cpuTimer.stop();
+          }
+
+          this.cpuTimer.setMode(value & 0b11);
         } else if (offset === 0x0040) {
           // LCDC Control Register update
           // If a display unit is set, notify it.
@@ -320,7 +363,7 @@ export class AddressBus {
             // Check if we should trigger the LCDC Status Interrupt
             const lcdEnabled = !this.display || this.display.getLcdControl().lcdEnabled;
             if (lcdEnabled && checkBit(6, lcdsRegister)) {
-              this.setByte(0xFF0F, this.getByte(0xFF0F) | (1 << 1));
+              this.triggerInterrupt(CPUInterrupt.LCDSTAT);
             }
           } else {
             decorated.setByte(0x0041, lcdsRegister & ~(1 << 2));
@@ -422,7 +465,7 @@ export class AddressBus {
     // Set the interrupt callback on the joypad
     // to catch button presses
     this.joypad.setInterruptCallback(() => {
-      this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | (0 << 4));
+      this.triggerInterrupt(CPUInterrupt.JOYPAD);
     });
 
     // Set default values
@@ -549,6 +592,16 @@ export class AddressBus {
    */
   public setDisplay(display: Display): void {
     this.display = display;
+  }
+
+  /**
+   * Set the bit matching the given interrupt in
+   * the IF register to 1.
+   *
+   * @param interrupt
+   */
+  public triggerInterrupt(interrupt: CPUInterrupt): void {
+    this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | (1 << interrupt));
   }
 
   /**

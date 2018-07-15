@@ -14,7 +14,7 @@
  *   registers.flags.H = 0;
  *   registers.flags.C = 0;
  */
-export class CpuRegisters {
+export class CPURegisters {
   private buffer: ArrayBuffer;
   private view: DataView;
   private flagsAccessor: {

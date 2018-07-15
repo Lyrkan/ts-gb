@@ -1,6 +1,7 @@
 import { AddressBus } from '../memory/address-bus';
 import { PPU, TILE_MAP, TILE_AREA } from './ppu';
 import { checkBit } from '../utils';
+import { CPUInterrupt } from '../cpu/cpu';
 
 export const SCREEN_WIDTH = 160;
 export const SCREEN_HEIGHT = 144;
@@ -156,7 +157,7 @@ export class Display {
     if (this.lcdControl.lcdEnabled) {
       // Trigger VBLANK interrupt if needed
       if (mode === GPU_MODE.VBLANK) {
-        this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 0));
+        this.addressBus.triggerInterrupt(CPUInterrupt.VBLANK);
       }
 
       // Check if the LCDC Status Interrupt should be triggered:
@@ -164,7 +165,7 @@ export class Display {
       // V-Blank Interrupt (Mode 1) = bit 4
       // OAM Interrupt (Mode 2) = bit 5
       if ((mode !== GPU_MODE.PIXEL_TRANSFER) && checkBit(3 + mode, lcdsRegister)) {
-        this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 1));
+        this.addressBus.triggerInterrupt(CPUInterrupt.LCDSTAT);
       }
     }
   }

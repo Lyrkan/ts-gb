@@ -1,12 +1,12 @@
 import { AddressBus, EMULATION_MODE } from '../memory/address-bus';
-import { CpuRegisters } from './cpu-registers';
+import { CPURegisters } from './cpu-registers';
 import { OPCODES, ICPUCallbacks } from './opcodes';
-import { CpuTimer } from './cpu-timer';
+import { CPUTimer } from './cpu-timer';
 import { checkBit } from '../utils';
 
 export class CPU {
   // Registers
-  private registers: CpuRegisters;
+  private registers: CPURegisters;
 
   // Memory
   private addressBus: AddressBus;
@@ -32,16 +32,16 @@ export class CPU {
   private interruptsEnabled: boolean;
 
   // Timer management
-  private timer: CpuTimer;
+  private timer: CPUTimer;
 
   /**
    * Instanciate a new CPU.
    *
    * @param addressBus Mapped memory (ROM, RAM, VRAM, IO, ...)
    */
-  public constructor(addressBus: AddressBus) {
+  public constructor(addressBus: AddressBus, cpuTimer: CPUTimer) {
     this.addressBus = addressBus;
-    this.timer = new CpuTimer(this.addressBus);
+    this.timer = cpuTimer;
     this.cpuCallbacks = {
       stop: () => { this.stopped = true; },
       halt: () => {
@@ -79,8 +79,7 @@ export class CPU {
    * Reset all registers
    */
   public reset(): void {
-    this.registers = new CpuRegisters();
-    this.timer.reset();
+    this.registers = new CPURegisters();
     this.skipCycles = 0;
     this.firstCycle = true;
     this.stopped = false;
@@ -105,7 +104,7 @@ export class CPU {
   /**
    * Retrieve CPU registers.
    */
-  public getRegisters(): CpuRegisters {
+  public getRegisters(): CPURegisters {
     return this.registers;
   }
 
@@ -122,11 +121,13 @@ export class CPU {
           this.registers.BC = 0x0013;
           this.registers.DE = 0x00D8;
           this.registers.HL = 0x014D;
+          this.timer.setCounter(0xABCC);
         } else {
           this.registers.AF = 0x1180;
           this.registers.BC = 0x0000;
           this.registers.DE = 0xFF56;
           this.registers.HL = 0x000D;
+          this.timer.setCounter(0x1EA0);
         }
 
         this.registers.SP = 0xFFFE;
@@ -158,7 +159,7 @@ export class CPU {
     // Do nothing if stopped until a button
     // is pressed.
     if (this.stopped) {
-      if (!checkBit(4, this.addressBus.getByte(0xFF0F))) {
+      if (!checkBit(CPUInterrupt.JOYPAD, this.addressBus.getByte(0xFF0F))) {
         return;
       }
 
@@ -282,6 +283,14 @@ export class CPU {
     // Run the opcode
     this.skipCycles += opcode(this.registers, this.addressBus, this.cpuCallbacks) - 1;
   }
+}
+
+export enum CPUInterrupt {
+  VBLANK = 0,
+  LCDSTAT = 1,
+  TIMER = 2,
+  SERIAL = 3,
+  JOYPAD = 4,
 }
 
 export const CPU_CLOCK_FREQUENCY = 1024 * 1024;

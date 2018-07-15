@@ -1,6 +1,7 @@
 import {
   AddressBus,
   CPU,
+  CPUTimer,
   Display,
   DMAHandler,
   GameCartridge,
@@ -9,6 +10,7 @@ import {
 
 export class System {
   private _cpu: CPU;
+  private _cpuTimer: CPUTimer;
   private _dmaHandler: DMAHandler;
   private _memory: AddressBus;
   private _display: Display;
@@ -18,9 +20,10 @@ export class System {
   public constructor() {
     this._joypad = new Joypad();
     this._dmaHandler = new DMAHandler();
-    this._memory = new AddressBus(this._joypad, this._dmaHandler);
+    this._cpuTimer = new CPUTimer();
+    this._memory = new AddressBus(this._joypad, this._dmaHandler, this._cpuTimer);
     this._display = new Display(this._memory);
-    this._cpu = new CPU(this._memory);
+    this._cpu = new CPU(this._memory, this._cpuTimer);
   }
 
   /**
@@ -53,6 +56,7 @@ export class System {
    */
   public reset(): void {
     this._cpu.reset();
+    this._cpuTimer.reset();
     this._memory.reset();
     this._display.reset();
     this._dmaHandler.reset();
@@ -75,6 +79,13 @@ export class System {
    */
   public get cpu(): CPU {
     return this._cpu;
+  }
+
+  /**
+   * Return the cpu internal timer.
+   */
+  public get cpuTimer(): CPUTimer {
+    return this._cpuTimer;
   }
 
   /**

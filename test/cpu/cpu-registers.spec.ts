@@ -1,12 +1,12 @@
 import 'mocha';
 import { expect } from 'chai';
-import { CpuRegisters } from '../../src/cpu/cpu-registers';
+import { CPURegisters } from '../../src/cpu/cpu-registers';
 
 describe('CpuRegisters', () => {
-  let registers: CpuRegisters;
+  let registers: CPURegisters;
 
   beforeEach(() => {
-    registers = new CpuRegisters();
+    registers = new CPURegisters();
   });
 
   describe('Byte registers', () => {

@@ -1,77 +1,127 @@
 import { AddressBus } from '../memory/address-bus';
-import { checkBit } from '../utils';
+import { CPUInterrupt } from './cpu';
 
-export class CpuTimer {
-  private addressBus: AddressBus;
-  private ticksCount: number;
+export class CPUTimer {
+  private addressBus?: AddressBus;
+  private counter: number;
+  private tima: number;
+  private tma: number;
+  private mode: CPUTimerMode;
+  private running: boolean;
 
-  public constructor(addressBus: AddressBus) {
+  public constructor() {
+    this.counter = 0;
+    this.tima = 0;
+    this.tma = 0;
+    this.mode = CPUTimerMode.HZ_4096;
+    this.running = false;
+  }
+
+  public setAddressBus(addressBus: AddressBus): void {
     this.addressBus = addressBus;
-    this.ticksCount = 0;
   }
 
   public tick(): void {
-    const control = this.addressBus.getByte(0xFF07);
-    const running = checkBit(2, control);
-
     // Increment ticks count
-    // There is no need to keep track over 255
-    this.ticksCount = (this.ticksCount + 1) & 0xFF;
+    // This is limited to 16 bits.
+    this.counter = (this.counter + 1) & 0xFFFF;
 
-    // We don't need to check anything if the current
-    // count isn't a multiple of 4.
-    if ((this.ticksCount % 4) !== 0) {
-      return;
-    }
+    if (this.running) {
+      // We don't need to check anything if the current
+      // count isn't a multiple of 4.
+      if ((this.counter % 4) !== 0) {
+        return;
+      }
 
-    // Divider counts up at 16384Hz (= every 64 ticks)
-    if ((this.ticksCount % 64) === 0) {
-      this.incrementDivider();
-    }
+      let shouldIncrementTima = false;
 
-    if (running) {
-      const speed = control & 0b11;
-
-      let shouldIncrementCounter = false;
-
-      switch (speed) {
+      switch (this.mode) {
         case 0: // 4096Hz (= every 256 ticks)
-          shouldIncrementCounter = this.ticksCount === 0;
+          shouldIncrementTima = this.counter === 0;
           break;
         case 1: // 262144Hz (= every 4 ticks, already checked before)
-          shouldIncrementCounter = true;
+          shouldIncrementTima = true;
           break;
         case 2: // 65536Hz (= every 16 ticks)
-          shouldIncrementCounter = (this.ticksCount % 16) === 0;
+          shouldIncrementTima = (this.counter % 16) === 0;
           break;
         case 3: // 16384Hz (= every 64 ticks)
-          shouldIncrementCounter = (this.ticksCount % 64) === 0;
+          shouldIncrementTima = (this.counter % 64) === 0;
           break;
       }
 
-      if (shouldIncrementCounter) {
-        this.incrementCounter();
+      if (shouldIncrementTima) {
+        this.incrementTima();
       }
     }
+  }
+
+  public start(): void {
+    this.running = true;
+  }
+
+  public stop(): void {
+    this.running = false;
+  }
+
+  public isRunning(): boolean {
+    return this.running;
   }
 
   public reset(): void {
-    this.ticksCount = 0;
+    this.counter = 0;
   }
 
-  private incrementDivider(): void {
-    this.addressBus.setByte(0xFF04, (this.addressBus.getByte(0xFF04) + 1) & 0xFF);
+  public getCounter(): number {
+    return this.counter;
   }
 
-  private incrementCounter(): void {
-    let newValue = (this.addressBus.getByte(0xFF05) + 1) & 0xFF;
+  public setCounter(counter: number): void {
+    this.counter = counter;
+  }
+
+  public getTima(): number {
+    return this.tima;
+  }
+
+  public setTima(tima: number): void {
+    this.tima = tima;
+  }
+
+  public getTma(): number {
+    return this.tma;
+  }
+
+  public setTma(tma: number): void {
+    this.tma = tma;
+  }
+
+  public getMode(): CPUTimerMode {
+    return this.mode;
+  }
+
+  public setMode(mode: CPUTimerMode): void {
+    this.mode = mode;
+  }
+
+  private incrementTima(): void {
+    this.tima = (this.tima + 1) & 0xFF;
 
     // Triggers interrupt and reset to modulo in case of an overflow
-    if (newValue === 0) {
-      this.addressBus.setByte(0xFF0F, this.addressBus.getByte(0xFF0F) | (1 << 2));
-      newValue = this.addressBus.getByte(0xFF06);
-    }
+    if (this.tima === 0) {
+      if (!this.addressBus) {
+        throw new Error('Address bus not found');
+      }
 
-    this.addressBus.setByte(0xFF05, newValue);
+      this.addressBus.triggerInterrupt(CPUInterrupt.TIMER);
+      this.tima = this.tma;
+    }
   }
+}
+
+export enum CPUTimerMode {
+  HZ_4096 = 0,
+  HZ_262144 = 1,
+  HZ_65536 = 2,
+  HZ_16384 = 3,
 }

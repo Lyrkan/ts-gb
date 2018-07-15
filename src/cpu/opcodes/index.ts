@@ -1,4 +1,4 @@
-import { CpuRegisters } from '../cpu-registers';
+import { CPURegisters } from '../cpu-registers';
 import { AddressBus } from '../../memory/address-bus';
 import { OPCODES_0XCB, OPCODES_0XCB_NAMES } from '../opcodes/opcodes-0xCB';
 import { OPCODES_DEFAULT, OPCODES_DEFAULT_NAMES } from '../opcodes/opcodes-default';
@@ -15,7 +15,7 @@ export const OPCODES_NAMES: { [index: string]: IOpcodesNamesMap } = {
 
 export interface IOpcodesMap {
   [index: number]: (
-    registers: CpuRegisters,
+    registers: CPURegisters,
     addressBus: AddressBus,
     cpuCallbacks?: ICPUCallbacks
   ) => number;

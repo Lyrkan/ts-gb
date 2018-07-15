@@ -2,20 +2,21 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { expect } from 'chai';
 import { OPCODES_DEFAULT } from '../../../src/cpu/opcodes/opcodes-default';
-import { CpuRegisters } from '../../../src/cpu/cpu-registers';
+import { CPURegisters } from '../../../src/cpu/cpu-registers';
 import { AddressBus } from '../../../src/memory/address-bus';
 import { ICPUCallbacks } from '../../../src/cpu/opcodes';
 import { Joypad } from '../../../src/controls/joypad';
 import { MemorySegment } from '../../../src/memory/segments/memory-segment';
 import { MBC_TYPE } from '../../../src/cartridge/game-cartridge-info';
+import { DMAHandler } from '../../../src/memory/dma/dma-handler';
+import { CPUTimer } from '../../../src/cpu/cpu-timer';
 import {
   CARTRIDGE_ROM_BANK_LENGTH,
   CARTRIDGE_RAM_BANK_LENGTH
 } from '../../../src/cartridge/game-cartridge';
-import { DMAHandler } from '../../../src/memory/dma/dma-handler';
 
 describe('Opcodes - Default table', () => {
-  let cpuRegisters: CpuRegisters;
+  let cpuRegisters: CPURegisters;
   let cpuCallbacks: ICPUCallbacks;
   let addressBus: AddressBus;
 
@@ -47,7 +48,7 @@ describe('Opcodes - Default table', () => {
   };
 
   beforeEach(() => {
-    cpuRegisters = new CpuRegisters();
+    cpuRegisters = new CPURegisters();
     cpuRegisters.PC = 0x0000;
     cpuRegisters.SP = 0xFFFE;
 
@@ -58,7 +59,7 @@ describe('Opcodes - Default table', () => {
       halt: () => { /* NOP */ },
     };
 
-    addressBus = new AddressBus(new Joypad(), new DMAHandler());
+    addressBus = new AddressBus(new Joypad(), new DMAHandler(), new CPUTimer());
     addressBus.loadCartridge({
       cartridgeInfo: {
         gameTitle: 'TEST',

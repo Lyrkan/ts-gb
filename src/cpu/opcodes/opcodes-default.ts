@@ -1,36 +1,36 @@
 import { IOpcodesMap, ICPUCallbacks, IOpcodesNamesMap } from '../opcodes';
-import { CpuRegisters } from '../cpu-registers';
+import { CPURegisters } from '../cpu-registers';
 import { AddressBus, EMULATION_MODE } from '../../memory/address-bus';
 import { ALU } from '../alu';
 import { uint8ToInt8 } from '../../utils';
 
 export const OPCODES_DEFAULT: IOpcodesMap = {
   // NOP
-  0x00: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x00: (registers: CPURegisters, addressBus: AddressBus) => {
     return 1;
   },
 
   // LD BC,d16
-  0x01: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x01: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.BC = addressBus.getWord(registers.PC);
     registers.PC += 2;
     return 3;
   },
 
   // LD (BC),A
-  0x02: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x02: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.BC, registers.A);
     return 2;
   },
 
   // INC BC
-  0x03: (registers: CpuRegisters,  addressBus: AddressBus) => {
+  0x03: (registers: CPURegisters,  addressBus: AddressBus) => {
     registers.BC = ALU.incWord(registers.BC).value;
     return 2;
   },
 
   // INC B
-  0x04: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x04: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.B);
 
     registers.B = value;
@@ -41,7 +41,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC B
-  0x05: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x05: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.B);
 
     registers.B = value;
@@ -52,13 +52,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD B,d8
-  0x06: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x06: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // RLCA
-  0x07: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x07: (registers: CPURegisters, addressBus: AddressBus) => {
     const shifted = registers.A << 1;
     const carry = (shifted >> 8) & 1;
 
@@ -71,14 +71,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD (a16),SP
-  0x08: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x08: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setWord(addressBus.getWord(registers.PC), registers.SP);
     registers.PC += 2;
     return 5;
   },
 
   // ADD HL,BC
-  0x09: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x09: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, N, H, C } = ALU.addWords(registers.HL, registers.BC);
 
     registers.HL = value;
@@ -89,19 +89,19 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD A,(BC)
-  0x0A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x0A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(registers.BC);
     return 2;
   },
 
   // DEC BC
-  0x0B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x0B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.BC = ALU.decWord(registers.BC).value;
     return 2;
   },
 
   // INC C
-  0x0C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x0C: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.C);
 
     registers.C = value;
@@ -112,7 +112,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC C
-  0x0D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x0D: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.C);
 
     registers.C = value;
@@ -123,13 +123,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD C,d8
-  0x0E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x0E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // RRCA
-  0x0F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x0F: (registers: CPURegisters, addressBus: AddressBus) => {
     const carry = registers.A & 1;
     const shifted = registers.A >> 1;
 
@@ -142,7 +142,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // STOP 0
-  0x10: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
+  0x10: (registers: CPURegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     registers.PC++;
 
     // In CGB mode the STOP instruction can be used to toggle the
@@ -161,26 +161,26 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD DE,d16
-  0x11: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x11: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.DE = addressBus.getWord(registers.PC);
     registers.PC += 2;
     return 3;
   },
 
   // LD (DE),A
-  0x12: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x12: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.DE, registers.A);
     return 2;
   },
 
   // INC DE
-  0x13: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x13: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.DE = ALU.incWord(registers.DE).value;
     return 2;
   },
 
   // INC D
-  0x14: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x14: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.D);
 
     registers.D = value;
@@ -191,7 +191,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC D
-  0x15: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x15: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.D);
 
     registers.D = value;
@@ -202,13 +202,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD D,d8
-  0x16: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x16: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // RLA
-  0x17: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x17: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, C } = ALU.rl(
       registers.A,
       registers.flags.C
@@ -223,7 +223,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JR r8
-  0x18: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x18: (registers: CPURegisters, addressBus: AddressBus) => {
     const offset = uint8ToInt8(addressBus.getByte(registers.PC++));
 
     registers.PC = registers.PC + offset;
@@ -231,7 +231,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD HL,DE
-  0x19: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x19: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, N, H, C } = ALU.addWords(registers.HL, registers.DE);
 
     registers.HL = value;
@@ -242,19 +242,19 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD A,(DE)
-  0x1A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x1A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(registers.DE);
     return 2;
   },
 
   // DEC DE
-  0x1B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x1B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.DE = ALU.decWord(registers.DE).value;
     return 2;
   },
 
   // INC E
-  0x1C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x1C: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.E);
 
     registers.E = value;
@@ -265,7 +265,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC E
-  0x1D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x1D: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.E);
 
     registers.E = value;
@@ -276,13 +276,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD E,d8
-  0x1E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x1E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // RRA
-  0x1F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x1F: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, C } = ALU.rr(
       registers.A,
       registers.flags.C
@@ -297,7 +297,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JR NZ,r8
-  0x20: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x20: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
       registers.PC++;
       return 2;
@@ -310,26 +310,26 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD HL,d16
-  0x21: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x21: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.HL = addressBus.getWord(registers.PC);
     registers.PC += 2;
     return 3;
   },
 
   // LD (HL+),A
-  0x22: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x22: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL++, registers.A);
     return 2;
   },
 
   // INC HL
-  0x23: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x23: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.HL = ALU.incWord(registers.HL).value;
     return 2;
   },
 
   // INC H
-  0x24: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x24: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.H);
 
     registers.H = value;
@@ -340,7 +340,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC H
-  0x25: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x25: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.H);
 
     registers.H = value;
@@ -351,13 +351,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD H,d8
-  0x26: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x26: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // DAA
-  0x27: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x27: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, H, C } = ALU.daa(
       registers.A,
       registers.flags.N,
@@ -373,7 +373,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JR Z,r8
-  0x28: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x28: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.Z) {
       registers.PC++;
       return 2;
@@ -386,7 +386,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD HL,HL
-  0x29: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x29: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, N, H, C } = ALU.addWords(registers.HL, registers.HL);
 
     registers.HL = value;
@@ -397,19 +397,19 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD A,(HL+)
-  0x2A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x2A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(registers.HL++);
     return 2;
   },
 
   // DEC HL
-  0x2B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x2B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.HL = ALU.decWord(registers.HL).value;
     return 2;
   },
 
   // INC L
-  0x2C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x2C: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.L);
 
     registers.L = value;
@@ -420,7 +420,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC L
-  0x2D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x2D: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.L);
 
     registers.L = value;
@@ -431,13 +431,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD L,d8
-  0x2E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x2E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // CPL
-  0x2F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x2F: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.A ^ 0xFF;
     registers.flags.N = 1;
     registers.flags.H = 1;
@@ -445,7 +445,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JR NC,r8
-  0x30: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x30: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
       registers.PC++;
       return 2;
@@ -458,26 +458,26 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD SP,d16
-  0x31: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x31: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP = addressBus.getWord(registers.PC);
     registers.PC += 2;
     return 3;
   },
 
   // LD (HL-),A
-  0x32: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x32: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL--, registers.A);
     return 2;
   },
 
   // INC SP
-  0x33: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x33: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP = ALU.incWord(registers.SP).value;
     return 2;
   },
 
   // INC (HL)
-  0x34: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x34: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(addressBus.getByte(registers.HL));
 
     addressBus.setByte(registers.HL, value);
@@ -489,7 +489,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC (HL)
-  0x35: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x35: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(addressBus.getByte(registers.HL));
 
     addressBus.setByte(registers.HL, value);
@@ -501,13 +501,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD (HL),d8
-  0x36: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x36: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, addressBus.getByte(registers.PC++));
     return 3;
   },
 
   // SCF
-  0x37: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x37: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.flags.C = 1;
     registers.flags.H = 0;
     registers.flags.N = 0;
@@ -515,7 +515,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JR C,r8
-  0x38: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x38: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
       registers.PC++;
       return 2;
@@ -528,7 +528,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD HL,SP
-  0x39: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x39: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, N, H, C } = ALU.addWords(registers.HL, registers.SP);
 
     registers.HL = value;
@@ -539,19 +539,19 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD A,(HL-)
-  0x3A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x3A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(registers.HL--);
     return 2;
   },
 
   // DEC SP
-  0x3B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x3B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP = ALU.decWord(registers.SP).value;
     return 2;
   },
 
   // INC A
-  0x3C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x3C: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.incByte(registers.A);
 
     registers.A = value;
@@ -562,7 +562,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // DEC A
-  0x3D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x3D: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H } = ALU.decByte(registers.A);
 
     registers.A = value;
@@ -573,13 +573,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD A,d8
-  0x3E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x3E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(registers.PC++);
     return 2;
   },
 
   // CCF
-  0x3F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x3F: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.flags.C = ~registers.flags.C;
     registers.flags.H = 0;
     registers.flags.N = 0;
@@ -587,391 +587,391 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD B,B
-  0x40: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x40: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.B;
     return 1;
   },
 
   // LD B,C
-  0x41: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x41: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.C;
     return 1;
   },
 
   // LD B,D
-  0x42: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x42: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.D;
     return 1;
   },
 
   // LD B,E
-  0x43: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x43: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.E;
     return 1;
   },
 
   // LD B,H
-  0x44: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x44: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.H;
     return 1;
   },
 
   // LD B,L
-  0x45: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x45: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.L;
     return 1;
   },
 
   // LD B,(HL)
-  0x46: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x46: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD B,A
-  0x47: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x47: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.B = registers.A;
     return 1;
   },
 
   // LD C,B
-  0x48: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x48: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.B;
     return 1;
   },
 
   // LD C,C
-  0x49: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x49: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.C;
     return 1;
   },
 
   // LD C,D
-  0x4A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x4A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.D;
     return 1;
   },
 
   // LD C,E
-  0x4B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x4B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.E;
     return 1;
   },
 
   // LD C,H
-  0x4C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x4C: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.H;
     return 1;
   },
 
   // LD C,L
-  0x4D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x4D: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.L;
     return 1;
   },
 
   // LD C,(HL)
-  0x4E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x4E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD C,A
-  0x4F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x4F: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.C = registers.A;
     return 1;
   },
 
   // LD D,B
-  0x50: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x50: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.B;
     return 1;
   },
 
   // LD D,C
-  0x51: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x51: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.C;
     return 1;
   },
 
   // LD D,D
-  0x52: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x52: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.D;
     return 1;
   },
 
   // LD D,E
-  0x53: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x53: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.E;
     return 1;
   },
 
   // LD D,H
-  0x54: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x54: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.H;
     return 1;
   },
 
   // LD D,L
-  0x55: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x55: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.L;
     return 1;
   },
 
   // LD D,(HL)
-  0x56: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x56: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD D,A
-  0x57: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x57: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.D = registers.A;
     return 1;
   },
 
   // LD E,B
-  0x58: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x58: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.B;
     return 1;
   },
 
   // LD E,C
-  0x59: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x59: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.C;
     return 1;
   },
 
   // LD E,D
-  0x5A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x5A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.D;
     return 1;
   },
 
   // LD E,E
-  0x5B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x5B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.E;
     return 1;
   },
 
   // LD E,H
-  0x5C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x5C: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.H;
     return 1;
   },
 
   // LD E,L
-  0x5D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x5D: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.L;
     return 1;
   },
 
   // LD E,(HL)
-  0x5E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x5E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD E,A
-  0x5F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x5F: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.E = registers.A;
     return 1;
   },
 
   // LD H,B
-  0x60: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x60: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.B;
     return 1;
   },
 
   // LD H,C
-  0x61: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x61: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.C;
     return 1;
   },
 
   // LD H,D
-  0x62: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x62: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.D;
     return 1;
   },
 
   // LD H,E
-  0x63: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x63: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.E;
     return 1;
   },
 
   // LD H,H
-  0x64: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x64: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.H;
     return 1;
   },
 
   // LD H,L
-  0x65: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x65: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.L;
     return 1;
   },
 
   // LD H,(HL)
-  0x66: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x66: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD H,A
-  0x67: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x67: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.H = registers.A;
     return 1;
   },
 
   // LD L,B
-  0x68: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x68: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.B;
     return 1;
   },
 
   // LD L,C
-  0x69: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x69: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.C;
     return 1;
   },
 
   // LD L,D
-  0x6A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x6A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.D;
     return 1;
   },
 
   // LD L,E
-  0x6B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x6B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.E;
     return 1;
   },
 
   // LD L,H
-  0x6C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x6C: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.H;
     return 1;
   },
 
   // LD L,L
-  0x6D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x6D: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.L;
     return 1;
   },
 
   // LD L,(HL)
-  0x6E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x6E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD L,A
-  0x6F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x6F: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.L = registers.A;
     return 1;
   },
 
   // LD (HL),B
-  0x70: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x70: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.B);
     return 2;
   },
 
   // LD (HL),C
-  0x71: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x71: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.C);
     return 2;
   },
 
   // LD (HL),D
-  0x72: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x72: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.D);
     return 2;
   },
 
   // LD (HL),E
-  0x73: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x73: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.E);
     return 2;
   },
 
   // LD (HL),H
-  0x74: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x74: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.H);
     return 2;
   },
 
   // LD (HL),L
-  0x75: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x75: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.L);
     return 2;
   },
 
   // HALT
-  0x76: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
+  0x76: (registers: CPURegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     cpuCallbacks.halt();
     return 1;
   },
 
   // LD (HL),A
-  0x77: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x77: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(registers.HL, registers.A);
     return 2;
   },
 
   // LD A,B
-  0x78: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x78: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.B;
     return 1;
   },
 
   // LD A,C
-  0x79: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x79: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.C;
     return 1;
   },
 
   // LD A,D
-  0x7A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x7A: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.D;
     return 1;
   },
 
   // LD A,E
-  0x7B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x7B: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.E;
     return 1;
   },
 
   // LD A,H
-  0x7C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x7C: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.H;
     return 1;
   },
 
   // LD A,L
-  0x7D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x7D: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.L;
     return 1;
   },
 
   // LD A,(HL)
-  0x7E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x7E: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(registers.HL);
     return 2;
   },
 
   // LD A,A
-  0x7F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x7F: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = registers.A;
     return 1;
   },
 
   // ADD A,B
-  0x80: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x80: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.B);
 
     registers.A = value;
@@ -983,7 +983,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,C
-  0x81: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x81: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.C);
 
     registers.A = value;
@@ -995,7 +995,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,D
-  0x82: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x82: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.D);
 
     registers.A = value;
@@ -1007,7 +1007,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,E
-  0x83: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x83: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.E);
 
     registers.A = value;
@@ -1019,7 +1019,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,H
-  0x84: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x84: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.H);
 
     registers.A = value;
@@ -1031,7 +1031,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,L
-  0x85: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x85: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.L);
 
     registers.A = value;
@@ -1043,7 +1043,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,(HL)
-  0x86: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x86: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, addressBus.getByte(registers.HL));
 
     registers.A = value;
@@ -1055,7 +1055,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD A,A
-  0x87: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x87: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, registers.A);
 
     registers.A = value;
@@ -1067,7 +1067,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,B
-  0x88: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x88: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.B,
@@ -1083,7 +1083,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,C
-  0x89: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x89: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.C,
@@ -1099,7 +1099,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,D
-  0x8A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x8A: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.D,
@@ -1115,7 +1115,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,E
-  0x8B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x8B: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.E,
@@ -1131,7 +1131,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,H
-  0x8C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x8C: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.H,
@@ -1147,7 +1147,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,L
-  0x8D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x8D: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.L,
@@ -1163,7 +1163,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,(HL)
-  0x8E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x8E: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       addressBus.getByte(registers.HL),
@@ -1179,7 +1179,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,A
-  0x8F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x8F: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       registers.A,
@@ -1195,7 +1195,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB B
-  0x90: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x90: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.B);
 
     registers.A = value;
@@ -1207,7 +1207,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB C
-  0x91: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x91: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.C);
 
     registers.A = value;
@@ -1219,7 +1219,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB D
-  0x92: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x92: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.D);
 
     registers.A = value;
@@ -1231,7 +1231,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB E
-  0x93: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x93: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.E);
 
     registers.A = value;
@@ -1243,7 +1243,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB H
-  0x94: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x94: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.H);
 
     registers.A = value;
@@ -1255,7 +1255,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB L
-  0x95: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x95: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.L);
 
     registers.A = value;
@@ -1267,7 +1267,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB (HL)
-  0x96: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x96: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(
       registers.A,
       addressBus.getByte(registers.HL)
@@ -1282,7 +1282,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SUB A
-  0x97: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x97: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(registers.A, registers.A);
 
     registers.A = value;
@@ -1294,7 +1294,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,B
-  0x98: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x98: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.B,
@@ -1310,7 +1310,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,C
-  0x99: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x99: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.C,
@@ -1326,7 +1326,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,D
-  0x9A: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x9A: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.D,
@@ -1342,7 +1342,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,E
-  0x9B: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x9B: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.E,
@@ -1358,7 +1358,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,H
-  0x9C: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x9C: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.H,
@@ -1374,7 +1374,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,L
-  0x9D: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x9D: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.L,
@@ -1390,7 +1390,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,(HL)
-  0x9E: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x9E: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       addressBus.getByte(registers.HL),
@@ -1406,7 +1406,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,A
-  0x9F: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0x9F: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       registers.A,
@@ -1422,7 +1422,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND B
-  0xA0: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA0: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.B);
 
     registers.A = value;
@@ -1434,7 +1434,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND C
-  0xA1: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA1: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.C);
 
     registers.A = value;
@@ -1446,7 +1446,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND D
-  0xA2: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA2: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.D);
 
     registers.A = value;
@@ -1458,7 +1458,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND E
-  0xA3: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA3: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.E);
 
     registers.A = value;
@@ -1470,7 +1470,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND H
-  0xA4: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA4: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.H);
 
     registers.A = value;
@@ -1482,7 +1482,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND L
-  0xA5: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA5: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.L);
 
     registers.A = value;
@@ -1494,7 +1494,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND (HL)
-  0xA6: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA6: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(
       registers.A,
       addressBus.getByte(registers.HL)
@@ -1509,7 +1509,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // AND A
-  0xA7: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA7: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(registers.A, registers.A);
 
     registers.A = value;
@@ -1521,7 +1521,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR B
-  0xA8: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA8: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.B);
 
     registers.A = value;
@@ -1533,7 +1533,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR C
-  0xA9: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xA9: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.C);
 
     registers.A = value;
@@ -1545,7 +1545,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR D
-  0xAA: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xAA: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.D);
 
     registers.A = value;
@@ -1557,7 +1557,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR E
-  0xAB: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xAB: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.E);
 
     registers.A = value;
@@ -1569,7 +1569,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR H
-  0xAC: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xAC: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.H);
 
     registers.A = value;
@@ -1581,7 +1581,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR L
-  0xAD: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xAD: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.L);
 
     registers.A = value;
@@ -1593,7 +1593,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR (HL)
-  0xAE: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xAE: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(
       registers.A,
       addressBus.getByte(registers.HL)
@@ -1608,7 +1608,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // XOR A
-  0xAF: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xAF: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(registers.A, registers.A);
 
     registers.A = value;
@@ -1620,7 +1620,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR B
-  0xB0: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB0: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.B);
 
     registers.A = value;
@@ -1632,7 +1632,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR C
-  0xB1: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB1: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.C);
 
     registers.A = value;
@@ -1644,7 +1644,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR D
-  0xB2: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB2: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.D);
 
     registers.A = value;
@@ -1656,7 +1656,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR E
-  0xB3: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB3: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.E);
 
     registers.A = value;
@@ -1668,7 +1668,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR H
-  0xB4: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB4: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.H);
 
     registers.A = value;
@@ -1680,7 +1680,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR L
-  0xB5: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB5: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.L);
 
     registers.A = value;
@@ -1692,7 +1692,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR (HL)
-  0xB6: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB6: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(
       registers.A,
       addressBus.getByte(registers.HL)
@@ -1707,7 +1707,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // OR A
-  0xB7: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB7: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(registers.A, registers.A);
 
     registers.A = value;
@@ -1719,7 +1719,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP B
-  0xB8: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB8: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.B);
 
     registers.flags.Z = Z;
@@ -1730,7 +1730,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP C
-  0xB9: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xB9: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.C);
 
     registers.flags.Z = Z;
@@ -1741,7 +1741,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP D
-  0xBA: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xBA: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.D);
 
     registers.flags.Z = Z;
@@ -1752,7 +1752,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP E
-  0xBB: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xBB: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.E);
 
     registers.flags.Z = Z;
@@ -1763,7 +1763,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP H
-  0xBC: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xBC: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.H);
 
     registers.flags.Z = Z;
@@ -1774,7 +1774,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP L
-  0xBD: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xBD: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.L);
 
     registers.flags.Z = Z;
@@ -1785,7 +1785,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP (HL)
-  0xBE: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xBE: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(
       registers.A,
       addressBus.getByte(registers.HL)
@@ -1799,7 +1799,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CP A
-  0xBF: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xBF: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(registers.A, registers.A);
 
     registers.flags.Z = Z;
@@ -1810,7 +1810,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RET NZ
-  0xC0: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC0: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
       return 2;
     }
@@ -1821,14 +1821,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // POP BC
-  0xC1: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC1: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.BC = addressBus.getWord(registers.SP);
     registers.SP += 2;
     return 3;
   },
 
   // JP NZ,a16
-  0xC2: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC2: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
       registers.PC += 2;
       return 3;
@@ -1839,13 +1839,13 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JP a16
-  0xC3: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC3: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.PC = addressBus.getWord(registers.PC);
     return 4;
   },
 
   // CALL NZ,a16
-  0xC4: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC4: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.Z) {
       registers.PC += 2;
       return 3;
@@ -1861,14 +1861,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // PUSH BC
-  0xC5: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC5: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.BC);
     return 4;
   },
 
   // ADD A,d8
-  0xC6: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC6: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.addBytes(registers.A, addressBus.getByte(registers.PC++));
 
     registers.A = value;
@@ -1880,7 +1880,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 00H
-  0xC7: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC7: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0000;
@@ -1888,7 +1888,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RET Z
-  0xC8: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC8: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.Z) {
       return 2;
     }
@@ -1899,14 +1899,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RET
-  0xC9: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xC9: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.PC = addressBus.getWord(registers.SP);
     registers.SP += 2;
     return 4;
   },
 
   // JP Z,a16
-  0xCA: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xCA: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.Z) {
       registers.PC += 2;
       return 3;
@@ -1917,7 +1917,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CALL Z,a16
-  0xCC: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xCC: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.Z) {
       registers.PC += 2;
       return 3;
@@ -1933,7 +1933,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CALL a16
-  0xCD: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xCD: (registers: CPURegisters, addressBus: AddressBus) => {
     // Push return address to the stack
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC + 2);
@@ -1944,7 +1944,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADC A,d8
-  0xCE: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xCE: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.adc(
       registers.A,
       addressBus.getByte(registers.PC++),
@@ -1960,7 +1960,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 08H
-  0xCF: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xCF: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0008;
@@ -1968,7 +1968,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RET NC
-  0xD0: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD0: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
       return 2;
     }
@@ -1979,14 +1979,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // POP DE
-  0xD1: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD1: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.DE = addressBus.getWord(registers.SP);
     registers.SP += 2;
     return 3;
   },
 
   // JP NC,a16
-  0xD2: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD2: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
       registers.PC += 2;
       return 3;
@@ -1997,7 +1997,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CALL NC,a16
-  0xD4: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD4: (registers: CPURegisters, addressBus: AddressBus) => {
     if (registers.flags.C) {
       registers.PC += 2;
       return 3;
@@ -2013,14 +2013,14 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // PUSH DE
-  0xD5: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD5: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.DE);
     return 4;
   },
 
   // SUB d8
-  0xD6: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD6: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sub(
       registers.A,
       addressBus.getByte(registers.PC++)
@@ -2035,7 +2035,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 10H
-  0xD7: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD7: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0010;
@@ -2043,7 +2043,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RET C
-  0xD8: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xD8: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
       return 2;
     }
@@ -2054,7 +2054,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RETI
-  0xD9: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
+  0xD9: (registers: CPURegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     registers.PC = addressBus.getWord(registers.SP);
     registers.SP += 2;
     cpuCallbacks.enableInterrupts();
@@ -2062,7 +2062,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JP C,a16
-  0xDA: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xDA: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
       registers.PC += 2;
       return 3;
@@ -2073,7 +2073,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // CALL C,a16
-  0xDC: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xDC: (registers: CPURegisters, addressBus: AddressBus) => {
     if (!registers.flags.C) {
       registers.PC += 2;
       return 3;
@@ -2089,7 +2089,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // SBC A,d8
-  0xDE: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xDE: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, Z, N, H, C } = ALU.sbc(
       registers.A,
       addressBus.getByte(registers.PC++),
@@ -2105,7 +2105,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 18H
-  0xDF: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xDF: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0018;
@@ -2113,33 +2113,33 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LDH (a8),A
-  0xE0: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE0: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(0xFF00 + addressBus.getByte(registers.PC++), registers.A);
     return 3;
   },
 
   // POP HL
-  0xE1: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE1: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.HL = addressBus.getWord(registers.SP);
     registers.SP += 2;
     return 3;
   },
 
   // LD (C),A
-  0xE2: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE2: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(0xFF00 + registers.C, registers.A);
     return 2;
   },
 
   // PUSH HL
-  0xE5: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE5: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.HL);
     return 4;
   },
 
   // AND d8
-  0xE6: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE6: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.and(
       registers.A,
       addressBus.getByte(registers.PC++)
@@ -2154,7 +2154,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 20H
-  0xE7: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE7: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0020;
@@ -2162,7 +2162,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // ADD SP,r8
-  0xE8: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE8: (registers: CPURegisters, addressBus: AddressBus) => {
     const signedOperand = uint8ToInt8(addressBus.getByte(registers.PC++));
     const value = (registers.SP + signedOperand) & 0xFFFF;
     const H = ((registers.SP & 0xF) + (signedOperand & 0xF)) >> 4;
@@ -2177,20 +2177,20 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // JP HL
-  0xE9: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xE9: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.PC = registers.HL;
     return 1;
   },
 
   // LD (a16),A
-  0xEA: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xEA: (registers: CPURegisters, addressBus: AddressBus) => {
     addressBus.setByte(addressBus.getWord(registers.PC), registers.A);
     registers.PC += 2;
     return 4;
   },
 
   // XOR d8
-  0xEE: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xEE: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.xor(
       registers.A,
       addressBus.getByte(registers.PC++)
@@ -2205,7 +2205,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 28H
-  0xEF: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xEF: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0028;
@@ -2213,39 +2213,39 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LDH A,(a8)
-  0xF0: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF0: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(0xFF00 + addressBus.getByte(registers.PC++));
     return 3;
   },
 
   // POP AF
-  0xF1: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF1: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.AF = addressBus.getWord(registers.SP);
     registers.SP += 2;
     return 3;
   },
 
   // LD A,(C)
-  0xF2: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF2: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(0xFF00 + registers.C);
     return 2;
   },
 
   // DI
-  0xF3: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
+  0xF3: (registers: CPURegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     cpuCallbacks.disableInterrupts();
     return 1;
   },
 
   // PUSH AF
-  0xF5: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF5: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.AF);
     return 4;
   },
 
   // OR d8
-  0xF6: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF6: (registers: CPURegisters, addressBus: AddressBus) => {
     const { value, H, Z, N, C } = ALU.or(
       registers.A,
       addressBus.getByte(registers.PC++)
@@ -2260,7 +2260,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 30H
-  0xF7: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF7: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0030;
@@ -2268,7 +2268,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD HL,SP+r8
-  0xF8: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF8: (registers: CPURegisters, addressBus: AddressBus) => {
     const signedOperand = uint8ToInt8(addressBus.getByte(registers.PC++));
     const value = (registers.SP + signedOperand) & 0xFFFF;
     const H = ((registers.SP & 0xF) + (signedOperand & 0xF)) >> 4;
@@ -2283,26 +2283,26 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // LD SP,HL
-  0xF9: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xF9: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP = registers.HL;
     return 2;
   },
 
   // LD A,(a16)
-  0xFA: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xFA: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.A = addressBus.getByte(addressBus.getWord(registers.PC));
     registers.PC += 2;
     return 4;
   },
 
   // EI
-  0xFB: (registers: CpuRegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
+  0xFB: (registers: CPURegisters, addressBus: AddressBus, cpuCallbacks: ICPUCallbacks) => {
     cpuCallbacks.enableInterrupts();
     return 1;
   },
 
   // CP d8
-  0xFE: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xFE: (registers: CPURegisters, addressBus: AddressBus) => {
     const { Z, N, H, C } = ALU.sub(
       registers.A,
       addressBus.getByte(registers.PC++)
@@ -2316,7 +2316,7 @@ export const OPCODES_DEFAULT: IOpcodesMap = {
   },
 
   // RST 38H
-  0xFF: (registers: CpuRegisters, addressBus: AddressBus) => {
+  0xFF: (registers: CPURegisters, addressBus: AddressBus) => {
     registers.SP -= 2;
     addressBus.setWord(registers.SP, registers.PC);
     registers.PC = 0x0038;
