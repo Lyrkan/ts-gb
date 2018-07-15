@@ -257,6 +257,12 @@ export class AddressBus {
         } else if (offset === 0x000F) {
           // Interrupt flags: Unused bits are always set to 1
           value |= 0xE0;
+        } else if (offset === 0x0026) {
+          // Sound control - On/Off
+          // Not used for now but some games check
+          // it to see if a sound is still playing...
+          // so make sure everything is always off.
+          value = 0x70;
         } else if (offset === 0x0040) {
           if (this.display) {
             const lcdControl = this.display.getLcdControl();
