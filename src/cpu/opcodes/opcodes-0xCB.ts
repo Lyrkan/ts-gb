@@ -899,7 +899,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 0,A
@@ -979,7 +979,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 1,A
@@ -1059,7 +1059,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 2,A
@@ -1139,7 +1139,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 3,A
@@ -1219,7 +1219,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 4,A
@@ -1299,7 +1299,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 5,A
@@ -1379,7 +1379,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 6,A
@@ -1459,7 +1459,7 @@ export const OPCODES_0XCB: IOpcodesMap = {
     registers.flags.Z = Z;
     registers.flags.N = N;
     registers.flags.H = H;
-    return 4;
+    return 3;
   },
 
   // BIT 7,A

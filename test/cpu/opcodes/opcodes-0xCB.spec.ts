@@ -1485,13 +1485,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b00000001);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000001);
@@ -1625,13 +1625,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b00000010);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000010);
@@ -1765,13 +1765,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b00000100);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000100);
@@ -1905,13 +1905,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b00001000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00001000);
@@ -2045,13 +2045,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b00010000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00010000);
@@ -2185,13 +2185,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b00100000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00100000);
@@ -2325,13 +2325,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b01000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b01000000);
@@ -2465,13 +2465,13 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.HL = 0xC000;
 
     addressBus.setByte(0xC000, 0b00000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
     checkFlags({ Z: 1, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b00000000);
 
     addressBus.setByte(0xC000, 0b10000000);
-    executeNextOpcode(4);
+    executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
     checkFlags({ Z: 0, N: 0, H: 1, C: 0 });
     expect(addressBus.getByte(0xC000)).to.equal(0b10000000);
