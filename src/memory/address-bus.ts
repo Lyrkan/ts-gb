@@ -300,6 +300,12 @@ export class AddressBus {
             value = (isInProgress ? 1 : 0) << 7;
             value |= (remainingLength > 0) ? ((remainingLength >> 4) - 1) : 0xFF;
           }
+        } else if (offset === 0x0068) {
+          // BG Palette index (CGB mode only)
+          // Bit 6 is always set to 1.
+          if (this.emulationMode === EMULATION_MODE.CGB) {
+            value |= 1 << 6;
+          }
         } else if (offset === 0x0069) {
           // Background palette data (CGB mode only)
           if (this.emulationMode === EMULATION_MODE.CGB) {
