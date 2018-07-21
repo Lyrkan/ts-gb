@@ -6,6 +6,9 @@ import { CPUInterrupt } from '../cpu/cpu';
 export const SCREEN_WIDTH = 160;
 export const SCREEN_HEIGHT = 144;
 
+const LINE_RENDERING_DURATION = 114;
+const FRAME_RENDERING_DURATION = LINE_RENDERING_DURATION * 154;
+
 export class Display {
   private addressBus: AddressBus;
   private buffers: Uint8ClampedArray[];
@@ -59,11 +62,19 @@ export class Display {
 
   public tick(): void {
     if (this.lcdControl.lcdEnabled && (this.lcdEnablingDelay <= 0)) {
-      const hblankOffset = (this.currentLine * 114);
+      const hblankOffset = (this.currentLine * LINE_RENDERING_DURATION);
 
       // Update current line every 114 ticks
-      if ((this.clock > 0) && ((this.clock % 114) === 0)) {
+      // Line 0 is a bit special since it is set 112 ticks before
+      // the end of VBLANK.
+      if (
+        (this.clock !== 0)
+        && (this.clock < (FRAME_RENDERING_DURATION - 112))
+        && ((this.clock % LINE_RENDERING_DURATION) === 0)
+      ) {
         this.setCurrentLine(this.currentLine + 1);
+      } else if (this.clock === (FRAME_RENDERING_DURATION - 112)) {
+        this.setCurrentLine(0);
       }
 
       // Scanline (access to OAM) in progress
@@ -78,7 +89,10 @@ export class Display {
       }
 
       // HBLANK in progress
-      if ((this.currentMode === GPU_MODE.HBLANK) && (this.clock === (hblankOffset + 114))) {
+      if (
+        (this.currentMode === GPU_MODE.HBLANK)
+        && (this.clock >= (hblankOffset + LINE_RENDERING_DURATION))
+      ) {
         if (this.currentLine < SCREEN_HEIGHT) {
           this.setMode(GPU_MODE.OAM_SEARCH);
         } else {
@@ -88,7 +102,7 @@ export class Display {
       }
 
       // Check for the end of VBLANK
-      if (this.clock >= 17556) {
+      if (this.clock >= FRAME_RENDERING_DURATION) {
         this.clock = 0;
         this.setMode(GPU_MODE.OAM_SEARCH);
         this.switchBuffers();
