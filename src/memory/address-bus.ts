@@ -11,6 +11,7 @@ import { TILE_MAP, TILE_AREA } from '../display/ppu';
 import { checkBit } from '../utils';
 import { CPUTimer } from '../cpu/cpu-timer';
 import { CPUInterrupt } from '../cpu/cpu';
+import { APU, DEFAULT_WAVE_DATA_DMG, DEFAULT_WAVE_DATA_CGB } from '../audio/apu';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 4 * 1024;
@@ -93,6 +94,9 @@ export class AddressBus {
   // single cycle instead of 161.
   private dmaHandler: DMAHandler;
 
+  // Audio Processing Unit
+  private apu: APU;
+
   // Emulation mode (DMG, CGB with/without DMG compatibility mode)
   // This is set when a ROM is loaded.
   private emulationMode: EMULATION_MODE;
@@ -103,9 +107,15 @@ export class AddressBus {
   /**
    * Initialize a new empty memory layout.
    */
-  public constructor(joypad: Joypad, dmaHandler: DMAHandler, cpuTimer: CPUTimer) {
+  public constructor(
+    joypad: Joypad,
+    dmaHandler: DMAHandler,
+    cpuTimer: CPUTimer,
+    apu: APU,
+  ) {
     this.joypad = joypad;
     this.dmaHandler = dmaHandler;
+    this.apu = apu;
 
     this.cpuTimer = cpuTimer;
     this.cpuTimer.setAddressBus(this);
@@ -257,12 +267,75 @@ export class AddressBus {
         } else if (offset === 0x000F) {
           // Interrupt flags: Unused bits are always set to 1
           value |= 0xE0;
+        } else if (offset === 0x0010) {
+          // Audio - NR10 - CH1 Frequency Sweep
+          value = this.apu.ch1.nrx0;
+        } else if (offset === 0x0011) {
+          // Audio - NR11 - CH1 Sound length / Duty
+          value = this.apu.ch1.nrx1;
+        } else if (offset === 0x0012) {
+          // Audio - NR12 - CH1 Volume envelope
+          value = this.apu.ch1.nrx2;
+        } else if (offset === 0x0013) {
+          // Audio - NR13 - CH1 Frequency (low)
+          value = this.apu.ch1.nrx3;
+        } else if (offset === 0x0014) {
+          // Audio - NR14 - CH1 Trigger / Frequency (high)
+          value = this.apu.ch1.nrx4;
+        } else if (offset === 0x0016) {
+          // Audio - NR21 - CH2 Sound length / Duty
+          value = this.apu.ch2.nrx1;
+        } else if (offset === 0x0017) {
+          // Audio - NR22 - CH2 Volume envelope
+          value = this.apu.ch2.nrx2;
+        } else if (offset === 0x0018) {
+          // Audio - NR23 - CH2 Frequency (low)
+          value = this.apu.ch2.nrx3;
+        } else if (offset === 0x0019) {
+          // Audio - NR24 - CH2 Trigger / Frequency (high)
+          value = this.apu.ch2.nrx4;
+        } else if (offset === 0x001A) {
+          // Audio - NR30 - CH3 On/Off
+          value = this.apu.ch3.nrx0;
+        } else if (offset === 0x001B) {
+          // Audio - NR31 - CH3 Sound length
+          value = this.apu.ch3.nrx1;
+        } else if (offset === 0x001C) {
+          // Audio - NR32 - CH3 Output level
+          value = this.apu.ch3.nrx2;
+        } else if (offset === 0x001D) {
+          // Audio - NR33 - CH3 Frequency (low)
+          value = this.apu.ch3.nrx3;
+        } else if (offset === 0x001E) {
+          // Audio - NR34 - CH3 Trigger / Frequency (high)
+          value = this.apu.ch3.nrx4;
+        } else if (offset === 0x0020) {
+          // Audio - NR41 - CH4 Sound length
+          value = this.apu.ch4.nrx1;
+        } else if (offset === 0x0021) {
+          // Audio - NR42 - CH4 Volume envelope
+          value = this.apu.ch4.nrx2;
+        } else if (offset === 0x0022) {
+          // Audio - NR43 - CH4 Polynomial counter
+          value = this.apu.ch4.nrx3;
+        } else if (offset === 0x0023) {
+          // Audio - NR44 - CH4 Trigger / Counter
+          value = this.apu.ch4.nrx4;
+        } else if (offset === 0x0024) {
+          // Audio - NR50 - Left/right volume / Vin output
+          value = this.apu.nr50;
+        } else if (offset === 0x0025) {
+          // Audio - NR51 - Channel left/right outputs
+          value = this.apu.nr51;
         } else if (offset === 0x0026) {
-          // Sound control - On/Off
-          // Not used for now but some games check
-          // it to see if a sound is still playing...
-          // so make sure everything is always off.
-          value = 0x70;
+          // Audio - NR52 - Sound on/off
+          value = this.apu.nr52;
+        } else if ((offset >= 0x0027) && (offset < 0x0030)) {
+          // Audio - Unused registers
+          value = 0xFF;
+        } else if ((offset >= 0x0030) && (offset < 0x0040)) {
+          // Audio - Waveform RAM
+          value = this.apu.ch3.waveform[offset - 0x0030];
         } else if (offset === 0x0040) {
           if (this.display) {
             const lcdControl = this.display.getLcdControl();
@@ -346,6 +419,72 @@ export class AddressBus {
           }
 
           this.cpuTimer.setMode(value & 0b11);
+        } else if (offset === 0x0010) {
+          // Audio - NR10 - CH1 Frequency Sweep
+          this.apu.ch1.nrx0 = value;
+        } else if (offset === 0x0011) {
+          // Audio - NR11 - CH1 Sound length / Duty
+          this.apu.ch1.nrx1 = value;
+        } else if (offset === 0x0012) {
+          // Audio - NR12 - CH1 Volume envelope
+          this.apu.ch1.nrx2 = value;
+        } else if (offset === 0x0013) {
+          // Audio - NR13 - CH1 Frequency (low)
+          this.apu.ch1.nrx3 = value;
+        } else if (offset === 0x0014) {
+          // Audio - NR14 - CH1 Trigger / Frequency (high)
+          this.apu.ch1.nrx4 = value;
+        } else if (offset === 0x0016) {
+          // Audio - NR21 - CH2 Sound length / Duty
+          this.apu.ch2.nrx1 = value;
+        } else if (offset === 0x0017) {
+          // Audio - NR22 - CH2 Volume envelope
+          this.apu.ch2.nrx2 = value;
+        } else if (offset === 0x0018) {
+          // Audio - NR23 - CH2 Frequency (low)
+          this.apu.ch2.nrx3 = value;
+        } else if (offset === 0x0019) {
+          // Audio - NR24 - CH2 Trigger / Frequency (high)
+          this.apu.ch2.nrx4 = value;
+        } else if (offset === 0x001A) {
+          // Audio - NR30 - CH3 On/Off
+          this.apu.ch3.nrx0 = value;
+        } else if (offset === 0x001B) {
+          // Audio - NR31 - CH3 Sound length
+          this.apu.ch3.nrx1 = value;
+        } else if (offset === 0x001C) {
+          // Audio - NR32 - CH3 Output level
+          this.apu.ch3.nrx2 = value;
+        } else if (offset === 0x001D) {
+          // Audio - NR33 - CH3 Frequency (low)
+          this.apu.ch3.nrx3 = value;
+        } else if (offset === 0x001E) {
+          // Audio - NR34 - CH3 Trigger / Frequency (high)
+          this.apu.ch3.nrx4 = value;
+        } else if (offset === 0x0020) {
+          // Audio - NR41 - CH4 Sound length
+          this.apu.ch4.nrx1 = value;
+        } else if (offset === 0x0021) {
+          // Audio - NR42 - CH4 Volume envelope
+          this.apu.ch4.nrx2 = value;
+        } else if (offset === 0x0022) {
+          // Audio - NR43 - CH4 Polynomial counter
+          this.apu.ch4.nrx3 = value;
+        } else if (offset === 0x0023) {
+          // Audio - NR44 - CH4 Trigger / Counter
+          this.apu.ch4.nrx4 = value;
+        } else if (offset === 0x0024) {
+          // Audio - NR50 - Left/right volume / Vin output
+          this.apu.nr50 = value;
+        } else if (offset === 0x0025) {
+          // Audio - NR51 - Channel left/right outputs
+          this.apu.nr51 = value;
+        } else if (offset === 0x0026) {
+          // Audio - NR52 - Sound on/off
+          this.apu.nr52 = value;
+        } else if ((offset >= 0x0030) && (offset < 0x0040)) {
+          // Audio - Waveform RAM
+          this.apu.ch3.updateWaveform(offset - 0x0030, value);
         } else if (offset === 0x0040) {
           // LCDC Control Register update
           // If a display unit is set, notify it.
@@ -479,9 +618,18 @@ export class AddressBus {
     this.joypad.setInterruptCallback(() => {
       this.triggerInterrupt(CPUInterrupt.JOYPAD);
     });
+  }
 
-    // Set default values
-    // Based on http://bgb.bircd.org/pandocs.htm#powerupsequence)
+  /**
+   * Initialize registers to the state they
+   * they are supposed to be in after the power
+   * up sequence.
+   *
+   * This is called by the CPU before the first
+   * instruction when no bootstrap ROM is available.
+   */
+  public initDefaultRegisterValues(): void {
+    // Audio registers
     this.ioRegisters.setByte(0x0010, 0x80); // NR10
     this.ioRegisters.setByte(0x0011, 0xBF); // NR11
     this.ioRegisters.setByte(0x0012, 0xF3); // NR12
@@ -497,6 +645,16 @@ export class AddressBus {
     this.ioRegisters.setByte(0x0024, 0x77); // NR50
     this.ioRegisters.setByte(0x0025, 0xF3); // NR51
     this.ioRegisters.setByte(0x0026, 0xF1); // NR52
+
+    const waveData = (this.emulationMode === EMULATION_MODE.DMG) ?
+      DEFAULT_WAVE_DATA_DMG :
+      DEFAULT_WAVE_DATA_CGB;
+
+    for (let i = 0; i < waveData.length; i++) {
+      this.ioRegisters.setByte(0x0030 + i, waveData[i]);
+    }
+
+    // Display registers
     this.ioRegisters.setByte(0x0040, 0x91); // LCDC
     this.ioRegisters.setByte(0x0047, 0xFC); // BGP
     this.ioRegisters.setByte(0x0048, 0xFF); // OBP0

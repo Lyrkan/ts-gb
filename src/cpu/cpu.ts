@@ -113,8 +113,8 @@ export class CPU {
    */
   private singleTick(): void {
     if (this.firstCycle) {
-      // If there isn't any boot ROM, directly
-      // jump to 0x0100.
+      // If no bootstrap ROM is availabe simulates what
+      // it does to somes registers.
       if (!this.addressBus.hasBootRom()) {
         if (this.addressBus.getEmulationMode() === EMULATION_MODE.DMG) {
           this.registers.AF = 0x01B0;
@@ -130,8 +130,14 @@ export class CPU {
           this.timer.setCounter(0x1EA0);
         }
 
+        // Stack must target the highest value of the HRAM
         this.registers.SP = 0xFFFE;
+
+        // Directly jump to 0x0100
         this.registers.PC = 0x0100;
+
+        // Set other registers to their default values
+        this.addressBus.initDefaultRegisterValues();
       }
 
       this.firstCycle = false;

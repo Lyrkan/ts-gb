@@ -6,6 +6,7 @@ import { GameCartridge } from '../../src/cartridge/game-cartridge';
 import { Joypad, BUTTON } from '../../src/controls/joypad';
 import { DMAHandler } from '../../src/memory/dma/dma-handler';
 import { CPUTimer } from '../../src/cpu/cpu-timer';
+import { APU } from '../../src/audio/apu';
 
 describe('AddressBus', () => {
   let addressBus: AddressBus;
@@ -13,7 +14,7 @@ describe('AddressBus', () => {
 
   beforeEach(() => {
     joypad = new Joypad();
-    addressBus = new AddressBus(joypad, new DMAHandler(), new CPUTimer());
+    addressBus = new AddressBus(joypad, new DMAHandler(), new CPUTimer(), new APU());
   });
 
   describe('Bootstrap ROM', () => {

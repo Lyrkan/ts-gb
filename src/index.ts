@@ -1,5 +1,6 @@
 
 export { AddressBus } from './memory/address-bus';
+export { APU } from './audio/apu';
 export { CPU } from './cpu/cpu';
 export { CPUTimer } from './cpu/cpu-timer';
 export { Display } from './display/display';
