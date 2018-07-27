@@ -110,7 +110,7 @@ export class WaveChannel extends AbstractSoundChannel {
 
     // Update the 3 upper bits of the
     // current frequency.
-    this.frequency = (this.frequency & 0xFF) | (value & 0b111);
+    this.frequency = (this.frequency & 0xFF) | ((value & 0b111) << 8);
 
     // Trigger/restart if the 7th bit
     // is set.
