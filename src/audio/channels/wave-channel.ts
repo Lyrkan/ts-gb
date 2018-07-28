@@ -19,14 +19,11 @@ export class WaveChannel extends AbstractSoundChannel {
   // Waveform (16x 2x 4-bits)
   private _waveform: number[];
 
-  public tick(): void {
+  public tick(sequencerCounter: number): void {
     // Sound length is updated at rate of 256Hz
-    if ((this.sequencerCounter % 2) === 0) {
+    if ((sequencerCounter % 2) === 0) {
       this.updateSoundLength();
     }
-
-    // Update sequence counter
-    super.tick();
   }
 
   public reset(): void {

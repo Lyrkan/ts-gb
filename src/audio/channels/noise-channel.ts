@@ -21,22 +21,19 @@ export class NoiseChannel extends AbstractSoundChannel {
   // private counterStep: number;
   // private dividingRatio: number;
 
-  public tick(): void {
+  public tick(sequencerCounter: number): void {
     // Sound length is updated at rate of 256Hz
-    if ((this.sequencerCounter % 2) === 0) {
+    if ((sequencerCounter % 2) === 0) {
       this.updateSoundLength();
     }
 
     // Volume is updated at a rate of 64Hz.
-    if (((this.sequencerCounter + 7) % 8) === 0) {
+    if (((sequencerCounter + 7) % 8) === 0) {
       this.updateVolume();
     }
 
     // Update LFSR
     // TODO
-
-    // Update sequence counter
-    super.tick();
   }
 
   public reset(): void {

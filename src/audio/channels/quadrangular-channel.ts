@@ -34,24 +34,21 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     this.hasFrequencySweep = hasFrequencySweep;
   }
 
-  public tick() {
+  public tick(sequencerCounter: number) {
     // Sound length is updated at rate of 256Hz
-    if ((this.sequencerCounter % 2) === 0) {
+    if ((sequencerCounter % 2) === 0) {
       this.updateSoundLength();
     }
 
     // Volume is updated at a rate of 64Hz.
-    if (((this.sequencerCounter + 7) % 8) === 0) {
+    if (((sequencerCounter + 7) % 8) === 0) {
       this.updateVolume();
     }
 
     // Frequency is updated at a rate of 64Hz.
-    if (this.hasFrequencySweep && ((this.sequencerCounter + 2) % 4) === 0) {
+    if (this.hasFrequencySweep && ((sequencerCounter + 2) % 4) === 0) {
       this.updateFrequency();
     }
-
-    // Update sequence counter
-    super.tick();
   }
 
   public reset(): void {

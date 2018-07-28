@@ -7,10 +7,6 @@ export abstract class AbstractSoundChannel {
   protected apu: APU;
   protected eventSource: EventSource;
 
-  // Sequencer counter
-  // It is incremented at a 512Hz rate.
-  protected sequencerCounter: number;
-
   // Registers
   protected _nrx0: number;
   protected _nrx1: number;
@@ -44,13 +40,8 @@ export abstract class AbstractSoundChannel {
     this.reset();
   }
 
-  public tick(): void {
-    this.sequencerCounter = (this.sequencerCounter + 1) % 512;
-  }
-
   public reset(): void {
     this.enabled = false;
-    this.sequencerCounter = 0;
   }
 
   public get enabled(): boolean {
@@ -119,6 +110,8 @@ export abstract class AbstractSoundChannel {
   public set nrx4(value: number) {
     this._nrx4 = value;
   }
+
+  public abstract tick(sequencerCounter: number): void;
 }
 
 export enum EnvelopeDirection {

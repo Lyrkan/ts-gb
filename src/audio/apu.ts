@@ -17,6 +17,9 @@ export class APU {
 
   private eventListener?: IAudioEventListener;
 
+  private ticksCounter: number;
+  private sequencerCounter: number;
+
   public constructor() {
     this.ch1 = new QuadrangularChannel(
       this,
@@ -49,13 +52,24 @@ export class APU {
     this._rightVolume = 0;
     this.vinLeftEnabled = false;
     this.vinRightEnabled = false;
+
+    this.ticksCounter = 0;
+    this.sequencerCounter = 0;
   }
 
   public tick(): void {
-    this.ch1.tick();
-    this.ch2.tick();
-    this.ch3.tick();
-    this.ch4.tick();
+    // Tick at a 512hz frequency (every 2048
+    // ticks if this method is called at a 1Mhz
+    // frequency)
+    if (this.ticksCounter === 0) {
+      this.ch1.tick(this.sequencerCounter);
+      this.ch2.tick(this.sequencerCounter);
+      this.ch3.tick(this.sequencerCounter);
+      this.ch4.tick(this.sequencerCounter);
+      this.sequencerCounter = (this.sequencerCounter + 1) % 8;
+    }
+
+    this.ticksCounter = (this.ticksCounter + 1) % 2048;
   }
 
   public reset(): void {
