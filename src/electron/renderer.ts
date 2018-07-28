@@ -2,10 +2,10 @@
 import { ipcRenderer } from 'electron';
 import { System } from '../system';
 import { CPU_CLOCK_FREQUENCY } from '../cpu/cpu';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../display/display';
 import { BUTTON } from '../controls/joypad';
 import { Debugger, DEBUGGER_MODE } from './debugger';
 import { WINDOW_SCALING } from './constants';
+import { CanvasRenderer } from '../display/renderers/canvas-renderer';
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -21,21 +21,13 @@ const systemDebugger = new Debugger(system.cpu, system.memory);
 (global as any).GAME_BOY = system;
 (global as any).GAME_BOY_DEBUGGER = systemDebugger;
 
-// Find the canvas that represents the LCD screen
-const canvas = document.getElementById('lcd');
-const canvasContext = canvas ? (canvas as HTMLCanvasElement).getContext('2d') : null;
-if (!canvas || !canvasContext) {
-  throw new Error('Could not find LCD canvas');
-}
+// Create canvas renderer
+const canvasRenderer = new CanvasRenderer(system.display, {
+  scaling: WINDOW_SCALING,
+  canvasId: 'lcd'
+});
 
-// Initialize canvas options
-canvas.style.width = `${SCREEN_WIDTH * WINDOW_SCALING}px` ;
-canvas.style.height = `${SCREEN_HEIGHT * WINDOW_SCALING}px` ;
-canvasContext.canvas.width = SCREEN_WIDTH * WINDOW_SCALING;
-canvasContext.canvas.height = SCREEN_HEIGHT * WINDOW_SCALING;
-canvasContext.imageSmoothingEnabled = false;
-canvasContext.fillStyle = '#EDEDED';
-canvasContext.fillRect(0, 0, SCREEN_WIDTH * WINDOW_SCALING, SCREEN_HEIGHT * WINDOW_SCALING);
+document.body.appendChild(canvasRenderer.getCanvas());
 
 // Status flags
 let gameRomLoaded = false;
@@ -213,9 +205,6 @@ window.addEventListener('keyup', event => {
 
 // Game loop
 let lastLoopTime: number|null = null;
-const imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
-const imageData = new ImageData(imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
-
 const gameLoop = (loopTime: number) => {
   let deltaTime: number|null = null;
   if (lastLoopTime != null) {
@@ -244,28 +233,7 @@ const gameLoop = (loopTime: number) => {
   }
 
   if (gameRomLoaded) {
-    // Draw buffer
-    const buffer = system.display.getFrontBuffer();
-
-    for (let line = 0; line < SCREEN_HEIGHT; line++) {
-      for (let column = 0; column < SCREEN_WIDTH; column++) {
-        const startIndex = (line * SCREEN_WIDTH * 4) + (column * 4);
-        imageDataBuffer[startIndex] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3)];
-        imageDataBuffer[startIndex + 1] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 1];
-        imageDataBuffer[startIndex + 2] = buffer[(line * SCREEN_WIDTH * 3) + (column * 3) + 2];
-        imageDataBuffer[startIndex + 3] = 255;
-      }
-    }
-
-    createImageBitmap(imageData).then(bitmap => {
-      canvasContext.drawImage(
-        bitmap,
-        0,
-        0,
-        SCREEN_WIDTH * WINDOW_SCALING,
-        SCREEN_HEIGHT * WINDOW_SCALING
-      );
-    });
+    canvasRenderer.renderFrame();
   }
 
   // Prepare for new frame
