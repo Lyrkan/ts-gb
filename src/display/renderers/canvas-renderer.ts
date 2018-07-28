@@ -10,11 +10,12 @@ export class CanvasRenderer {
   private imageDataBuffer: Uint8ClampedArray;
   private imageData: ImageData;
 
-  public constructor(display: Display, {
-    scaling,
+  public constructor(
+    display: Display, {
+    scaling = 1,
     defaultColor = '#EDEDED',
     canvasId = '',
-  }: ICanvasRendererOptions) {
+  }: ICanvasRendererOptions = {}) {
     this.display = display;
     this.scaling = scaling;
 
@@ -66,7 +67,7 @@ export class CanvasRenderer {
 }
 
 export interface ICanvasRendererOptions {
-  scaling: number;
+  scaling?: number;
   defaultColor?: string;
   canvasId?: string;
 }
