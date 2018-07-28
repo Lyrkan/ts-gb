@@ -282,6 +282,9 @@ export class AddressBus {
         } else if (offset === 0x0014) {
           // Audio - NR14 - CH1 Trigger / Frequency (high)
           value = this.apu.ch1.nrx4;
+        } else if (offset === 0x0015) {
+          // Audio - NR20 - CH2 Unused register
+          value = this.apu.ch2.nrx0;
         } else if (offset === 0x0016) {
           // Audio - NR21 - CH2 Sound length / Duty
           value = this.apu.ch2.nrx1;
@@ -309,6 +312,9 @@ export class AddressBus {
         } else if (offset === 0x001E) {
           // Audio - NR34 - CH3 Trigger / Frequency (high)
           value = this.apu.ch3.nrx4;
+        } else if (offset === 0x001F) {
+          // Audio - NR40 - CH4 Unused register
+          value = this.apu.ch4.nrx0;
         } else if (offset === 0x0020) {
           // Audio - NR41 - CH4 Sound length
           value = this.apu.ch4.nrx1;
