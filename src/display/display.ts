@@ -11,7 +11,7 @@ const FRAME_RENDERING_DURATION = LINE_RENDERING_DURATION * 154;
 
 export class Display {
   private addressBus: AddressBus;
-  private buffers: Uint8ClampedArray[];
+  private buffers: Uint8Array[];
   private currentBuffer: number;
   private currentMode: GPU_MODE;
   private currentLine: number;
@@ -38,8 +38,8 @@ export class Display {
     };
 
     this.buffers = [
-      new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
-      new Uint8ClampedArray(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
+      new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
+      new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
     ];
 
     this.clearBuffer(0);
@@ -52,11 +52,11 @@ export class Display {
     this.setCurrentLine(0);
   }
 
-  public getFrontBuffer(): Uint8ClampedArray {
+  public getFrontBuffer(): Uint8Array {
     return this.buffers[this.currentBuffer];
   }
 
-  public getBackBuffer(): Uint8ClampedArray {
+  public getBackBuffer(): Uint8Array {
     return this.buffers[~this.currentBuffer & 1];
   }
 

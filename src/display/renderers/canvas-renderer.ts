@@ -18,22 +18,11 @@ export class CanvasRenderer {
   }: ICanvasRendererOptions = {}) {
     this.display = display;
     this.scaling = scaling;
-
-    this.canvas = document.createElement('canvas');
-    this.canvas.id = canvasId;
-    this.canvas.style.width = `${SCREEN_WIDTH * this.scaling}px` ;
-    this.canvas.style.height = `${SCREEN_HEIGHT * this.scaling}px` ;
-
-    this.canvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-    this.canvasContext.canvas.width = SCREEN_WIDTH * this.scaling;
-    this.canvasContext.canvas.height = SCREEN_HEIGHT * this.scaling;
-    this.canvasContext.imageSmoothingEnabled = false;
-
-    this.canvasContext.fillStyle = defaultColor;
-    this.canvasContext.fillRect(0, 0, SCREEN_WIDTH * this.scaling, SCREEN_HEIGHT * this.scaling);
-
     this.imageDataBuffer = new Uint8ClampedArray(4 * SCREEN_WIDTH * SCREEN_HEIGHT);
     this.imageData = new ImageData(this.imageDataBuffer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    this.createCanvas(canvasId);
+    this.initializeContext(defaultColor);
   }
 
   public getCanvas(): HTMLCanvasElement {
@@ -63,6 +52,27 @@ export class CanvasRenderer {
         SCREEN_HEIGHT * this.scaling
       );
     });
+  }
+
+  private createCanvas(canvasId: string): void {
+    this.canvas = document.createElement('canvas');
+    this.canvas.id = canvasId;
+    this.canvas.style.width = `${SCREEN_WIDTH * this.scaling}px` ;
+    this.canvas.style.height = `${SCREEN_HEIGHT * this.scaling}px` ;
+  }
+
+  private initializeContext(defaultColor: string): void {
+    this.canvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+    if (!this.canvasContext) {
+      throw new Error('Could not retrieve canvas 2D context');
+    }
+
+    this.canvasContext.canvas.width = SCREEN_WIDTH * this.scaling;
+    this.canvasContext.canvas.height = SCREEN_HEIGHT * this.scaling;
+    this.canvasContext.imageSmoothingEnabled = false;
+
+    this.canvasContext.fillStyle = defaultColor;
+    this.canvasContext.fillRect(0, 0, SCREEN_WIDTH * this.scaling, SCREEN_HEIGHT * this.scaling);
   }
 }
 

@@ -6,6 +6,7 @@ import { BUTTON } from '../controls/joypad';
 import { Debugger, DEBUGGER_MODE } from './debugger';
 import { WINDOW_SCALING } from './constants';
 import { CanvasRenderer } from '../display/renderers/canvas-renderer';
+import { WebGLRenderer } from '../display/renderers/webgl-renderer';
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -21,11 +22,19 @@ const systemDebugger = new Debugger(system.cpu, system.memory);
 (global as any).GAME_BOY = system;
 (global as any).GAME_BOY_DEBUGGER = systemDebugger;
 
-// Create canvas renderer
-const canvasRenderer = new CanvasRenderer(system.display, {
-  scaling: WINDOW_SCALING,
-  canvasId: 'lcd'
-});
+// Create Canvas or WebGL renderer
+const webGLSupport = (() => {
+  try {
+    return !!document.createElement('canvas').getContext('webgl');
+  } catch (e) {
+    return false;
+  }
+})();
+
+const rendererOptions = { scaling: WINDOW_SCALING, canvasId: 'lcd' };
+const canvasRenderer = webGLSupport ?
+  new WebGLRenderer(system.display, rendererOptions) :
+  new CanvasRenderer(system.display, rendererOptions);
 
 document.body.appendChild(canvasRenderer.getCanvas());
 
