@@ -87,7 +87,7 @@ export class APU {
 
   public notifyListener(source: EventSource, name: EventName) {
     if (this.eventListener) {
-      this.eventListener.onAudioEvent(source, name);
+      this.eventListener.onAudioEvent(this, source, name);
     }
   }
 
@@ -204,7 +204,7 @@ export enum EventName {
 }
 
 export interface IAudioEventListener {
-  onAudioEvent: (source: EventSource, name: EventName) => any;
+  onAudioEvent: (apu: APU, source: EventSource, name: EventName) => any;
 }
 
 export const DEFAULT_WAVE_DATA_DMG = [

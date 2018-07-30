@@ -7,6 +7,7 @@ import { Debugger, DEBUGGER_MODE } from './debugger';
 import { WINDOW_SCALING } from './constants';
 import { CanvasRenderer } from '../display/renderers/canvas-renderer';
 import { WebGLRenderer } from '../display/renderers/webgl-renderer';
+import { TonejsRenderer } from '../audio/renderers/tonejs-renderer';
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -37,6 +38,9 @@ const canvasRenderer = webGLSupport ?
   new CanvasRenderer(system.display, rendererOptions);
 
 document.body.appendChild(canvasRenderer.getCanvas());
+
+// Create audio renderer
+system.apu.setEventListener(new TonejsRenderer());
 
 // Status flags
 let gameRomLoaded = false;
