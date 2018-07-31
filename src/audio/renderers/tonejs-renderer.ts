@@ -1,5 +1,5 @@
 import { IAudioEventListener, EventName, EventSource, Audio } from '../audio';
-import { QuadrangularChannel } from '../channels/quadrangular-channel';
+import { QuadrangularChannel, WAVE_DUTY_MAP } from '../channels/quadrangular-channel';
 
 const Tone: any = (() => {
   try {
@@ -119,7 +119,7 @@ class PulseWave {
   }
 
   public updateWaveDuty(channel: QuadrangularChannel): void {
-    this.setWaveDuty(channel.waveDuty);
+    this.setWaveDuty(WAVE_DUTY_MAP[channel.waveDuty]);
   }
 
   public updateVolume(channel: QuadrangularChannel): void {
@@ -136,7 +136,7 @@ class PulseWave {
   }
 
   public setWaveDuty(waveDuty: number): void {
-    this.oscillator.width.value = DUTY_MAPPING[waveDuty];
+    this.oscillator.width.value = waveDuty;
   }
 
   public setVolume(volume: number): void {
@@ -147,5 +147,3 @@ class PulseWave {
     }
   }
 }
-
-const DUTY_MAPPING = [0.125, 0.25, 0.5, 0.75];

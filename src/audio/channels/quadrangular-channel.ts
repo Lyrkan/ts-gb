@@ -202,3 +202,5 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     }
   }
 }
+
+export const WAVE_DUTY_MAP = [0.125, 0.25, 0.5, 0.75];
