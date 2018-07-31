@@ -16,6 +16,7 @@ export abstract class AbstractSoundChannel {
 
   // State
   private _enabled: boolean;
+  private _dac: boolean;
 
   // Registers masks used by the getters
   private registerMasks: number[];
@@ -45,11 +46,20 @@ export abstract class AbstractSoundChannel {
   }
 
   public get enabled(): boolean {
-    return this._enabled;
+    return this._dac && this._enabled;
   }
 
   public set enabled(value: boolean) {
     this._enabled = value;
+    this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
+  }
+
+  public get dac(): boolean {
+    return this._dac;
+  }
+
+  public set dac(value: boolean) {
+    this._dac = value;
     this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
   }
 

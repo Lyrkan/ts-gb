@@ -10,6 +10,7 @@ export class QuadrangularChannel extends AbstractSoundChannel {
   private _frequency: number;
   private hasFrequencySweep: boolean;
   private frequencySweepEnabled: boolean;
+  private frequencySweepTimer: number;
   private frequencySweepShadow: number;
   private frequencySweepPeriod: number;
   private frequencySweepShift: number;
@@ -57,6 +58,7 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     this.waveDuty = 0;
     this.frequency = 0;
     this.frequencySweepEnabled = false;
+    this.frequencySweepTimer = 0;
     this.frequencySweepShadow = 0;
     this.frequencySweepPeriod = 0;
     this.frequencySweepShift = 0;
@@ -109,11 +111,19 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     super.nrx1 = value;
 
     this.waveDuty = (value >> 6) & 0b11;
-    this.soundLengthCounter = 64 - (value & 0x3F);
+    this.soundLengthCounter = 64 - (this._nrx1 & 0x3F);
   }
 
   public set nrx2(value: number) {
     super.nrx2 = value;
+
+    // If all the upper 5 bits are equal to 0
+    // the DAC is disabled. If the channel was
+    // enabled it is instantly disabled too.
+    this.dac = ((value >> 3) & 0b11111) !== 0;
+    if (!this.dac && this.enabled) {
+      this.enabled = false;
+    }
 
     this.volume = (value >> 4) & 0b1111;
     this.volumeSweepDirection = checkBit(3, value) ?
@@ -148,36 +158,47 @@ export class QuadrangularChannel extends AbstractSoundChannel {
   }
 
   private trigger(): void {
-    this.enabled = true;
-
-    // Restart sound length counter
-    this.soundLengthCounter = 64 - (this._nrx1 & 0x3F);
+    // Restart sound length counter if needed
+    if (this.soundLengthCounter === 0) {
+      this.soundLengthCounter = 64;
+    }
 
     // Restart volume sweep envelope
     this.volume = (this._nrx2 >> 4) & 0b1111;
     this.volumeSweepCounter = this._nrx2 & 0b111;
+
+    // Restart frequency sweep
+    this.frequencySweepShadow = this.frequency;
+    this.frequencySweepTimer = this.frequencySweepPeriod || 8;
+    this.frequencySweepEnabled = (this.frequencySweepPeriod !== 0) ||
+      (this.frequencySweepShift !== 0);
+
+    if (this.frequencySweepShift > 0) {
+      this.sweepFrequency(false);
+    }
+
+    // Only enable the channel if DAC is on
+    if (this.dac) {
+      this.enabled = true;
+    }
   }
 
   private updateFrequency(): void {
-    if (this.frequencySweepEnabled && (this.frequencySweepPeriod > 0)) {
-      let shiftedShadow = this.frequencySweepShadow >> this.frequencySweepShift;
-      if (this.frequencySweepDirection === EnvelopeDirection.DECREASE) {
-        shiftedShadow = 0 - shiftedShadow;
-      }
-
-      const newFrequency = this.frequencySweepShadow + shiftedShadow;
-
-      if (newFrequency >= 2048) {
-        this.enabled = false;
-      } else {
-        if (this.frequencySweepShift !== 0) {
-          this.frequencySweepShadow = newFrequency;
-          this.frequency = newFrequency;
-        }
-
-        this.frequencySweepPeriod--;
-      }
+    if (!this.frequencySweepEnabled || (this.frequencySweepPeriod === 0)) {
+      return;
     }
+
+    // Wait for the timer to expire
+    this.frequencySweepTimer--;
+    if (this.frequencySweepTimer > 0) {
+      return;
+    }
+
+    // Reload the timer
+    this.frequencySweepTimer = this.frequencySweepPeriod || 8;
+
+    // Compute the new frequency
+    this.sweepFrequency(true);
   }
 
   private updateVolume(): void {
@@ -199,6 +220,22 @@ export class QuadrangularChannel extends AbstractSoundChannel {
       if (this.soundLengthCounter <= 0) {
         this.enabled = false;
       }
+    }
+  }
+
+  private sweepFrequency(saveChange: boolean): void {
+    let shiftedShadow = this.frequencySweepShadow >> this.frequencySweepShift;
+    if (this.frequencySweepDirection === EnvelopeDirection.DECREASE) {
+      shiftedShadow = 0 - shiftedShadow;
+    }
+
+    const newFrequency = this.frequencySweepShadow + shiftedShadow;
+    if (newFrequency >= 2048) {
+      this.enabled = false;
+    } else if ((this.frequencySweepShift !== 0) && saveChange) {
+      this.frequencySweepShadow = newFrequency;
+      this.frequency = newFrequency;
+      this.sweepFrequency(false);
     }
   }
 }

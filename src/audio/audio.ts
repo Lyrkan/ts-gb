@@ -176,13 +176,14 @@ export class Audio {
   }
 
   public set nr52(value: number) {
+    const wasEnabled = this.enabled;
     this.enabled = checkBit(7, value);
 
-    if (!this.enabled) {
-      this.ch1.reset();
-      this.ch1.reset();
-      this.ch1.reset();
-      this.ch1.reset();
+    if (!this.enabled && wasEnabled) {
+      this.ch1.enabled = false;
+      this.ch2.enabled = false;
+      this.ch3.enabled = false;
+      this.ch4.enabled = false;
     }
   }
 }

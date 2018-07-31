@@ -3,9 +3,6 @@ import { checkBit } from '../../utils';
 import { EventName } from '../audio';
 
 export class WaveChannel extends AbstractSoundChannel {
-  // State
-  private _playbackEnabled: boolean;
-
   // Frequency
   private _frequency: number;
 
@@ -45,15 +42,6 @@ export class WaveChannel extends AbstractSoundChannel {
     this.audio.notifyListener(this.eventSource, EventName.WAVEFORM_CHANGED);
   }
 
-  public get playbackEnabled(): boolean {
-    return this._playbackEnabled;
-  }
-
-  public set playbackEnabled(value: boolean) {
-    this._playbackEnabled = value;
-    this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
-  }
-
   public get frequency(): number {
     return this._frequency;
   }
@@ -78,7 +66,14 @@ export class WaveChannel extends AbstractSoundChannel {
 
   public set nrx0(value: number) {
     super.nrx0 = value;
-    this.playbackEnabled = checkBit(7, value);
+
+    // If bit 7 is equal to 0 the DAC is disabled.
+    // If the channel was enabled it is instantly
+    // disabled too.
+    this.dac = checkBit(7, value);
+    if (!this.dac && this.enabled) {
+      this.enabled = false;
+    }
   }
 
   public set nrx1(value: number) {
@@ -117,10 +112,15 @@ export class WaveChannel extends AbstractSoundChannel {
   }
 
   private trigger(): void {
-    this.enabled = true;
+    // Restart sound length counter if needed
+    if (this.soundLengthCounter === 0) {
+      this.soundLengthCounter = 256;
+    }
 
-    // Restart sound length counter
-    this.soundLengthCounter = 256 - this._nrx1;
+    // Only enable the channel if DAC is on
+    if (this.dac) {
+      this.enabled = true;
+    }
   }
 
   private updateSoundLength(): void {

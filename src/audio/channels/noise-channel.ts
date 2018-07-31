@@ -71,6 +71,15 @@ export class NoiseChannel extends AbstractSoundChannel {
 
   public set nrx2(value: number) {
     super.nrx2 = value;
+
+    // If all the upper 5 bits are equal to 0
+    // the DAC is disabled. If the channel was
+    // enabled it is instantly disabled too.
+    this.dac = ((value >> 3) & 0b11111) !== 0;
+    if (!this.dac && this.enabled) {
+      this.enabled = false;
+    }
+
     this.volume = (value >> 4) & 0b1111;
     this.volumeSweepDirection = checkBit(3, value) ?
       EnvelopeDirection.INCREASE :
@@ -99,14 +108,19 @@ export class NoiseChannel extends AbstractSoundChannel {
   }
 
   private trigger(): void {
-    this.enabled = true;
-
-    // Restart sound length counter
-    this.soundLengthCounter = 64 - (this._nrx1 & 0x3F);
+    // Restart sound length counter if needed
+    if (this.soundLengthCounter === 0) {
+      this.soundLengthCounter = 64;
+    }
 
     // Restart volume sweep envelope
     this.volume = (this._nrx2 >> 4) & 0b1111;
     this.volumeSweepCounter = this._nrx2 & 0b111;
+
+    // Only enable the channel if DAC is on
+    if (this.dac) {
+      this.enabled = true;
+    }
   }
 
   private updateVolume(): void {
