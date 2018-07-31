@@ -8,7 +8,9 @@ export class NoiseChannel extends AbstractSoundChannel {
 
   // Volume
   private _volume: number;
-  private volumeSweepCounter: number;
+  private volumeSweepEnabled: boolean;
+  private volumeSweepTimer: number;
+  private volumeSweepLength: number;
   private volumeSweepDirection: EnvelopeDirection;
 
   // Sound length
@@ -40,7 +42,9 @@ export class NoiseChannel extends AbstractSoundChannel {
     super.reset();
 
     this.volume = 0;
-    this.volumeSweepCounter = 0;
+    this.volumeSweepEnabled = false;
+    this.volumeSweepTimer = 0;
+    this.volumeSweepLength = 0;
     this.volumeSweepDirection = EnvelopeDirection.INCREASE;
     this.soundLengthEnabled = false;
     this.soundLengthCounter = 0;
@@ -84,7 +88,7 @@ export class NoiseChannel extends AbstractSoundChannel {
     this.volumeSweepDirection = checkBit(3, value) ?
       EnvelopeDirection.INCREASE :
       EnvelopeDirection.DECREASE;
-    this.volumeSweepCounter = value & 0b111;
+    this.volumeSweepLength = value & 0b111;
   }
 
   public set nrx3(value: number) {
@@ -115,7 +119,8 @@ export class NoiseChannel extends AbstractSoundChannel {
 
     // Restart volume sweep envelope
     this.volume = (this._nrx2 >> 4) & 0b1111;
-    this.volumeSweepCounter = this._nrx2 & 0b111;
+    this.volumeSweepEnabled = (this.volumeSweepLength !== 0);
+    this.volumeSweepTimer = this.volumeSweepLength;
 
     // Only enable the channel if DAC is on
     if (this.dac) {
@@ -124,14 +129,28 @@ export class NoiseChannel extends AbstractSoundChannel {
   }
 
   private updateVolume(): void {
-    if (this.volumeSweepCounter > 0) {
-      this.volumeSweepCounter--;
+    if (!this.volumeSweepEnabled || (this.volumeSweepLength === 0)) {
+      return;
+    }
 
-      if (this.volumeSweepDirection === EnvelopeDirection.INCREASE) {
-        this.volume = Math.min(0x0F, this.volume + 1);
-      } else {
-        this.volume = Math.max(0, this.volume - 1);
-      }
+    // Wait for the timer to expire
+    this.volumeSweepTimer--;
+    if (this.volumeSweepTimer > 0) {
+      return;
+    }
+
+    // Reload the timer
+    this.volumeSweepTimer = this.volumeSweepLength;
+
+    // Update volume if not min/maxed
+    if (this.volumeSweepDirection === EnvelopeDirection.INCREASE) {
+      this.volume = Math.min(0x0F, this.volume + 1);
+    } else {
+      this.volume = Math.max(0, this.volume - 1);
+    }
+
+    if ((this.volume === 0) || (this.volume === 0x0F)) {
+      this.volumeSweepEnabled = false;
     }
   }
 
