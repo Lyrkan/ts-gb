@@ -19,8 +19,30 @@ export class Audio {
 
   private ticksCounter: number;
   private sequencerCounter: number;
+  private pendingEvents: { [source: number]: Set<EventName> };
 
   public constructor() {
+    // Create the pending events object first
+    // since channels may start emitting events
+    // as soon as they're created.
+    this.pendingEvents = {
+      [EventSource.GLOBAL]: new Set(),
+      [EventSource.CHANNEL1]: new Set(),
+      [EventSource.CHANNEL2]: new Set(),
+      [EventSource.CHANNEL3]: new Set(),
+      [EventSource.CHANNEL4]: new Set(),
+    };
+
+    this._enabled = false;
+    this._leftVolume = 0;
+    this._rightVolume = 0;
+    this.vinLeftEnabled = false;
+    this.vinRightEnabled = false;
+
+    this.ticksCounter = 0;
+    this.sequencerCounter = 0;
+
+    // Create audio channels
     this.ch1 = new QuadrangularChannel(
       this,
       EventSource.CHANNEL1,
@@ -46,15 +68,6 @@ export class Audio {
       EventSource.CHANNEL4,
       [0xFF, 0xFF, 0x00, 0x00, 0xBF]
     );
-
-    this._enabled = false;
-    this._leftVolume = 0;
-    this._rightVolume = 0;
-    this.vinLeftEnabled = false;
-    this.vinRightEnabled = false;
-
-    this.ticksCounter = 0;
-    this.sequencerCounter = 0;
   }
 
   public tick(): void {
@@ -69,6 +82,20 @@ export class Audio {
       this.sequencerCounter = (this.sequencerCounter + 1) % 8;
     }
 
+    // Broadcast pending events
+    if (this.eventListener) {
+      for (const eventSource of EVENT_SOURCES) {
+        if (this.pendingEvents[eventSource].size > 0) {
+          for (const eventName of this.pendingEvents[eventSource]) {
+            this.eventListener.onAudioEvent(this, eventSource, eventName);
+          }
+
+          this.pendingEvents[eventSource].clear();
+        }
+      }
+    }
+
+    // Next tick
     this.ticksCounter = (this.ticksCounter + 1) % 2048;
   }
 
@@ -86,9 +113,7 @@ export class Audio {
   }
 
   public notifyListener(source: EventSource, name: EventName) {
-    if (this.eventListener) {
-      this.eventListener.onAudioEvent(this, source, name);
-    }
+    this.pendingEvents[source].add(name);
   }
 
   public get enabled(): boolean {
@@ -195,6 +220,14 @@ export enum EventSource {
   CHANNEL3,
   CHANNEL4,
 }
+
+const EVENT_SOURCES = [
+  EventSource.GLOBAL,
+  EventSource.CHANNEL1,
+  EventSource.CHANNEL2,
+  EventSource.CHANNEL3,
+  EventSource.CHANNEL4,
+];
 
 export enum EventName {
   ON_OFF,
