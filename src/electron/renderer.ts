@@ -40,7 +40,9 @@ const canvasRenderer = webGLSupport ?
 document.body.appendChild(canvasRenderer.getCanvas());
 
 // Create audio renderer
-system.audio.setEventListener(new TonejsRenderer());
+const audioRenderer = new TonejsRenderer();
+system.audio.setEventListener(audioRenderer);
+audioRenderer.start();
 
 // Status flags
 let gameRomLoaded = false;
@@ -137,6 +139,27 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
     if (fpsCounterElement) {
       const currentDisplay = fpsCounterElement.style.display;
       fpsCounterElement.style.display = (currentDisplay === 'none') ? 'block' : 'none';
+    }
+  },
+
+  startAudio: () => {
+    audioRenderer.start();
+  },
+
+  stopAudio: () => {
+    audioRenderer.stop();
+  },
+
+  restartAudio: () => {
+    audioRenderer.stop();
+    audioRenderer.start();
+  },
+
+  setVolume: (event: any, volume: number) => {
+    if (volume === 0) {
+      audioRenderer.setVolume(-Infinity);
+    } else {
+      audioRenderer.setVolume((volume - 100) / 3);
     }
   },
 

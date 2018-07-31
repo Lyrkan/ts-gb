@@ -65,6 +65,48 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
       ]
     },
     {
+      label: 'Audio',
+      submenu: [
+        {
+          label: 'Start',
+          click: () => window.webContents.send('startAudio')
+        },
+        {
+          label: 'Stop',
+          click: () => window.webContents.send('stopAudio')
+        },
+        {
+          label: 'Restart',
+          click: () => window.webContents.send('restartAudio')
+        },
+        {
+          label: 'Volume',
+          submenu: [
+            {
+              label: '0%',
+              click: () => window.webContents.send('setVolume', 0),
+            },
+            {
+              label: '25%',
+              click: () => window.webContents.send('setVolume', 25),
+            },
+            {
+              label: '50%',
+              click: () => window.webContents.send('setVolume', 50),
+            },
+            {
+              label: '75%',
+              click: () => window.webContents.send('setVolume', 75),
+            },
+            {
+              label: '100%',
+              click: () => window.webContents.send('setVolume', 100),
+            },
+          ]
+        },
+      ]
+    },
+    {
       label: 'Debug',
       submenu: [
         {
