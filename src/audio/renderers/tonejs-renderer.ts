@@ -16,14 +16,21 @@ Please add it to your project using one of the following commands:
 })();
 
 export class TonejsRenderer implements IAudioEventListener {
+  private panVol: any;
+
   private channel1: PulseWave;
   private channel2: PulseWave;
 
   public constructor() {
+    this.panVol = new Tone.PanVol(0, -Infinity);
+    Tone.Master.chain(this.panVol);
+
     this.channel1 = new PulseWave();
     this.channel2 = new PulseWave();
+  }
 
-    Tone.Master.volume.value = -Infinity;
+  public setVolume(db: number) {
+    Tone.Master.volume.value = db;
   }
 
   public onAudioEvent(apu: APU, source: EventSource, name: EventName) {
@@ -47,13 +54,14 @@ export class TonejsRenderer implements IAudioEventListener {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
         const volume = apu.enabled ?
-          (apu.leftVolume + apu.rightVolume) / (2 * 0xF) :
+          (apu.leftVolume + apu.rightVolume) :
           0;
 
         if (volume > 0) {
-          Tone.Master.volume.value = volume;
+          this.panVol.volume.value = volume - 0x0F;
+          this.panVol.pan.value = ((0 - apu.leftVolume) + apu.rightVolume) / 0x0F;
         } else {
-          Tone.Master.volume.value = -Infinity;
+          this.panVol.volume.value = -Infinity;
         }
         break;
     }
@@ -96,11 +104,14 @@ export class TonejsRenderer implements IAudioEventListener {
 
 class PulseWave {
   private oscillator: any;
+  private panner: any;
 
   public constructor() {
-    this.oscillator = new Tone.PulseOscillator(440, 0);
-    this.oscillator.toMaster().start();
+    this.oscillator = new Tone.PulseOscillator(0, 0.5);
+    this.panner = new Tone.Panner(0);
+    this.oscillator.chain(this.panner, Tone.Master);
     this.oscillator.volume.mute = true;
+    this.oscillator.start();
   }
 
   public updateFrequency(channel: QuadrangularChannel): void {
@@ -112,7 +123,12 @@ class PulseWave {
   }
 
   public updateVolume(channel: QuadrangularChannel): void {
-    this.setVolume(channel.enabled ? channel.volume : 0);
+    if (channel.enabled && (channel.outputLeft || channel.outputRight)) {
+      this.panner.pan.value = (channel.outputLeft ? -1 : 0) + (channel.outputRight ? 1 : 0);
+      this.setVolume(channel.volume);
+    } else {
+      this.setVolume(0);
+    }
   }
 
   public setFrequency(frequency: number): void {
@@ -125,7 +141,7 @@ class PulseWave {
 
   public setVolume(volume: number): void {
     if (volume > 0) {
-      this.oscillator.volume.value = volume;
+      this.oscillator.volume.value = (volume - 0x0F);
     } else {
       this.oscillator.volume.value = -Infinity;
     }
