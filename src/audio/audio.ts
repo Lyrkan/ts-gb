@@ -180,10 +180,10 @@ export class Audio {
     this.enabled = checkBit(7, value);
 
     if (!this.enabled && wasEnabled) {
-      this.ch1.enabled = false;
-      this.ch2.enabled = false;
-      this.ch3.enabled = false;
-      this.ch4.enabled = false;
+      this.ch1.dac = false;
+      this.ch2.dac = false;
+      this.ch3.dac = false;
+      this.ch4.dac = false;
     }
   }
 }

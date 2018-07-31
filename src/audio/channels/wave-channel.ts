@@ -72,12 +72,7 @@ export class WaveChannel extends AbstractSoundChannel {
     super.nrx0 = value;
 
     // If bit 7 is equal to 0 the DAC is disabled.
-    // If the channel was enabled it is instantly
-    // disabled too.
     this.dac = checkBit(7, value);
-    if (!this.dac && this.enabled) {
-      this.enabled = false;
-    }
   }
 
   public get nrx1(): number {

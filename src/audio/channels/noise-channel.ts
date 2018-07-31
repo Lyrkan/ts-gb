@@ -85,12 +85,8 @@ export class NoiseChannel extends AbstractSoundChannel {
     super.nrx2 = value;
 
     // If all the upper 5 bits are equal to 0
-    // the DAC is disabled. If the channel was
-    // enabled it is instantly disabled too.
+    // the DAC is disabled.
     this.dac = ((value >> 3) & 0b11111) !== 0;
-    if (!this.dac && this.enabled) {
-      this.enabled = false;
-    }
 
     this.volume = (value >> 4) & 0b1111;
     this.volumeSweepDirection = checkBit(3, value) ?

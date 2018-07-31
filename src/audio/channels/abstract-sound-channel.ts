@@ -60,6 +60,10 @@ export abstract class AbstractSoundChannel {
 
   public set dac(value: boolean) {
     this._dac = value;
+    if (this._enabled) {
+      this._enabled = false;
+    }
+
     this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
   }
 
