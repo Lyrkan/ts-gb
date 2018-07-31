@@ -1,10 +1,10 @@
-import { APU, EventSource, EventName } from '../apu';
+import { Audio, EventSource, EventName } from '../audio';
 
 export abstract class AbstractSoundChannel {
   // Reference to the APU
   // Can be used to notify the registered
   // audio event listener.
-  protected apu: APU;
+  protected audio: Audio;
   protected eventSource: EventSource;
 
   // Registers
@@ -25,7 +25,7 @@ export abstract class AbstractSoundChannel {
   private _outputRight: boolean;
 
   public constructor(
-    apu: APU,
+    audio: Audio,
     eventSource: EventSource,
     registerMasks: number[]
   ) {
@@ -33,7 +33,7 @@ export abstract class AbstractSoundChannel {
       throw new Error('Invalid register masks length');
     }
 
-    this.apu = apu;
+    this.audio = audio;
     this.eventSource = eventSource;
     this.registerMasks = registerMasks;
 
@@ -50,7 +50,7 @@ export abstract class AbstractSoundChannel {
 
   public set enabled(value: boolean) {
     this._enabled = value;
-    this.apu.notifyListener(this.eventSource, EventName.ON_OFF);
+    this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
   }
 
   public get outputLeft(): boolean {
@@ -59,7 +59,7 @@ export abstract class AbstractSoundChannel {
 
   public set outputLeft(value: boolean) {
     this._outputLeft = value;
-    this.apu.notifyListener(this.eventSource, EventName.ON_OFF);
+    this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
   }
 
   public get outputRight(): boolean {
@@ -68,7 +68,7 @@ export abstract class AbstractSoundChannel {
 
   public set outputRight(value: boolean) {
     this._outputRight = value;
-    this.apu.notifyListener(this.eventSource, EventName.ON_OFF);
+    this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
   }
 
   public get nrx0(): number {

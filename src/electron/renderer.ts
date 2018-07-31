@@ -40,7 +40,7 @@ const canvasRenderer = webGLSupport ?
 document.body.appendChild(canvasRenderer.getCanvas());
 
 // Create audio renderer
-system.apu.setEventListener(new TonejsRenderer());
+system.audio.setEventListener(new TonejsRenderer());
 
 // Status flags
 let gameRomLoaded = false;

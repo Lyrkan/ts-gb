@@ -1,6 +1,6 @@
 import { AbstractSoundChannel } from './abstract-sound-channel';
 import { checkBit } from '../../utils';
-import { EventName } from '../apu';
+import { EventName } from '../audio';
 
 export class WaveChannel extends AbstractSoundChannel {
   // State
@@ -42,7 +42,7 @@ export class WaveChannel extends AbstractSoundChannel {
     }
 
     this.waveform[offset] = value & 0xFF;
-    this.apu.notifyListener(this.eventSource, EventName.WAVEFORM_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.WAVEFORM_CHANGED);
   }
 
   public get playbackEnabled(): boolean {
@@ -51,7 +51,7 @@ export class WaveChannel extends AbstractSoundChannel {
 
   public set playbackEnabled(value: boolean) {
     this._playbackEnabled = value;
-    this.apu.notifyListener(this.eventSource, EventName.ON_OFF);
+    this.audio.notifyListener(this.eventSource, EventName.ON_OFF);
   }
 
   public get frequency(): number {
@@ -60,7 +60,7 @@ export class WaveChannel extends AbstractSoundChannel {
 
   public set frequency(value: number) {
     this._frequency = value;
-    this.apu.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
   }
 
   public get volume(): WaveChannelVolume {
@@ -69,7 +69,7 @@ export class WaveChannel extends AbstractSoundChannel {
 
   public set volume(value: WaveChannelVolume) {
     this._volume = value;
-    this.apu.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
   }
 
   public get waveform(): number[] {

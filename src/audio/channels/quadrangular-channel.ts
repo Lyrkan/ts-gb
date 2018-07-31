@@ -1,6 +1,6 @@
 import { checkBit } from '../../utils';
 import { AbstractSoundChannel, EnvelopeDirection } from './abstract-sound-channel';
-import { APU, EventSource, EventName } from '../apu';
+import { Audio, EventSource, EventName } from '../audio';
 
 export class QuadrangularChannel extends AbstractSoundChannel {
   // Duty
@@ -25,12 +25,12 @@ export class QuadrangularChannel extends AbstractSoundChannel {
   private soundLengthCounter: number;
 
   public constructor(
-    apu: APU,
+    audio: Audio,
     eventSource: EventSource,
     registerMasks: number[],
     hasFrequencySweep: boolean
   ) {
-    super(apu, eventSource, registerMasks);
+    super(audio, eventSource, registerMasks);
     this.hasFrequencySweep = hasFrequencySweep;
   }
 
@@ -74,7 +74,7 @@ export class QuadrangularChannel extends AbstractSoundChannel {
 
   public set frequency(value: number) {
     this._frequency = value;
-    this.apu.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
   }
 
   public get volume(): number {
@@ -83,7 +83,7 @@ export class QuadrangularChannel extends AbstractSoundChannel {
 
   public set volume(value: number) {
     this._volume = value;
-    this.apu.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
   }
 
   public get waveDuty(): number {
@@ -92,7 +92,7 @@ export class QuadrangularChannel extends AbstractSoundChannel {
 
   public set waveDuty(value: number) {
     this._waveDuty = value;
-    this.apu.notifyListener(this.eventSource, EventName.DUTY_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.DUTY_CHANGED);
   }
 
   public set nrx0(value: number) {

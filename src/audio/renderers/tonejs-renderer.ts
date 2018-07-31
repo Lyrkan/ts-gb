@@ -1,4 +1,4 @@
-import { IAudioEventListener, EventName, EventSource, APU } from '../apu';
+import { IAudioEventListener, EventName, EventSource, Audio } from '../audio';
 import { QuadrangularChannel } from '../channels/quadrangular-channel';
 
 const Tone: any = (() => {
@@ -33,33 +33,33 @@ export class TonejsRenderer implements IAudioEventListener {
     Tone.Master.volume.value = db;
   }
 
-  public onAudioEvent(apu: APU, source: EventSource, name: EventName) {
+  public onAudioEvent(audio: Audio, source: EventSource, name: EventName) {
     switch (source) {
       case EventSource.GLOBAL:
-        this.updateGlobal(apu, name);
+        this.updateGlobal(audio, name);
         break;
 
       case EventSource.CHANNEL1:
-        this.updateChannel1(apu, name);
+        this.updateChannel1(audio, name);
         break;
 
       case EventSource.CHANNEL2:
-        this.updateChannel2(apu, name);
+        this.updateChannel2(audio, name);
         break;
     }
   }
 
-  private updateGlobal(apu: APU, name: EventName): void {
+  private updateGlobal(audio: Audio, name: EventName): void {
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
-        const volume = apu.enabled ?
-          (apu.leftVolume + apu.rightVolume) :
+        const volume = audio.enabled ?
+          (audio.leftVolume + audio.rightVolume) :
           0;
 
         if (volume > 0) {
           this.panVol.volume.value = volume - 0x0F;
-          this.panVol.pan.value = ((0 - apu.leftVolume) + apu.rightVolume) / 0x0F;
+          this.panVol.pan.value = ((0 - audio.leftVolume) + audio.rightVolume) / 0x0F;
         } else {
           this.panVol.volume.value = -Infinity;
         }
@@ -67,36 +67,36 @@ export class TonejsRenderer implements IAudioEventListener {
     }
   }
 
-  private updateChannel1(apu: APU, name: EventName): void {
+  private updateChannel1(audio: Audio, name: EventName): void {
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
-        this.channel1.updateVolume(apu.ch1);
+        this.channel1.updateVolume(audio.ch1);
         break;
 
       case EventName.FREQUENCY_CHANGED:
-        this.channel1.updateFrequency(apu.ch1);
+        this.channel1.updateFrequency(audio.ch1);
         break;
 
       case EventName.DUTY_CHANGED:
-        this.channel1.updateWaveDuty(apu.ch1);
+        this.channel1.updateWaveDuty(audio.ch1);
         break;
     }
   }
 
-  private updateChannel2(apu: APU, name: EventName): void {
+  private updateChannel2(audio: Audio, name: EventName): void {
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
-        this.channel2.updateVolume(apu.ch2);
+        this.channel2.updateVolume(audio.ch2);
         break;
 
       case EventName.FREQUENCY_CHANGED:
-        this.channel2.updateFrequency(apu.ch2);
+        this.channel2.updateFrequency(audio.ch2);
         break;
 
       case EventName.DUTY_CHANGED:
-        this.channel2.updateWaveDuty(apu.ch2);
+        this.channel2.updateWaveDuty(audio.ch2);
         break;
     }
   }

@@ -8,7 +8,7 @@ import { MBC_TYPE } from '../../../src/cartridge/game-cartridge-info';
 import { MemorySegment } from '../../../src/memory/segments/memory-segment';
 import { DMAHandler } from '../../../src/memory/dma/dma-handler';
 import { CPUTimer } from '../../../src/cpu/cpu-timer';
-import { APU } from '../../../src/audio/apu';
+import { Audio } from '../../../src/audio/audio';
 import {
   CARTRIDGE_ROM_BANK_LENGTH,
   CARTRIDGE_RAM_BANK_LENGTH
@@ -47,7 +47,7 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.PC = 0x0000;
     cpuRegisters.SP = 0xFFFE;
 
-    addressBus = new AddressBus(new Joypad(), new DMAHandler(), new CPUTimer(), new APU());
+    addressBus = new AddressBus(new Joypad(), new DMAHandler(), new CPUTimer(), new Audio());
     addressBus.loadCartridge({
       cartridgeInfo: {
         gameTitle: 'TEST',

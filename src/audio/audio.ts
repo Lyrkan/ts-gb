@@ -3,7 +3,7 @@ import { QuadrangularChannel } from './channels/quadrangular-channel';
 import { WaveChannel } from './channels/wave-channel';
 import { checkBit } from '../utils';
 
-export class APU {
+export class Audio {
   public readonly ch1: QuadrangularChannel;
   public readonly ch2: QuadrangularChannel;
   public readonly ch3: WaveChannel;
@@ -204,7 +204,7 @@ export enum EventName {
 }
 
 export interface IAudioEventListener {
-  onAudioEvent: (apu: APU, source: EventSource, name: EventName) => any;
+  onAudioEvent: (audio: Audio, source: EventSource, name: EventName) => any;
 }
 
 export const DEFAULT_WAVE_DATA_DMG = [

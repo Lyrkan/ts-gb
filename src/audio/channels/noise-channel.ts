@@ -1,6 +1,6 @@
 import { AbstractSoundChannel, EnvelopeDirection } from './abstract-sound-channel';
 import { checkBit } from '../../utils';
-import { EventName } from '../apu';
+import { EventName } from '../audio';
 
 export class NoiseChannel extends AbstractSoundChannel {
   // Frequency
@@ -52,7 +52,7 @@ export class NoiseChannel extends AbstractSoundChannel {
 
   public set frequency(value: number) {
     this._frequency = value;
-    this.apu.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
   }
 
   public get volume(): number {
@@ -61,7 +61,7 @@ export class NoiseChannel extends AbstractSoundChannel {
 
   public set volume(value: number) {
     this._volume = value;
-    this.apu.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
+    this.audio.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
   }
 
   public set nrx1(value: number) {
