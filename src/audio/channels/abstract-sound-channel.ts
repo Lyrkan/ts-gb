@@ -46,7 +46,7 @@ export abstract class AbstractSoundChannel {
   }
 
   public get enabled(): boolean {
-    return this._dac && this._enabled;
+    return this._enabled;
   }
 
   public set enabled(value: boolean) {

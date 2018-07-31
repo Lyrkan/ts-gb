@@ -168,10 +168,10 @@ export class Audio {
   public get nr52(): number {
     let value = 0;
     value |= (this.enabled ? 1 : 0) << 7;
-    value |= (this.ch4.enabled ? 1 : 0) << 3;
-    value |= (this.ch3.enabled ? 1 : 0) << 2;
-    value |= (this.ch2.enabled ? 1 : 0) << 1;
-    value |= (this.ch1.enabled ? 1 : 0);
+    value |= ((this.ch4.enabled && this.ch4.dac) ? 1 : 0) << 3;
+    value |= ((this.ch3.enabled && this.ch3.dac) ? 1 : 0) << 2;
+    value |= ((this.ch2.enabled && this.ch2.dac) ? 1 : 0) << 1;
+    value |= ((this.ch1.enabled && this.ch1.dac) ? 1 : 0);
     return value;
   }
 
