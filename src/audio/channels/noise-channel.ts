@@ -66,7 +66,7 @@ export class NoiseChannel extends AbstractSoundChannel {
 
   public set nrx1(value: number) {
     super.nrx1 = value;
-    this.soundLengthCounter = (value & 0x3F);
+    this.soundLengthCounter = 64 - (value & 0x3F);
   }
 
   public set nrx2(value: number) {
@@ -102,7 +102,7 @@ export class NoiseChannel extends AbstractSoundChannel {
     this.enabled = true;
 
     // Restart sound length counter
-    this.soundLengthCounter = (this._nrx1 & 0x3F);
+    this.soundLengthCounter = 64 - (this._nrx1 & 0x3F);
 
     // Restart volume sweep envelope
     this.volume = (this._nrx2 >> 4) & 0b1111;

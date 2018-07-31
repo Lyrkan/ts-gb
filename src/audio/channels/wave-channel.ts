@@ -83,7 +83,7 @@ export class WaveChannel extends AbstractSoundChannel {
 
   public set nrx1(value: number) {
     super.nrx1 = value;
-    this.soundLengthCounter = value;
+    this.soundLengthCounter = 256 - value;
   }
 
   public set nrx2(value: number) {
@@ -120,7 +120,7 @@ export class WaveChannel extends AbstractSoundChannel {
     this.enabled = true;
 
     // Restart sound length counter
-    this.soundLengthCounter = (this._nrx1 & 0x3F);
+    this.soundLengthCounter = 256 - this._nrx1;
   }
 
   private updateSoundLength(): void {
