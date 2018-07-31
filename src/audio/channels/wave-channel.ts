@@ -64,6 +64,10 @@ export class WaveChannel extends AbstractSoundChannel {
     return this._waveform;
   }
 
+  public get nrx0(): number {
+    return super.nrx0;
+  }
+
   public set nrx0(value: number) {
     super.nrx0 = value;
 
@@ -76,14 +80,26 @@ export class WaveChannel extends AbstractSoundChannel {
     }
   }
 
+  public get nrx1(): number {
+    return super.nrx1;
+  }
+
   public set nrx1(value: number) {
     super.nrx1 = value;
     this.soundLengthCounter = 256 - value;
   }
 
+  public get nrx2(): number {
+    return super.nrx2;
+  }
+
   public set nrx2(value: number) {
     super.nrx2 = value;
     this.volume = (value >> 5) & 0b11;
+  }
+
+  public get nrx3(): number {
+    return super.nrx3;
   }
 
   public set nrx3(value: number) {
@@ -92,6 +108,10 @@ export class WaveChannel extends AbstractSoundChannel {
     // Update the 8 lower bits of the
     // current frequency.
     this.frequency = (this.frequency & ~0xFF) | (value & 0xFF);
+  }
+
+  public get nrx4(): number {
+    return super.nrx4;
   }
 
   public set nrx4(value: number) {

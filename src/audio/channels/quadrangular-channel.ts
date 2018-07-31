@@ -101,6 +101,10 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     this.audio.notifyListener(this.eventSource, EventName.DUTY_CHANGED);
   }
 
+  public get nrx0(): number {
+    return super.nrx0;
+  }
+
   public set nrx0(value: number) {
     super.nrx0 = value;
 
@@ -111,11 +115,19 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     this.frequencySweepShift = value & 0b111;
   }
 
+  public get nrx1(): number {
+    return super.nrx1;
+  }
+
   public set nrx1(value: number) {
     super.nrx1 = value;
 
     this.waveDuty = (value >> 6) & 0b11;
     this.soundLengthCounter = 64 - (this._nrx1 & 0x3F);
+  }
+
+  public get nrx2(): number {
+    return super.nrx2;
   }
 
   public set nrx2(value: number) {
@@ -136,12 +148,20 @@ export class QuadrangularChannel extends AbstractSoundChannel {
     this.volumeSweepLength = value & 0b111;
   }
 
+  public get nrx3(): number {
+    return super.nrx3;
+  }
+
   public set nrx3(value: number) {
     super.nrx3 = value;
 
     // Update the 8 lower bits of the
     // current frequency.
     this.frequency = (this.frequency & ~0xFF) | (value & 0xFF);
+  }
+
+  public get nrx4(): number {
+    return super.nrx4;
   }
 
   public set nrx4(value: number) {

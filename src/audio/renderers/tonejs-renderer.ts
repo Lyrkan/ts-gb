@@ -18,15 +18,31 @@ Please add it to your project using one of the following commands:
 export class TonejsRenderer implements IAudioEventListener {
   private panVol: any;
 
-  private channel1: PulseWave;
-  private channel2: PulseWave;
+  private channel1: PulseWave | null;
+  private channel2: PulseWave | null;
 
   public constructor() {
     this.panVol = new Tone.PanVol(0, -Infinity);
     Tone.Master.chain(this.panVol);
+  }
+
+  public start() {
+    this.stop();
 
     this.channel1 = new PulseWave();
     this.channel2 = new PulseWave();
+  }
+
+  public stop() {
+    if (this.channel1) {
+      this.channel1.dispose();
+      this.channel1 = null;
+    }
+
+    if (this.channel2) {
+      this.channel2.dispose();
+      this.channel2 = null;
+    }
   }
 
   public setVolume(db: number) {
@@ -68,6 +84,10 @@ export class TonejsRenderer implements IAudioEventListener {
   }
 
   private updateChannel1(audio: Audio, name: EventName): void {
+    if (!this.channel1) {
+      return;
+    }
+
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
@@ -85,6 +105,10 @@ export class TonejsRenderer implements IAudioEventListener {
   }
 
   private updateChannel2(audio: Audio, name: EventName): void {
+    if (!this.channel2) {
+      return;
+    }
+
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
@@ -112,6 +136,11 @@ class PulseWave {
     this.oscillator.chain(this.panner, Tone.Master);
     this.oscillator.volume.mute = true;
     this.oscillator.start();
+  }
+
+  public dispose() {
+    this.oscillator.dispose();
+    this.panner.dispose();
   }
 
   public updateFrequency(channel: QuadrangularChannel): void {

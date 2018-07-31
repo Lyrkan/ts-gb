@@ -68,9 +68,17 @@ export class NoiseChannel extends AbstractSoundChannel {
     this.audio.notifyListener(this.eventSource, EventName.VOLUME_CHANGED);
   }
 
+  public get nrx1(): number {
+    return super.nrx1;
+  }
+
   public set nrx1(value: number) {
     super.nrx1 = value;
     this.soundLengthCounter = 64 - (value & 0x3F);
+  }
+
+  public get nrx2(): number {
+    return super.nrx2;
   }
 
   public set nrx2(value: number) {
@@ -91,11 +99,19 @@ export class NoiseChannel extends AbstractSoundChannel {
     this.volumeSweepLength = value & 0b111;
   }
 
+  public get nrx3(): number {
+    return super.nrx3;
+  }
+
   public set nrx3(value: number) {
     super.nrx3 = value;
     // this.shiftClockFrequency = (value >> 4) & 0b1111;
     // this.counterStep = (value >> 3) & 0b1;
     // this.dividingRatio = value & 0b111;
+  }
+
+  public get nrx4(): number {
+    return super.nrx4;
   }
 
   public set nrx4(value: number) {
