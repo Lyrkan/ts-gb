@@ -40,7 +40,7 @@ const canvasRenderer = webGLSupport ?
 document.body.appendChild(canvasRenderer.getCanvas());
 
 // Create audio renderer
-const audioRenderer = new TonejsRenderer();
+const audioRenderer = new TonejsRenderer(system.audio);
 system.audio.setEventListener(audioRenderer);
 audioRenderer.setVolume(-Infinity);
 

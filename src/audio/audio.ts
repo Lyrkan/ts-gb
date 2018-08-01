@@ -19,19 +19,16 @@ export class Audio {
 
   private ticksCounter: number;
   private sequencerCounter: number;
-  private pendingEvents: { [source: number]: Set<EventName> };
+  private pendingEvents: Array<Set<EventName>>;
 
   public constructor() {
     // Create the pending events object first
     // since channels may start emitting events
     // as soon as they're created.
-    this.pendingEvents = {
-      [EventSource.GLOBAL]: new Set(),
-      [EventSource.CHANNEL1]: new Set(),
-      [EventSource.CHANNEL2]: new Set(),
-      [EventSource.CHANNEL3]: new Set(),
-      [EventSource.CHANNEL4]: new Set(),
-    };
+    this.pendingEvents = [];
+    for (const eventSource of EVENT_SOURCES) {
+      this.pendingEvents[eventSource] = new Set();
+    }
 
     this._enabled = false;
     this._leftVolume = 0;
@@ -80,20 +77,26 @@ export class Audio {
       this.ch3.tick(this.sequencerCounter);
       this.ch4.tick(this.sequencerCounter);
       this.sequencerCounter = (this.sequencerCounter + 1) % 8;
-    }
 
-    // Broadcast pending events
-    if (this.eventListener) {
-      for (const eventSource of EVENT_SOURCES) {
-        if (this.pendingEvents[eventSource].size > 0) {
-          for (const eventName of this.pendingEvents[eventSource]) {
-            this.eventListener.onAudioEvent(this, eventSource, eventName);
+      // Broadcast pending events
+      if (this.eventListener) {
+        for (const eventSource of EVENT_SOURCES) {
+          if (this.pendingEvents[eventSource].size > 0) {
+            for (const eventName of this.pendingEvents[eventSource]) {
+              this.eventListener.onAudioEvent(eventSource, eventName);
+            }
+
+            this.pendingEvents[eventSource].clear();
           }
-
-          this.pendingEvents[eventSource].clear();
         }
       }
     }
+
+    // Also update the LFSR of the noise channel
+    // This is called every tick since it needs to
+    // be refreshed way more often than the usual
+    // sequencers.
+    this.ch4.updateLFSR();
 
     // Next tick
     this.ticksCounter = (this.ticksCounter + 1) % 2048;
@@ -238,7 +241,7 @@ export enum EventName {
 }
 
 export interface IAudioEventListener {
-  onAudioEvent: (audio: Audio, source: EventSource, name: EventName) => any;
+  onAudioEvent: (source: EventSource, name: EventName) => any;
 }
 
 export const DEFAULT_WAVE_DATA_DMG = [

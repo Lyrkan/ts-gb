@@ -3,9 +3,6 @@ import { checkBit } from '../../utils';
 import { EventName } from '../audio';
 
 export class NoiseChannel extends AbstractSoundChannel {
-  // Frequency
-  private _frequency: number;
-
   // Volume
   private _volume: number;
   private volumeSweepEnabled: boolean;
@@ -18,10 +15,11 @@ export class NoiseChannel extends AbstractSoundChannel {
   private soundLengthCounter: number;
 
   // Polynomial counter
-  // private lfsr: number;
-  // private shiftClockFrequency: number;
-  // private counterStep: number;
-  // private dividingRatio: number;
+  private lfsr: number;
+  private lfsrTimer: number;
+  private shiftClockFrequency: number;
+  private counterStep: number;
+  private dividingRatio: number;
 
   public tick(sequencerCounter: number): void {
     // Sound length is updated at rate of 256Hz
@@ -33,9 +31,6 @@ export class NoiseChannel extends AbstractSoundChannel {
     if (((sequencerCounter + 7) % 8) === 0) {
       this.updateVolume();
     }
-
-    // Update LFSR
-    // TODO
   }
 
   public reset(): void {
@@ -48,15 +43,36 @@ export class NoiseChannel extends AbstractSoundChannel {
     this.volumeSweepDirection = EnvelopeDirection.INCREASE;
     this.soundLengthEnabled = false;
     this.soundLengthCounter = 0;
+    this.lfsr = 0;
+    this.lfsrTimer = 0;
+    this.shiftClockFrequency = 0;
+    this.counterStep = 0;
+    this.dividingRatio = 0;
   }
 
-  public get frequency(): number {
-    return this._frequency;
+  public updateLFSR(): void {
+    if (this.lfsrTimer > 0) {
+      this.lfsrTimer--;
+      return;
+    }
+
+    // Reload timer
+    this.lfsrTimer = 2 * ((this.dividingRatio || 0.5) / (2 ^ (this.shiftClockFrequency + 1)));
+
+    // Update current register value
+    const carry = this.lfsr & 1;
+    this.lfsr = this.lfsr >> 1;
+
+    const xored = carry ^ (this.lfsr & 1);
+    this.lfsr |= (xored << 7);
+
+    if (this.counterStep === 1) {
+      this.lfsr = (this.lfsr & ~(1 << 6)) | (xored << 6);
+    }
   }
 
-  public set frequency(value: number) {
-    this._frequency = value;
-    this.audio.notifyListener(this.eventSource, EventName.FREQUENCY_CHANGED);
+  public get waveformOutput(): number {
+    return this.lfsr & 1;
   }
 
   public get volume(): number {
@@ -101,9 +117,9 @@ export class NoiseChannel extends AbstractSoundChannel {
 
   public set nrx3(value: number) {
     super.nrx3 = value;
-    // this.shiftClockFrequency = (value >> 4) & 0b1111;
-    // this.counterStep = (value >> 3) & 0b1;
-    // this.dividingRatio = value & 0b111;
+    this.shiftClockFrequency = (value >> 4) & 0b1111;
+    this.counterStep = (value >> 3) & 0b1;
+    this.dividingRatio = value & 0b111;
   }
 
   public get nrx4(): number {

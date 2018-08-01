@@ -1,5 +1,6 @@
 import { IAudioEventListener, EventName, EventSource, Audio } from '../audio';
 import { QuadrangularChannel, WAVE_DUTY_MAP } from '../channels/quadrangular-channel';
+import { NoiseChannel } from '../channels/noise-channel';
 
 const Tone: any = (() => {
   try {
@@ -16,50 +17,59 @@ Please add it to your project using one of the following commands:
 })();
 
 export class TonejsRenderer implements IAudioEventListener {
+  private audio: Audio;
   private panVol: any;
 
-  private channel1: PulseWave | null;
-  private channel2: PulseWave | null;
+  private channel1: PulseWave;
+  private channel2: PulseWave;
+  private channel4: NoiseWave;
 
-  public constructor() {
+  public constructor(audio: Audio) {
+    this.audio = audio;
+
     this.panVol = new Tone.PanVol(0, -Infinity);
     Tone.Master.chain(this.panVol);
 
-    this.channel1 = new PulseWave();
-    this.channel2 = new PulseWave();
+    this.channel1 = new PulseWave(this.audio.ch1);
+    this.channel2 = new PulseWave(this.audio.ch2);
+    this.channel4 = new NoiseWave(this.audio.ch4);
   }
 
   public setVolume(db: number) {
     Tone.Master.volume.rampTo(db, 0.05);
   }
 
-  public onAudioEvent(audio: Audio, source: EventSource, name: EventName) {
+  public onAudioEvent(source: EventSource, name: EventName) {
     switch (source) {
       case EventSource.GLOBAL:
-        this.updateGlobal(audio, name);
+        this.updateGlobal(name);
         break;
 
       case EventSource.CHANNEL1:
-        this.updateChannel1(audio, name);
+        this.updateChannel1(name);
         break;
 
       case EventSource.CHANNEL2:
-        this.updateChannel2(audio, name);
+        this.updateChannel2(name);
+        break;
+
+      case EventSource.CHANNEL4:
+        this.updateChannel4(name);
         break;
     }
   }
 
-  private updateGlobal(audio: Audio, name: EventName): void {
+  private updateGlobal(name: EventName): void {
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
-        const volume = audio.enabled ?
-          (audio.leftVolume + audio.rightVolume) :
+        const volume = this.audio.enabled ?
+          (this.audio.leftVolume + this.audio.rightVolume) :
           0;
 
         if (volume > 0) {
           this.panVol.volume.value = volume - 0x0F;
-          this.panVol.pan.value = ((0 - audio.leftVolume) + audio.rightVolume) / 0x0F;
+          this.panVol.pan.value = ((0 - this.audio.leftVolume) + this.audio.rightVolume) / 0x0F;
         } else {
           this.panVol.volume.value = -Infinity;
         }
@@ -67,7 +77,7 @@ export class TonejsRenderer implements IAudioEventListener {
     }
   }
 
-  private updateChannel1(audio: Audio, name: EventName): void {
+  private updateChannel1(name: EventName): void {
     if (!this.channel1) {
       return;
     }
@@ -75,20 +85,20 @@ export class TonejsRenderer implements IAudioEventListener {
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
-        this.channel1.updateVolume(audio.ch1);
+        this.channel1.updateVolume();
         break;
 
       case EventName.FREQUENCY_CHANGED:
-        this.channel1.updateFrequency(audio.ch1);
+        this.channel1.updateFrequency();
         break;
 
       case EventName.DUTY_CHANGED:
-        this.channel1.updateWaveDuty(audio.ch1);
+        this.channel1.updateWaveDuty();
         break;
     }
   }
 
-  private updateChannel2(audio: Audio, name: EventName): void {
+  private updateChannel2(name: EventName): void {
     if (!this.channel2) {
       return;
     }
@@ -96,49 +106,62 @@ export class TonejsRenderer implements IAudioEventListener {
     switch (name) {
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
-        this.channel2.updateVolume(audio.ch2);
+        this.channel2.updateVolume();
         break;
 
       case EventName.FREQUENCY_CHANGED:
-        this.channel2.updateFrequency(audio.ch2);
+        this.channel2.updateFrequency();
         break;
 
       case EventName.DUTY_CHANGED:
-        this.channel2.updateWaveDuty(audio.ch2);
+        this.channel2.updateWaveDuty();
+        break;
+    }
+  }
+
+  private updateChannel4(name: EventName): void {
+    if (!this.channel4) {
+      return;
+    }
+
+    switch (name) {
+      case EventName.ON_OFF:
+      case EventName.VOLUME_CHANGED:
+        this.channel4.updateVolume();
         break;
     }
   }
 }
 
 class PulseWave {
+  private channel: QuadrangularChannel;
   private oscillator: any;
   private panner: any;
 
-  public constructor() {
+  public constructor(channel: QuadrangularChannel) {
+    this.channel = channel;
     this.oscillator = new Tone.PulseOscillator(0, 0.5);
     this.panner = new Tone.Panner(0);
+
+    this.setVolume(-Infinity);
+
     this.oscillator.chain(this.panner, Tone.Master);
-    this.oscillator.volume.mute = true;
     this.oscillator.start();
   }
 
-  public dispose() {
-    this.oscillator.dispose();
-    this.panner.dispose();
+  public updateFrequency(): void {
+    this.setFrequency(131072 / (2048 - this.channel.frequency));
   }
 
-  public updateFrequency(channel: QuadrangularChannel): void {
-    this.setFrequency(131072 / (2048 - channel.frequency));
+  public updateWaveDuty(): void {
+    this.setWaveDuty(WAVE_DUTY_MAP[this.channel.waveDuty]);
   }
 
-  public updateWaveDuty(channel: QuadrangularChannel): void {
-    this.setWaveDuty(WAVE_DUTY_MAP[channel.waveDuty]);
-  }
-
-  public updateVolume(channel: QuadrangularChannel): void {
-    if (channel.enabled && (channel.outputLeft || channel.outputRight)) {
-      this.panner.pan.value = (channel.outputLeft ? -1 : 0) + (channel.outputRight ? 1 : 0);
-      this.setVolume(channel.volume);
+  public updateVolume(): void {
+    if (this.channel.enabled && (this.channel.outputLeft || this.channel.outputRight)) {
+      // tslint:disable-next-line:max-line-length
+      this.panner.pan.value = (this.channel.outputLeft ? -1 : 0) + (this.channel.outputRight ? 1 : 0);
+      this.setVolume(this.channel.volume);
     } else {
       this.setVolume(0);
     }
@@ -152,7 +175,42 @@ class PulseWave {
     this.oscillator.width.value = waveDuty;
   }
 
-  public setVolume(volume: number): void {
+  private setVolume(volume: number): void {
+    if (volume > 0) {
+      this.oscillator.volume.value = (volume - 0x0F);
+    } else {
+      this.oscillator.volume.value = -Infinity;
+    }
+  }
+}
+
+class NoiseWave {
+  private channel: NoiseChannel;
+  private oscillator: any;
+  private panner: any;
+
+  public constructor(channel: NoiseChannel) {
+    this.channel = channel;
+    this.oscillator = new Tone.Noise('white');
+    this.panner = new Tone.Panner(0);
+
+    this.setVolume(-Infinity);
+
+    this.oscillator.chain(this.panner, Tone.Master);
+    this.oscillator.start();
+  }
+
+  public updateVolume(): void {
+    if (this.channel.enabled && (this.channel.outputLeft || this.channel.outputRight)) {
+      // tslint:disable-next-line:max-line-length
+      this.panner.pan.value = (this.channel.outputLeft ? -1 : 0) + (this.channel.outputRight ? 1 : 0);
+      this.setVolume(this.channel.volume);
+    } else {
+      this.setVolume(0);
+    }
+  }
+
+  private setVolume(volume: number): void {
     if (volume > 0) {
       this.oscillator.volume.value = (volume - 0x0F);
     } else {
