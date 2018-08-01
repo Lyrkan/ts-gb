@@ -24,29 +24,13 @@ export class TonejsRenderer implements IAudioEventListener {
   public constructor() {
     this.panVol = new Tone.PanVol(0, -Infinity);
     Tone.Master.chain(this.panVol);
-  }
-
-  public start() {
-    this.stop();
 
     this.channel1 = new PulseWave();
     this.channel2 = new PulseWave();
   }
 
-  public stop() {
-    if (this.channel1) {
-      this.channel1.dispose();
-      this.channel1 = null;
-    }
-
-    if (this.channel2) {
-      this.channel2.dispose();
-      this.channel2 = null;
-    }
-  }
-
   public setVolume(db: number) {
-    Tone.Master.volume.value = db;
+    Tone.Master.volume.rampTo(db, 0.05);
   }
 
   public onAudioEvent(audio: Audio, source: EventSource, name: EventName) {

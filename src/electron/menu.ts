@@ -68,18 +68,6 @@ export const buildMenu = (window: Electron.BrowserWindow) => {
       label: 'Audio',
       submenu: [
         {
-          label: 'Start',
-          click: () => window.webContents.send('startAudio')
-        },
-        {
-          label: 'Stop',
-          click: () => window.webContents.send('stopAudio')
-        },
-        {
-          label: 'Restart',
-          click: () => window.webContents.send('restartAudio')
-        },
-        {
           label: 'Volume',
           submenu: [
             {

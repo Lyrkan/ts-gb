@@ -42,7 +42,7 @@ document.body.appendChild(canvasRenderer.getCanvas());
 // Create audio renderer
 const audioRenderer = new TonejsRenderer();
 system.audio.setEventListener(audioRenderer);
-audioRenderer.start();
+audioRenderer.setVolume(-Infinity);
 
 // Status flags
 let gameRomLoaded = false;
@@ -140,19 +140,6 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
       const currentDisplay = fpsCounterElement.style.display;
       fpsCounterElement.style.display = (currentDisplay === 'none') ? 'block' : 'none';
     }
-  },
-
-  startAudio: () => {
-    audioRenderer.start();
-  },
-
-  stopAudio: () => {
-    audioRenderer.stop();
-  },
-
-  restartAudio: () => {
-    audioRenderer.stop();
-    audioRenderer.start();
   },
 
   setVolume: (event: any, volume: number) => {
