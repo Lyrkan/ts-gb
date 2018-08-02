@@ -7,6 +7,7 @@ import { Debugger, DEBUGGER_MODE } from './debugger';
 import { WINDOW_SCALING } from './constants';
 import { CanvasRenderer } from '../display/renderers/canvas-renderer';
 import { WebGLRenderer } from '../display/renderers/webgl-renderer';
+import { TonejsRenderer } from '../audio/renderers/tonejs-renderer';
 
 const fs = require('fs');
 const crypto = require('crypto');
@@ -37,6 +38,11 @@ const canvasRenderer = webGLSupport ?
   new CanvasRenderer(system.display, rendererOptions);
 
 document.body.appendChild(canvasRenderer.getCanvas());
+
+// Create audio renderer
+const audioRenderer = new TonejsRenderer(system.audio);
+system.audio.setEventListener(audioRenderer);
+audioRenderer.setVolume(-Infinity);
 
 // Status flags
 let gameRomLoaded = false;
@@ -133,6 +139,14 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
     if (fpsCounterElement) {
       const currentDisplay = fpsCounterElement.style.display;
       fpsCounterElement.style.display = (currentDisplay === 'none') ? 'block' : 'none';
+    }
+  },
+
+  setVolume: (event: any, volume: number) => {
+    if (volume === 0) {
+      audioRenderer.setVolume(-Infinity);
+    } else {
+      audioRenderer.setVolume((volume - 100) / 3);
     }
   },
 

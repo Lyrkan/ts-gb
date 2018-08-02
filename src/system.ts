@@ -1,5 +1,6 @@
 import {
   AddressBus,
+  Audio,
   CPU,
   CPUTimer,
   Display,
@@ -9,6 +10,7 @@ import {
 } from './index';
 
 export class System {
+  private _audio: Audio;
   private _cpu: CPU;
   private _cpuTimer: CPUTimer;
   private _dmaHandler: DMAHandler;
@@ -21,7 +23,8 @@ export class System {
     this._joypad = new Joypad();
     this._dmaHandler = new DMAHandler();
     this._cpuTimer = new CPUTimer();
-    this._memory = new AddressBus(this._joypad, this._dmaHandler, this._cpuTimer);
+    this._audio = new Audio();
+    this._memory = new AddressBus(this._joypad, this._dmaHandler, this._cpuTimer, this._audio);
     this._display = new Display(this._memory);
     this._cpu = new CPU(this._memory, this._cpuTimer);
   }
@@ -55,6 +58,7 @@ export class System {
    * Reset all components.
    */
   public reset(): void {
+    this._audio.reset();
     this._cpu.reset();
     this._cpuTimer.reset();
     this._memory.reset();
@@ -72,6 +76,15 @@ export class System {
     if (!this._dmaHandler.isHdmaTransferActive()) {
       this._cpu.tick();
     }
+
+    this._audio.tick();
+  }
+
+  /**
+   * Return the audio processing unit.
+   */
+  public get audio(): Audio {
+    return this._audio;
   }
 
   /**

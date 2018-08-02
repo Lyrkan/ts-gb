@@ -10,6 +10,7 @@ import { MemorySegment } from '../../../src/memory/segments/memory-segment';
 import { MBC_TYPE } from '../../../src/cartridge/game-cartridge-info';
 import { DMAHandler } from '../../../src/memory/dma/dma-handler';
 import { CPUTimer } from '../../../src/cpu/cpu-timer';
+import { Audio } from '../../../src/audio/audio';
 import {
   CARTRIDGE_ROM_BANK_LENGTH,
   CARTRIDGE_RAM_BANK_LENGTH
@@ -59,7 +60,7 @@ describe('Opcodes - Default table', () => {
       halt: () => { /* NOP */ },
     };
 
-    addressBus = new AddressBus(new Joypad(), new DMAHandler(), new CPUTimer());
+    addressBus = new AddressBus(new Joypad(), new DMAHandler(), new CPUTimer(), new Audio());
     addressBus.loadCartridge({
       cartridgeInfo: {
         gameTitle: 'TEST',
@@ -3984,19 +3985,19 @@ describe('Opcodes - Default table', () => {
 
   it('0xE0 - LDH (a8),A', () => {
     addressBus.setByte(0x0000, 0xE0);
-    addressBus.setByte(0x0001, 0x12);
+    addressBus.setByte(0x0001, 0xFD);
     addressBus.setByte(0x0002, 0xE0);
-    addressBus.setByte(0x0003, 0x34);
+    addressBus.setByte(0x0003, 0xFE);
 
     cpuRegisters.A = 0x56;
     executeNextOpcode(3);
     checkRegisters({ PC: 0x0002 });
-    expect(addressBus.getByte(0xFF12)).to.equal(0x56);
+    expect(addressBus.getByte(0xFFFD)).to.equal(0x56);
 
     cpuRegisters.A = 0x78;
     executeNextOpcode(3);
     checkRegisters({ PC: 0x0004 });
-    expect(addressBus.getByte(0xFF34)).to.equal(0x78);
+    expect(addressBus.getByte(0xFFFE)).to.equal(0x78);
   });
 
   it('0xE1 - POP HL', () => {
@@ -4018,16 +4019,16 @@ describe('Opcodes - Default table', () => {
     addressBus.setByte(0x0000, 0xE2);
     addressBus.setByte(0x0001, 0xE2);
 
-    cpuRegisters.C = 0x12;
+    cpuRegisters.C = 0xFD;
     cpuRegisters.A = 0x34;
     executeNextOpcode(2);
-    expect(addressBus.getByte(0xFF12)).to.equal(0x34);
+    expect(addressBus.getByte(0xFFFD)).to.equal(0x34);
     checkRegisters({ PC: 0x0001 });
 
-    cpuRegisters.C = 0x13;
+    cpuRegisters.C = 0xFE;
     cpuRegisters.A = 0x56;
     executeNextOpcode(2);
-    expect(addressBus.getByte(0xFF13)).to.equal(0x56);
+    expect(addressBus.getByte(0xFFFE)).to.equal(0x56);
     checkRegisters({ PC: 0x0002 });
   });
 
@@ -4171,12 +4172,12 @@ describe('Opcodes - Default table', () => {
 
   it('0xF0 - LDH A,(a8)', () => {
     addressBus.setByte(0x0000, 0xF0);
-    addressBus.setByte(0x0001, 0x12);
+    addressBus.setByte(0x0001, 0xFD);
     addressBus.setByte(0x0002, 0xF0);
-    addressBus.setByte(0x0003, 0x34);
+    addressBus.setByte(0x0003, 0xFE);
 
-    addressBus.setByte(0xFF12, 0x56);
-    addressBus.setByte(0xFF34, 0x78);
+    addressBus.setByte(0xFFFD, 0x56);
+    addressBus.setByte(0xFFFE, 0x78);
 
     executeNextOpcode(3);
     checkRegisters({ A: 0x56, PC: 0x0002 });
@@ -4204,13 +4205,13 @@ describe('Opcodes - Default table', () => {
     addressBus.setByte(0x0000, 0xF2);
     addressBus.setByte(0x0001, 0xF2);
 
-    cpuRegisters.C = 0x12;
-    addressBus.setByte(0xFF12, 0x34);
+    cpuRegisters.C = 0xFD;
+    addressBus.setByte(0xFFFD, 0x34);
     executeNextOpcode(2);
     checkRegisters({ A: 0x34, PC: 0x0001 });
 
-    cpuRegisters.C = 0x13;
-    addressBus.setByte(0xFF13, 0x56);
+    cpuRegisters.C = 0xFE;
+    addressBus.setByte(0xFFFE, 0x56);
     executeNextOpcode(2);
     checkRegisters({ A: 0x56, PC: 0x0002 });
   });
