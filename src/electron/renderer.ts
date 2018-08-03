@@ -42,7 +42,7 @@ document.body.appendChild(canvasRenderer.getCanvas());
 // Create audio renderer
 const audioRenderer = new TonejsRenderer(system.audio);
 system.audio.setEventListener(audioRenderer);
-audioRenderer.setVolume(-Infinity);
+audioRenderer.setVolume(0);
 
 // Status flags
 let gameRomLoaded = false;
@@ -143,11 +143,7 @@ const WINDOW_EVENTS: { [name: string]: (event?: any, data?: any) => void } = {
   },
 
   setVolume: (event: any, volume: number) => {
-    if (volume === 0) {
-      audioRenderer.setVolume(-Infinity);
-    } else {
-      audioRenderer.setVolume((volume - 100) / 3);
-    }
+    audioRenderer.setVolume(volume);
   },
 
   runSingleTick: () => {

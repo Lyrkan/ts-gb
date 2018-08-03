@@ -16,6 +16,10 @@ Please add it to your project using one of the following commands:
   }
 })();
 
+// Used to scale the volume in the
+// setVolume/getVolume methods.
+const VOLUME_SCALING = -38;
+
 export class TonejsRenderer implements IAudioEventListener {
   private audio: Audio;
   private panVol: any;
@@ -35,8 +39,24 @@ export class TonejsRenderer implements IAudioEventListener {
     this.channel4 = new NoiseWave(this.audio.ch4);
   }
 
-  public setVolume(db: number) {
+  public setVolume(volume: number) {
+    const cappedVolume = Math.max(0, Math.min(100, volume));
+    const db = (volume === 0) ?
+      -Infinity :
+      ((cappedVolume / 100) * Math.abs(VOLUME_SCALING)) + VOLUME_SCALING;
+
     Tone.Master.volume.rampTo(db, 0.05);
+  }
+
+  public getVolume() {
+    const db = Tone.Master.volume.value;
+    if (db === -Infinity) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(100,
+      100 * (Tone.Master.volume.value - VOLUME_SCALING) / Math.abs(VOLUME_SCALING)
+    ));
   }
 
   public onAudioEvent(source: EventSource, name: EventName) {
