@@ -30,15 +30,6 @@ export class Audio {
       this.pendingEvents[eventSource] = new Set();
     }
 
-    this._enabled = false;
-    this._leftVolume = 0;
-    this._rightVolume = 0;
-    this.vinLeftEnabled = false;
-    this.vinRightEnabled = false;
-
-    this.ticksCounter = 0;
-    this.sequencerCounter = 0;
-
     // Create audio channels
     this.ch1 = new QuadrangularChannel(
       this,
@@ -65,6 +56,30 @@ export class Audio {
       EventSource.CHANNEL4,
       [0xFF, 0xFF, 0x00, 0x00, 0xBF]
     );
+
+    this.reset();
+  }
+
+  public reset(): void {
+    for (const eventSource of EVENT_SOURCES) {
+      this.pendingEvents[eventSource].clear();
+    }
+
+    this.enabled = false;
+    this.leftVolume = 0;
+    this.rightVolume = 0;
+    this.vinLeftEnabled = false;
+    this.vinRightEnabled = false;
+
+    this.ticksCounter = 0;
+    this.sequencerCounter = 0;
+
+    this.ch1.reset();
+    this.ch2.reset();
+    this.ch3.reset();
+    this.ch4.reset();
+
+    this.notifyListener(EventSource.GLOBAL, EventName.RESET);
   }
 
   public tick(): void {
@@ -102,21 +117,11 @@ export class Audio {
     this.ticksCounter = (this.ticksCounter + 1) % 2048;
   }
 
-  public reset(): void {
-    this.enabled = false;
-    this.ch1.reset();
-    this.ch2.reset();
-    this.ch3.reset();
-    this.ch4.reset();
-
-    this.notifyListener(EventSource.GLOBAL, EventName.RESET);
-  }
-
-  public setEventListener(eventListener: IAudioEventListener) {
+  public setEventListener(eventListener: IAudioEventListener): void {
     this.eventListener = eventListener;
   }
 
-  public notifyListener(source: EventSource, name: EventName) {
+  public notifyListener(source: EventSource, name: EventName): void {
     this.pendingEvents[source].add(name);
   }
 

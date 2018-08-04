@@ -39,7 +39,7 @@ export class TonejsRenderer implements IAudioEventListener {
     this.channel4 = new NoiseWave(this.audio.ch4);
   }
 
-  public setVolume(volume: number) {
+  public setVolume(volume: number): void {
     const cappedVolume = Math.max(0, Math.min(100, volume));
     const db = (volume === 0) ?
       -Infinity :
@@ -48,7 +48,7 @@ export class TonejsRenderer implements IAudioEventListener {
     Tone.Master.volume.rampTo(db, 0.05);
   }
 
-  public getVolume() {
+  public getVolume(): number {
     const db = Tone.Master.volume.value;
     if (db === -Infinity) {
       return 0;
@@ -59,7 +59,7 @@ export class TonejsRenderer implements IAudioEventListener {
     ));
   }
 
-  public onAudioEvent(source: EventSource, name: EventName) {
+  public onAudioEvent(source: EventSource, name: EventName): void {
     switch (source) {
       case EventSource.GLOBAL:
         this.updateGlobal(name);

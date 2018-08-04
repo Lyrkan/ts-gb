@@ -42,6 +42,7 @@ export class CPU {
   public constructor(addressBus: AddressBus, cpuTimer: CPUTimer) {
     this.addressBus = addressBus;
     this.timer = cpuTimer;
+    this.registers = new CPURegisters();
     this.cpuCallbacks = {
       stop: () => { this.stopped = true; },
       halt: () => {
@@ -79,7 +80,7 @@ export class CPU {
    * Reset all registers
    */
   public reset(): void {
-    this.registers = new CPURegisters();
+    this.registers.reset();
     this.skipCycles = 0;
     this.firstCycle = true;
     this.stopped = false;

@@ -76,6 +76,19 @@ export class CPURegisters {
     };
   }
 
+  public reset(): void {
+    this.registers.A = 0;
+    this.registers.F = 0;
+    this.registers.B = 0;
+    this.registers.C = 0;
+    this.registers.D = 0;
+    this.registers.E = 0;
+    this.registers.H = 0;
+    this.registers.L = 0;
+    this.registers.SP = 0;
+    this.registers.PC = 0;
+  }
+
   public get A(): number {
     return this.registers.A;
   }
