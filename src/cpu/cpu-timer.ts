@@ -27,25 +27,19 @@ export class CPUTimer {
     this.counter = (this.counter + 1) & 0xFFFF;
 
     if (this.running) {
-      // We don't need to check anything if the current
-      // count isn't a multiple of 4.
-      if ((this.counter % 4) !== 0) {
-        return;
-      }
-
       let shouldIncrementTima = false;
 
       switch (this.mode) {
-        case 0: // 4096Hz (= every 256 ticks)
-          shouldIncrementTima = this.counter === 0;
+        case CPUTimerMode.HZ_4096: // 4096Hz (= every 256 ticks)
+          shouldIncrementTima = (this.counter % 256) === 0;
           break;
-        case 1: // 262144Hz (= every 4 ticks, already checked before)
-          shouldIncrementTima = true;
+        case CPUTimerMode.HZ_262144: // 262144Hz (= every 4 ticks)
+          shouldIncrementTima = (this.counter % 4) === 0;
           break;
-        case 2: // 65536Hz (= every 16 ticks)
+        case CPUTimerMode.HZ_65536: // 65536Hz (= every 16 ticks)
           shouldIncrementTima = (this.counter % 16) === 0;
           break;
-        case 3: // 16384Hz (= every 64 ticks)
+        case CPUTimerMode.HZ_16384: // 16384Hz (= every 64 ticks)
           shouldIncrementTima = (this.counter % 64) === 0;
           break;
       }
