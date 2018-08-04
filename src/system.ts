@@ -61,9 +61,9 @@ export class System {
     this._audio.reset();
     this._cpu.reset();
     this._cpuTimer.reset();
-    this._memory.reset();
     this._display.reset();
     this._dmaHandler.reset();
+    this._memory.reset();
   }
 
   /**
