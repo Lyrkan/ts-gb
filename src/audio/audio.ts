@@ -104,11 +104,12 @@ export class Audio {
 
   public reset(): void {
     this.enabled = false;
-
     this.ch1.reset();
     this.ch2.reset();
     this.ch3.reset();
     this.ch4.reset();
+
+    this.notifyListener(EventSource.GLOBAL, EventName.RESET);
   }
 
   public setEventListener(eventListener: IAudioEventListener) {
@@ -233,6 +234,7 @@ const EVENT_SOURCES = [
 ];
 
 export enum EventName {
+  RESET,
   ON_OFF,
   VOLUME_CHANGED,
   FREQUENCY_CHANGED,

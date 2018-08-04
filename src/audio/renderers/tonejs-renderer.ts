@@ -81,6 +81,7 @@ export class TonejsRenderer implements IAudioEventListener {
 
   private updateGlobal(name: EventName): void {
     switch (name) {
+      case EventName.RESET:
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
         const volume = this.audio.enabled ?
@@ -98,11 +99,11 @@ export class TonejsRenderer implements IAudioEventListener {
   }
 
   private updateChannel1(name: EventName): void {
-    if (!this.channel1) {
-      return;
-    }
-
     switch (name) {
+      case EventName.RESET:
+        this.channel1.updateAll();
+        break;
+
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
         this.channel1.updateVolume();
@@ -119,11 +120,11 @@ export class TonejsRenderer implements IAudioEventListener {
   }
 
   private updateChannel2(name: EventName): void {
-    if (!this.channel2) {
-      return;
-    }
-
     switch (name) {
+      case EventName.RESET:
+        this.channel2.updateAll();
+        break;
+
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
         this.channel2.updateVolume();
@@ -140,11 +141,8 @@ export class TonejsRenderer implements IAudioEventListener {
   }
 
   private updateChannel4(name: EventName): void {
-    if (!this.channel4) {
-      return;
-    }
-
     switch (name) {
+      case EventName.RESET:
       case EventName.ON_OFF:
       case EventName.VOLUME_CHANGED:
         this.channel4.updateVolume();
@@ -167,6 +165,12 @@ class PulseWave {
 
     this.oscillator.chain(this.panner, Tone.Master);
     this.oscillator.start();
+  }
+
+  public updateAll(): void {
+    this.updateVolume();
+    this.updateFrequency();
+    this.updateWaveDuty();
   }
 
   public updateFrequency(): void {

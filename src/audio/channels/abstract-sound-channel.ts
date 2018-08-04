@@ -43,6 +43,7 @@ export abstract class AbstractSoundChannel {
 
   public reset(): void {
     this.enabled = false;
+    this.audio.notifyListener(this.eventSource, EventName.RESET);
   }
 
   public get enabled(): boolean {
