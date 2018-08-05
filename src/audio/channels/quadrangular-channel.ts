@@ -38,23 +38,23 @@ export class QuadrangularChannel extends AbstractSoundChannel {
   }
 
   public reset(): void {
-    super.reset();
-
-    this.waveDuty = 0;
-    this.frequency = 0;
+    this._waveDuty = 0;
+    this._frequency = 0;
     this.frequencySweepEnabled = false;
     this.frequencySweepTimer = 0;
     this.frequencySweepShadow = 0;
     this.frequencySweepPeriod = 0;
     this.frequencySweepShift = 0;
     this.frequencySweepDirection = EnvelopeDirection.INCREASE;
-    this.volume = 0;
+    this._volume = 0;
     this.volumeSweepEnabled = false;
     this.volumeSweepTimer = 0;
     this.volumeSweepLength = 0;
     this.volumeSweepDirection = EnvelopeDirection.INCREASE;
     this.soundLengthEnabled = false;
     this.soundLengthCounter = 0;
+
+    super.reset();
   }
 
   public tick(sequencerCounter: number): void {

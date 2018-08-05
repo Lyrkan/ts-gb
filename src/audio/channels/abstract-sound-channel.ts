@@ -42,7 +42,16 @@ export abstract class AbstractSoundChannel {
   }
 
   public reset(): void {
-    this.enabled = false;
+    this._enabled = false;
+    this._dac = false;
+    this._nrx0 = 0;
+    this._nrx1 = 0;
+    this._nrx2 = 0;
+    this._nrx3 = 0;
+    this._nrx4 = 0;
+    this._outputLeft = false;
+    this._outputRight = false;
+
     this.audio.notifyListener(this.eventSource, EventName.RESET);
   }
 

@@ -22,9 +22,7 @@ export class NoiseChannel extends AbstractSoundChannel {
   private dividingRatio: number;
 
   public reset(): void {
-    super.reset();
-
-    this.volume = 0;
+    this._volume = 0;
     this.volumeSweepEnabled = false;
     this.volumeSweepTimer = 0;
     this.volumeSweepLength = 0;
@@ -36,6 +34,8 @@ export class NoiseChannel extends AbstractSoundChannel {
     this.shiftClockFrequency = 0;
     this.counterStep = 0;
     this.dividingRatio = 0;
+
+    super.reset();
   }
 
   public tick(sequencerCounter: number): void {

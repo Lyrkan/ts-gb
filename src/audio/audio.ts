@@ -65,9 +65,9 @@ export class Audio {
       this.pendingEvents[eventSource].clear();
     }
 
-    this.enabled = false;
-    this.leftVolume = 0;
-    this.rightVolume = 0;
+    this._enabled = false;
+    this._leftVolume = 0;
+    this._rightVolume = 0;
     this.vinLeftEnabled = false;
     this.vinRightEnabled = false;
 

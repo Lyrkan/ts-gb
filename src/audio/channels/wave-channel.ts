@@ -17,13 +17,13 @@ export class WaveChannel extends AbstractSoundChannel {
   private _waveform: number[];
 
   public reset(): void {
-    super.reset();
-
-    this.frequency = 0;
-    this.volume = 0;
+    this._frequency = 0;
+    this._volume = 0;
     this.soundLengthEnabled = false;
     this.soundLengthCounter = 0;
     this._waveform = new Array(16).fill(0);
+
+    super.reset();
   }
 
   public tick(sequencerCounter: number): void {
