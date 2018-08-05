@@ -1,6 +1,6 @@
 {
   "name": "ts-gb",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "TypeScript Game Boy emulator",
   "author": "Vincent Le Biannic",
   "license": "MIT",
