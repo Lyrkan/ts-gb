@@ -1,6 +1,6 @@
 {
   "extends": [
-      "tslint:recommended"
+    "tslint:recommended"
   ],
   "rules": {
     "trailing-comma": [false, {"multiline": "always", "singleline": "never"}],
@@ -16,7 +16,7 @@
       "timeEnd",
       "trace"
     ],
-    "max-classes-per-file": [false],
+    "max-classes-per-file": false,
     "max-line-length": [
       true,
       100

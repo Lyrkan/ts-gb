@@ -1,27 +1,27 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "lib": ["es2015", "dom"],
-        "typeRoots": [
-            "node_modules/@types",
-            "src/@types"
-        ],
-        "outDir": "./dist",
-        "importHelpers": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": false,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "experimentalDecorators": true,
-        "sourceMap": true,
-        "inlineSources": true,
-        "strictNullChecks": true,
-        "declaration": true
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es2015", "dom"],
+    "typeRoots": [
+      "node_modules/@types",
+      "src/@types"
+    ],
+    "outDir": "./dist",
+    "importHelpers": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "strictNullChecks": true,
+    "declaration": true
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
