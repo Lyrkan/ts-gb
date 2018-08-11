@@ -1,3 +1,7 @@
+/**
+ * This class holds the state of all the
+ * control buttons present on the console.
+ */
 export class Joypad {
   public readonly pressedButtons: Set<BUTTON>;
   private interruptCallback: () => void;

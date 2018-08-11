@@ -10,6 +10,12 @@ import { CPUInterrupt } from '../../cpu/cpu';
 import { HDMA_TRANSFER_MODE } from '../dma/hdma-transfer';
 import { TILE_MAP, TILE_AREA } from '../../display/ppu';
 
+/**
+ * This class handles the IO registers' segment.
+ * These registers allows to read or change the
+ * state of various components (timers, display,
+ * audio, ...).
+ */
 export class IOSegment extends MemorySegment {
   private addressBus: AddressBus;
   private display: Display;

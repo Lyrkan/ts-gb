@@ -1,7 +1,11 @@
 import { AddressBus } from '../address-bus';
 import { OAMTransfer } from './oam-transfer';
-import { HDMATransfer } from './hdma-transfer';
+import { HDMATransfer, HDMA_TRANSFER_MODE } from './hdma-transfer';
 
+/**
+ * This class allows to control both OAM and
+ * HDMA transfers.
+ */
 export class DMAHandler {
   private oamTransfer: OAMTransfer | null;
   private hdmaTransfer: HDMATransfer | null;
@@ -10,11 +14,24 @@ export class DMAHandler {
     this.reset();
   }
 
+  /**
+   * Start a new OAM transfer.
+   *
+   * @param addressBus The memory unit
+   * @param fromAddress Starting address for the copy (minus 0xFE00)
+   */
   public startOamTransfer(addressBus: AddressBus, fromAddress: number) {
     this.oamTransfer = new OAMTransfer(addressBus, fromAddress);
   }
 
-  public startHdmaTransfer(addressBus: AddressBus, mode: number, length: number) {
+  /**
+   * Start a new HDMA transfer.
+   *
+   * @param addressBus The memory unit
+   * @param mode Which mode the HDMA transfer should use
+   * @param length Amount of data that should be copied
+   */
+  public startHdmaTransfer(addressBus: AddressBus, mode: HDMA_TRANSFER_MODE, length: number) {
     let fromAddress = (addressBus.getByte(0xFF51) << 8) | addressBus.getByte(0xFF52);
     fromAddress &= ~0b1111;
 
@@ -36,15 +53,30 @@ export class DMAHandler {
     this.hdmaTransfer = new HDMATransfer(addressBus, mode, fromAddress, toAddress, length);
   }
 
-  public getHdmaTransfer() {
+  /**
+   * Return the current HDMA transfer if there
+   * is one.
+   */
+  public getHdmaTransfer(): HDMATransfer | null {
     return this.hdmaTransfer;
   }
 
-  public isHdmaTransferActive() {
-    return this.hdmaTransfer && this.hdmaTransfer.isActive();
+  /**
+   * Check if there is a HDMA transfer and if is
+   * still active.
+   */
+  public isHdmaTransferActive(): boolean {
+    return (this.hdmaTransfer !== null) && this.hdmaTransfer.isActive();
   }
 
-  public tick() {
+  /**
+   * Execute a single tick of the current OAM or
+   * HDMA transfer if there is one.
+   *
+   * It must be called once every cycle (1MHz frequency)
+   * regardless of CPU double speed activation.
+   */
+  public tick(): void {
     // HDMA Transfer
     if (this.hdmaTransfer && this.hdmaTransfer.isActive()) {
       this.hdmaTransfer.tick();

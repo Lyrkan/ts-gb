@@ -10,13 +10,36 @@ const LINE_RENDERING_DURATION = 114;
 const FRAME_RENDERING_DURATION = LINE_RENDERING_DURATION * 154;
 
 export class Display {
+  // Memory unit
   private addressBus?: AddressBus;
+
+  // Rendering buffers (front + back).
   private buffers: Uint8Array[];
   private currentBuffer: number;
+
+  // Current GPU mode (HBLANK, VBLANK, OAM search,
+  // pixels transfer).
   private currentMode: GPU_MODE;
+
+  // Current line being rendered.
+  // Note that even if the LCD only displays
+  // 144 lines, that variable can go up to
+  // 153 because it keeps being incremented
+  // during the VBLANK state.
   private currentLine: number;
+
+  // Internal clock
   private clock: number;
+
+  // Holds various information about the
+  // current state of the LCD.
   private lcdControl: ILCDControl;
+
+  // There is a slight delay (61 ticks) between
+  // the moment the LCD is enabled and the first
+  // frame is actually rendered. This variable keeps
+  // track of how much time is left before the
+  // rendering starts.
   private lcdEnablingDelay: number;
 
   // Color game-boy background palettes data
