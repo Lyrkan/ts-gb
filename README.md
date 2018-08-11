@@ -9,19 +9,10 @@ TypeScript Game Boy emulator (WIP)
 
 # How to use it
 
-You can either directly use the embedded electron app or (relatively)
-easily implement your own thing on top of the classes provided by `ts-gb`.
+You easily use all the classes provided by `ts-gb` to integrate
+it to a website or an electron app.
 
-## Running the embedded electron app
-
-```
-$ git clone git@github.com:lyrkan/ts-gb.git
-$ cd ts-gb
-$ yarn
-$ yarn start
-```
-
-## Doing it manually
+## Wiring everything manually
 
 ```
 $ yarn add ts-gb
@@ -57,9 +48,17 @@ Once that's done you'll have to handle the following things:
 * The `system.tick()` method will have to be called at a
   frequency of 1MHz.
 
-You'll then be able to call `system.display.getFrontBuffer()` everytime
-you want to refresh your screen (the closer from 59.7 FPS the
-better).
+You'll then be able to use one of the [two provided graphic
+renderers](src/display/renderers) or to directly read the
+data returned by the `system.display.getFrontBuffer()` method
+everytime you want to refresh your screen (the closer from
+59.7 FPS the better).
 
-If you want to see how that can be done take a look at the
+The audio is a bit harder to implement since you have to
+basically create all the noises yourself based on the state of
+the various channels of the `Audio` component. Luckily ` ts-gb`
+also provides a basic [`Tone.js` renderer](src/audio/renderers/tonejs-renderer.ts)
+that is probably accurate enough for most games.
+
+If you want to see how all of that can be done take a look at the
 [TS-GB Web](https://github.com/Lyrkan/ts-gb-web) implementation.
