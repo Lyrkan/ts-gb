@@ -167,7 +167,7 @@ export const PPU = {
 
             if (isCgbMode) {
               spriteColor = PPU.readCgbPaletteColor(
-                addressBus.getCgbSpritePalettes(),
+                display.getCgbSpritePalettes(),
                 sprite.cgbPalette,
                 colorIndex
               );
@@ -232,7 +232,7 @@ export const PPU = {
 
         if (isCgbMode) {
           const color = PPU.readCgbPaletteColor(
-            addressBus.getCgbBackgroundPalettes(),
+            display.getCgbBackgroundPalettes(),
             paletteIndex,
             colorIndex
           );
@@ -308,7 +308,7 @@ export const PPU = {
 
         if (isCgbMode) {
           const color = PPU.readCgbPaletteColor(
-            addressBus.getCgbBackgroundPalettes(),
+            display.getCgbBackgroundPalettes(),
             paletteIndex,
             colorIndex
           );

@@ -10,7 +10,7 @@ const LINE_RENDERING_DURATION = 114;
 const FRAME_RENDERING_DURATION = LINE_RENDERING_DURATION * 154;
 
 export class Display {
-  private addressBus: AddressBus;
+  private addressBus?: AddressBus;
   private buffers: Uint8Array[];
   private currentBuffer: number;
   private currentMode: GPU_MODE;
@@ -19,10 +19,18 @@ export class Display {
   private lcdControl: ILCDControl;
   private lcdEnablingDelay: number;
 
-  public constructor(addressBus: AddressBus) {
-    this.addressBus = addressBus;
-    addressBus.setDisplay(this);
+  // Color game-boy background palettes data
+  private cgbBackgroundPalettes: number[];
+
+  // Color game-boy sprites palettes data
+  private cgbSpritePalettes: number[];
+
+  public constructor() {
     this.reset();
+  }
+
+  public setAddressBus(addressBus: AddressBus) {
+    this.addressBus = addressBus;
   }
 
   public reset(): void {
@@ -36,6 +44,15 @@ export class Display {
       windowTileMap: TILE_MAP.MAP_1,
       lcdEnabled: true,
     };
+
+    // Reset CGB palettes
+    // 8 * 4 colors * 2 bytes/color
+    this.cgbBackgroundPalettes = [];
+    this.cgbSpritePalettes = [];
+    for (let i = 0; i <= 64; i++) {
+      this.cgbBackgroundPalettes.push(0xFF);
+      this.cgbSpritePalettes.push(0xFF);
+    }
 
     this.buffers = [
       new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT * 3),
@@ -61,6 +78,10 @@ export class Display {
   }
 
   public tick(): void {
+    if (!this.addressBus) {
+      return;
+    }
+
     if (this.lcdControl.lcdEnabled && (this.lcdEnablingDelay <= 0)) {
       const hblankOffset = (this.currentLine * LINE_RENDERING_DURATION);
 
@@ -145,6 +166,14 @@ export class Display {
     return this.lcdControl;
   }
 
+  public getCgbBackgroundPalettes(): number[] {
+    return this.cgbBackgroundPalettes;
+  }
+
+  public getCgbSpritePalettes(): number[] {
+    return this.cgbSpritePalettes;
+  }
+
   private switchBuffers(): void {
     // Switch the current buffer
     this.currentBuffer = ~this.currentBuffer & 1;
@@ -161,6 +190,10 @@ export class Display {
   }
 
   private setMode(mode: GPU_MODE): void {
+    if (!this.addressBus) {
+      return;
+    }
+
     this.currentMode = mode;
 
     // Switch mode in LCD Status Register
@@ -185,6 +218,10 @@ export class Display {
   }
 
   private setCurrentLine(line: number): void {
+    if (!this.addressBus) {
+      return;
+    }
+
     this.currentLine = line % 154;
     this.addressBus.setByte(0xFF44, this.currentLine);
   }

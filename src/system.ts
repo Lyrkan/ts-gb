@@ -24,8 +24,14 @@ export class System {
     this._dmaHandler = new DMAHandler();
     this._cpuTimer = new CPUTimer();
     this._audio = new Audio();
-    this._memory = new AddressBus(this._joypad, this._dmaHandler, this._cpuTimer, this._audio);
-    this._display = new Display(this._memory);
+    this._display = new Display();
+    this._memory = new AddressBus(
+      this._joypad,
+      this._dmaHandler,
+      this._cpuTimer,
+      this._audio,
+      this._display
+    );
     this._cpu = new CPU(this._memory, this._cpuTimer);
   }
 

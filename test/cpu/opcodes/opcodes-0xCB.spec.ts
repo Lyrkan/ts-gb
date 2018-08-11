@@ -13,6 +13,7 @@ import {
   CARTRIDGE_ROM_BANK_LENGTH,
   CARTRIDGE_RAM_BANK_LENGTH
 } from '../../../src/cartridge/game-cartridge';
+import { Display } from '../../../src/display/display';
 
 describe('Opcodes - 0xCB table', () => {
   let cpuRegisters: CPURegisters;
@@ -47,7 +48,14 @@ describe('Opcodes - 0xCB table', () => {
     cpuRegisters.PC = 0x0000;
     cpuRegisters.SP = 0xFFFE;
 
-    addressBus = new AddressBus(new Joypad(), new DMAHandler(), new CPUTimer(), new Audio());
+    addressBus = new AddressBus(
+      new Joypad(),
+      new DMAHandler(),
+      new CPUTimer(),
+      new Audio(),
+      new Display(),
+    );
+
     addressBus.loadCartridge({
       cartridgeInfo: {
         gameTitle: 'TEST',
