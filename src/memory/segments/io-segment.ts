@@ -378,7 +378,7 @@ export class IOSegment extends MemorySegment {
       this.display.getLcdPosition().windowPositionY = value & 0xFF;
     } else if (offset === 0x004B) {
       // Background position X
-      this.display.getLcdPosition().windowPositionX = value & 0xFF;
+      this.display.getLcdPosition().windowPositionX = (value & 0xFF) - 7;
     } else if (offset === 0x004F) {
       // Writes on 0x004F (=0xFF4F) in CGB mode select
       // a new VRAM bank.

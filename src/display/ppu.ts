@@ -60,18 +60,13 @@ export const PPU = {
     const vramData = addressBus.getVideoRamBanks().map(bank => bank.data);
     const oamData = addressBus.getOamSegment().data;
 
-    const lcdPositions = display.getLcdPosition();
-    const palettes = display.getLcdPalettes();
-
     const bgMapOffset = (lcdControl.backgroundTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
     const winMapOffset = (lcdControl.windowTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
 
-    const bgScrollX = lcdPositions.backgroundScrollX;
-    const bgScrollY = lcdPositions.backgroundScrollY;
+    const { backgroundScrollX, backgroundScrollY } = display.getLcdPosition();
+    const { windowPositionX, windowPositionY } = display.getLcdPosition();
 
-    const winPosX = lcdPositions.windowPositionX;
-    const winPosY = lcdPositions.windowPositionY;
-
+    const palettes = display.getLcdPalettes();
     const cgbSpritePalettes = display.getCgbSpritePalettes();
     const cgbBackgroundPalettes = display.getCgbBackgroundPalettes();
 
@@ -91,7 +86,10 @@ export const PPU = {
 
     // Render current line
     for (let i = 0; i < SCREEN_WIDTH; i++) {
-      const isWindowPixel = lcdControl.windowEnabled && (winPosY <= line) && (winPosX <= i);
+      const isWindowPixel =
+        lcdControl.windowEnabled &&
+        (windowPositionY <= line) &&
+        (windowPositionX <= i);
       const isBackgroundPixel = (isCgbMode || lcdControl.backgroundEnabled) && !isWindowPixel;
       const screenBufferIndex = (line * (SCREEN_WIDTH * 3)) + (i * 3);
 
@@ -149,8 +147,8 @@ export const PPU = {
 
       // Render background
       if (isCgbMode || isBackgroundPixel) {
-        const mapPosX = Math.floor((bgScrollX + i) / 8) % 32;
-        const mapPosY = Math.floor((bgScrollY + line) / 8) % 32;
+        const mapPosX = Math.floor((backgroundScrollX + i) / 8) % 32;
+        const mapPosY = Math.floor((backgroundScrollY + line) / 8) % 32;
 
         let tileIndex = vramData[0][bgMapOffset + mapPosY * 32 + mapPosX];
         if (lcdControl.backgroundTileArea === TILE_AREA.AREA_1) {
@@ -177,8 +175,8 @@ export const PPU = {
           forceAbove = ((tileAttributes >> 7) & 1) === 1;
         }
 
-        let tileColumn = (i + bgScrollX) % 8;
-        let tileLine = (line + bgScrollY) % 8;
+        let tileColumn = (i + backgroundScrollX) % 8;
+        let tileLine = (line + backgroundScrollY) % 8;
 
         if (xFlip) {
           tileColumn = 7 - tileColumn;
@@ -225,8 +223,8 @@ export const PPU = {
 
       // Render window
       if (isWindowPixel) {
-        const mapPosX = Math.floor((i - winPosX) / 8) % 32;
-        const mapPosY = Math.floor((line - winPosY) / 8) % 32;
+        const mapPosX = Math.floor((i - windowPositionX) / 8) % 32;
+        const mapPosY = Math.floor((line - windowPositionY) / 8) % 32;
 
         let tileIndex = vramData[0][winMapOffset + mapPosY * 32 + mapPosX];
         if (lcdControl.backgroundTileArea === TILE_AREA.AREA_1) {
@@ -253,8 +251,8 @@ export const PPU = {
           forceAbove = ((tileAttributes >> 7) & 1) === 1;
         }
 
-        let tileColumn = (i - winPosX) % 8;
-        let tileLine = (line - winPosY) % 8;
+        let tileColumn = (i - windowPositionX) % 8;
+        let tileLine = (line - windowPositionY) % 8;
 
         if (xFlip) {
           tileColumn = 7 - tileColumn;
