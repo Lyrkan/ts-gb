@@ -3,51 +3,11 @@ import { SCREEN_WIDTH, Display } from './display';
 import { uint8ToInt8 } from '../utils';
 
 export const PPU = {
-  readPosRegisters: (addressBus: AddressBus) => {
-    const backgroundScroll = addressBus.getWord(0xFF42);
-    const windowPosition = addressBus.getWord(0xFF4A);
-    return {
-      backgroundScrollY: backgroundScroll & 0xFF,
-      backgroundScrollX: backgroundScroll >> 8,
-      windowPositionY: windowPosition & 0xFF,
-      windowPositionX: (windowPosition >> 8) - 7,
-    };
-  },
-
-  readPaletteRegisters: (addressBus: AddressBus) => {
-    const backgroundPalette = addressBus.getByte(0xFF47);
-    const spritePalette0 = addressBus.getByte(0xFF48);
-    const spritePalette1 = addressBus.getByte(0xFF49);
-
-    return {
-      backgroundPalette: [
-        (backgroundPalette) & 3,
-        (backgroundPalette >> 2) & 3,
-        (backgroundPalette >> 4) & 3,
-        (backgroundPalette >> 6) & 3,
-      ],
-      spritePalette0: [
-        (spritePalette0 & 3), // Not used
-        (spritePalette0 >> 2) & 3,
-        (spritePalette0 >> 4) & 3,
-        (spritePalette0 >> 6) & 3,
-      ],
-      spritePalette1: [
-        (spritePalette1 & 3), // Not used
-        (spritePalette1 >> 2) & 3,
-        (spritePalette1 >> 4) & 3,
-        (spritePalette1 >> 6) & 3,
-      ],
-    };
-  },
-
   retrieveSprites: (oamData: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
     const sprites: ISprite[] = [];
 
     for (let i = 0; i < 40; i++) {
       // Only 10 sprites can be displayed for a given line
-      // TODO Not sure this check should be done there since
-      // a sprite can have a line with only transparent pixels.
       if (sprites.length >= 10) {
         break;
       }
@@ -100,8 +60,8 @@ export const PPU = {
     const vramData = addressBus.getVideoRamBanks().map(bank => bank.data);
     const oamData = addressBus.getOamSegment().data;
 
-    const lcdPositions = PPU.readPosRegisters(addressBus);
-    const palettes = PPU.readPaletteRegisters(addressBus);
+    const lcdPositions = display.getLcdPosition();
+    const palettes = display.getLcdPalettes();
 
     const bgMapOffset = (lcdControl.backgroundTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
     const winMapOffset = (lcdControl.windowTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
@@ -111,6 +71,9 @@ export const PPU = {
 
     const winPosX = lcdPositions.windowPositionX;
     const winPosY = lcdPositions.windowPositionY;
+
+    const cgbSpritePalettes = display.getCgbSpritePalettes();
+    const cgbBackgroundPalettes = display.getCgbBackgroundPalettes();
 
     // Retrieve sprites for the current line
     let sprites: ISprite[] = [];
@@ -167,7 +130,7 @@ export const PPU = {
 
             if (isCgbMode) {
               spriteColor = PPU.readCgbPaletteColor(
-                display.getCgbSpritePalettes(),
+                cgbSpritePalettes,
                 sprite.cgbPalette,
                 colorIndex
               );
@@ -232,7 +195,7 @@ export const PPU = {
 
         if (isCgbMode) {
           const color = PPU.readCgbPaletteColor(
-            display.getCgbBackgroundPalettes(),
+            cgbBackgroundPalettes,
             paletteIndex,
             colorIndex
           );
@@ -308,7 +271,7 @@ export const PPU = {
 
         if (isCgbMode) {
           const color = PPU.readCgbPaletteColor(
-            display.getCgbBackgroundPalettes(),
+            cgbBackgroundPalettes,
             paletteIndex,
             colorIndex
           );

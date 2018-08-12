@@ -316,6 +316,12 @@ export class IOSegment extends MemorySegment {
         windowTileMap: checkBit(6, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
         lcdEnabled: checkBit(7, value),
       });
+    } else if (offset === 0x0042) {
+      // Background scroll Y
+      this.display.getLcdPosition().backgroundScrollY = value & 0xFF;
+    } else if (offset === 0x0043) {
+      // Background scroll X
+      this.display.getLcdPosition().backgroundScrollX = value & 0xFF;
     } else if (offset === 0x0044) {
       // LY update.
       // When that happens it should also change the value of LYC
@@ -343,6 +349,36 @@ export class IOSegment extends MemorySegment {
       // was provided to the AddressBus.
       this.dmaHandler.startOamTransfer(this.addressBus, fromAddress);
       return;
+    } else if (offset === 0x0047) {
+      // Background palette
+      this.display.getLcdPalettes().backgroundPalette = [
+        value & 3,
+        (value >> 2) & 3,
+        (value >> 4) & 3,
+        (value >> 6) & 3,
+      ];
+    } else if (offset === 0x0048) {
+      // Sprite palette #0
+      this.display.getLcdPalettes().spritePalette0 = [
+        value & 3,
+        (value >> 2) & 3,
+        (value >> 4) & 3,
+        (value >> 6) & 3,
+      ];
+    } else if (offset === 0x0049) {
+      // Sprite palette #1
+      this.display.getLcdPalettes().spritePalette1 = [
+        value & 3,
+        (value >> 2) & 3,
+        (value >> 4) & 3,
+        (value >> 6) & 3,
+      ];
+    } else if (offset === 0x004A) {
+      // Background position Y
+      this.display.getLcdPosition().windowPositionY = value & 0xFF;
+    } else if (offset === 0x004B) {
+      // Background position X
+      this.display.getLcdPosition().windowPositionX = value & 0xFF;
     } else if (offset === 0x004F) {
       // Writes on 0x004F (=0xFF4F) in CGB mode select
       // a new VRAM bank.

@@ -1,5 +1,8 @@
 import { AddressBus, OAM_LENGTH } from '../address-bus';
 
+/**
+ * This class represents a single OAM transfer.
+ */
 export class OAMTransfer {
   private addressBus: AddressBus;
   private fromAddress: number;

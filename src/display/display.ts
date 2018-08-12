@@ -35,6 +35,12 @@ export class Display {
   // current state of the LCD.
   private lcdControl: ILCDControl;
 
+  // Holds current LCD palettes
+  private lcdPalettes: ILCDPalettes;
+
+  //  Holds current LCD positions
+  private lcdPositions: ILCDPositions;
+
   // There is a slight delay (61 ticks) between
   // the moment the LCD is enabled and the first
   // frame is actually rendered. This variable keeps
@@ -57,6 +63,7 @@ export class Display {
   }
 
   public reset(): void {
+    // Reset LCD control flags
     this.lcdControl = {
       backgroundEnabled: true,
       spritesEnabled: false,
@@ -66,6 +73,21 @@ export class Display {
       windowEnabled: false,
       windowTileMap: TILE_MAP.MAP_1,
       lcdEnabled: true,
+    };
+
+    // Reset palettes
+    this.lcdPalettes = {
+      backgroundPalette: [0, 0, 0, 0],
+      spritePalette0: [0, 0, 0, 0],
+      spritePalette1: [0, 0, 0, 0],
+    };
+
+    // Reset background/window positions
+    this.lcdPositions = {
+      backgroundScrollY: 0,
+      backgroundScrollX: 0,
+      windowPositionY: 0,
+      windowPositionX: 0,
     };
 
     // Reset CGB palettes
@@ -189,6 +211,22 @@ export class Display {
     return this.lcdControl;
   }
 
+  public setLcdPalettes(lcdPalettes: ILCDPalettes): void {
+    this.lcdPalettes = lcdPalettes;
+  }
+
+  public getLcdPalettes(): ILCDPalettes {
+    return this.lcdPalettes;
+  }
+
+  public setLcdPositions(lcdPositions: ILCDPositions): void {
+    this.lcdPositions = lcdPositions;
+  }
+
+  public getLcdPosition(): ILCDPositions {
+    return this.lcdPositions;
+  }
+
   public getCgbBackgroundPalettes(): number[] {
     return this.cgbBackgroundPalettes;
   }
@@ -255,6 +293,21 @@ export enum GPU_MODE {
   VBLANK = 1,
   OAM_SEARCH = 2,
   PIXEL_TRANSFER = 3,
+}
+
+export type LCDPalette = [number, number, number, number];
+
+export interface ILCDPalettes {
+  backgroundPalette: LCDPalette;
+  spritePalette0: LCDPalette;
+  spritePalette1: LCDPalette;
+}
+
+export interface ILCDPositions {
+  backgroundScrollY: number;
+  backgroundScrollX: number;
+  windowPositionY: number;
+  windowPositionX: number;
 }
 
 export interface ILCDControl {
