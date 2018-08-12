@@ -155,18 +155,17 @@ export class IOSegment extends MemorySegment {
       // Audio - Waveform RAM
       value = this.audio.ch3.waveform[offset - 0x0030];
     } else if (offset === 0x0040) {
-      if (this.display) {
-        const lcdControl = this.display.getLcdControl();
-        value = 0;
-        value |= lcdControl.backgroundEnabled ? 1 : 0;
-        value |= lcdControl.spritesEnabled ? (1 << 1) : 0;
-        value |= (lcdControl.spritesHeight === 16) ? (1 << 2) : 0;
-        value |= (lcdControl.backgroundTileMap === TILE_MAP.MAP_2) ? (1 << 3) : 0;
-        value |= (lcdControl.backgroundTileArea === TILE_AREA.AREA_2) ? (1 << 4) : 0;
-        value |= lcdControl.windowEnabled ? (1 << 5) : 0;
-        value |= (lcdControl.windowTileMap === TILE_MAP.MAP_2) ? (1 << 6) : 0;
-        value |= lcdControl.lcdEnabled ? (1 << 7) : 0;
-      }
+      // LCD Control
+      const lcdControl = this.display.getLcdControl();
+      value = 0;
+      value |= lcdControl.backgroundEnabled ? 1 : 0;
+      value |= lcdControl.spritesEnabled ? (1 << 1) : 0;
+      value |= (lcdControl.spritesHeight === 16) ? (1 << 2) : 0;
+      value |= (lcdControl.backgroundTileMap === TILE_MAP.MAP_2) ? (1 << 3) : 0;
+      value |= (lcdControl.backgroundTileArea === TILE_AREA.AREA_2) ? (1 << 4) : 0;
+      value |= lcdControl.windowEnabled ? (1 << 5) : 0;
+      value |= (lcdControl.windowTileMap === TILE_MAP.MAP_2) ? (1 << 6) : 0;
+      value |= lcdControl.lcdEnabled ? (1 << 7) : 0;
     } else if (offset === 0x0041) {
       // LCD Status: bit 7 is always set to 1
       value |= 1 << 7;
@@ -307,18 +306,16 @@ export class IOSegment extends MemorySegment {
     } else if (offset === 0x0040) {
       // LCDC Control Register update
       // If a display unit is set, notify it.
-      if (this.display) {
-        this.display.setLcdControl({
-          backgroundEnabled: checkBit(0, value),
-          spritesEnabled: checkBit(1, value),
-          spritesHeight: checkBit(2, value) ? 16 : 8,
-          backgroundTileMap: checkBit(3, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
-          backgroundTileArea: checkBit(4, value) ? TILE_AREA.AREA_2 : TILE_AREA.AREA_1,
-          windowEnabled: checkBit(5, value),
-          windowTileMap: checkBit(6, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
-          lcdEnabled: checkBit(7, value),
-        });
-      }
+      this.display.setLcdControl({
+        backgroundEnabled: checkBit(0, value),
+        spritesEnabled: checkBit(1, value),
+        spritesHeight: checkBit(2, value) ? 16 : 8,
+        backgroundTileMap: checkBit(3, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
+        backgroundTileArea: checkBit(4, value) ? TILE_AREA.AREA_2 : TILE_AREA.AREA_1,
+        windowEnabled: checkBit(5, value),
+        windowTileMap: checkBit(6, value) ? TILE_MAP.MAP_2 : TILE_MAP.MAP_1,
+        lcdEnabled: checkBit(7, value),
+      });
     } else if (offset === 0x0044) {
       // LY update.
       // When that happens it should also change the value of LYC
