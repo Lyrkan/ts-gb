@@ -31,12 +31,12 @@ export class MemorySegment implements IMemorySegment {
   }
 
   public getWord(offset: number) {
-    return (this.data[offset + 1] << 8) | this.data[offset];
+    return (this.getByte(offset + 1) << 8) | this.getByte(offset);
   }
 
   public setWord(offset: number, value: number) {
-    this.data[offset + 1] = (value & 0xFF00) >> 8;
-    this.data[offset] = value & 0xFF;
+    this.setByte(offset + 1, (value & 0xFF00) >> 8);
+    this.setByte(offset, value & 0xFF);
   }
 }
 

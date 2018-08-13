@@ -457,13 +457,4 @@ export class IOSegment extends MemorySegment {
     // Still update the value stored in memory
     super.setByte(offset, value);
   }
-
-  public getWord(offset: number) {
-    return (this.getByte(offset + 1) << 8) | this.getByte(offset);
-  }
-
-  public setWord(offset: number, value: number) {
-    this.setByte(offset + 1, (value & 0xFF00) >> 8);
-    this.setByte(offset, value & 0xFF);
-  }
 }

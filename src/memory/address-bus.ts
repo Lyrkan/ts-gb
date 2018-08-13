@@ -9,6 +9,7 @@ import { CPUTimer } from '../cpu/cpu-timer';
 import { CPUInterrupt } from '../cpu/cpu';
 import { Audio, DEFAULT_WAVE_DATA_DMG, DEFAULT_WAVE_DATA_CGB } from '../audio/audio';
 import { IOSegment } from './segments/io-segment';
+import { OAMSegment } from './segments/oam-segment';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 4 * 1024;
@@ -56,7 +57,7 @@ export class AddressBus {
 
   // Sprite attribute table (OAM)
   // 0xFE00 to 0xFE9F
-  private oam: MemorySegment;
+  private oam: OAMSegment;
 
   // I/O Registers
   // 0xFF00 to 0xFF7F
@@ -209,7 +210,7 @@ export class AddressBus {
     this.currentRamBank = 1;
 
     // Empty OAM (160B)
-    this.oam = new MemorySegment(OAM_LENGTH);
+    this.oam = new OAMSegment();
 
     // Double speed mode is not enabled by default
     this.doubleSpeedModeEnabled = false;
@@ -375,7 +376,7 @@ export class AddressBus {
    * OAM. It avoids doing many calls to getByte/getWord
    * and unecessary lookups during video rendering.
    */
-  public getOamSegment(): MemorySegment {
+  public getOamSegment(): OAMSegment {
     return this.oam;
   }
 

@@ -3,33 +3,17 @@ import { SCREEN_WIDTH, Display } from './display';
 import { uint8ToInt8 } from '../utils';
 
 export const PPU = {
-  retrieveSprites: (oamData: Uint8Array, line: number, spritesHeight: number): ISprite[] => {
+  retrieveSprites: (oamSprites: ISprite[], line: number, spritesHeight: number): ISprite[] => {
     const sprites: ISprite[] = [];
 
-    for (let i = 0; i < 40; i++) {
+    for (const oamSprite of oamSprites) {
       // Only 10 sprites can be displayed for a given line
       if (sprites.length >= 10) {
         break;
       }
 
-      const yPos = oamData[i * 4] - 16;
-      const xPos = oamData[(i * 4) + 1] - 8;
-
-      // Filter sprites based on the current line
-      if ((yPos <= line) && (yPos + spritesHeight > line)) {
-        const spriteFlags = oamData[(i * 4) + 3];
-
-        sprites.push({
-          y: yPos,
-          x: xPos,
-          tile: oamData[(i * 4) + 2],
-          priority: (spriteFlags >> 7) & 1,
-          yFlip: ((spriteFlags >> 6) & 1) === 1,
-          xFlip: ((spriteFlags >> 5) & 1) === 1,
-          palette: (spriteFlags >> 4) & 1,
-          vramBank: (spriteFlags >> 3) & 1,
-          cgbPalette: (spriteFlags & 0b111)
-        });
+      if ((oamSprite.y <= line) && (oamSprite.y + spritesHeight > line)) {
+        sprites.push(oamSprite);
       }
     }
 
@@ -58,7 +42,7 @@ export const PPU = {
     const isCgbMode = addressBus.getEmulationMode() === EMULATION_MODE.CGB;
 
     const vramData = addressBus.getVideoRamBanks().map(bank => bank.data);
-    const oamData = addressBus.getOamSegment().data;
+    const oamSprites = addressBus.getOamSegment().spriteCache;
 
     const bgMapOffset = (lcdControl.backgroundTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
     const winMapOffset = (lcdControl.windowTileMap === TILE_MAP.MAP_1) ? 0x1800 : 0x1C00;
@@ -73,7 +57,7 @@ export const PPU = {
     // Retrieve sprites for the current line
     let sprites: ISprite[] = [];
     if (lcdControl.spritesEnabled) {
-      sprites = PPU.retrieveSprites(oamData, line, lcdControl.spritesHeight);
+      sprites = PPU.retrieveSprites(oamSprites, line, lcdControl.spritesHeight);
 
       if (!isCgbMode) {
         // In Non-CGB mode sprites are sorted on
