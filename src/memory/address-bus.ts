@@ -10,13 +10,13 @@ import { CPUInterrupt } from '../cpu/cpu';
 import { Audio, DEFAULT_WAVE_DATA_DMG, DEFAULT_WAVE_DATA_CGB } from '../audio/audio';
 import { IOSegment } from './segments/io-segment';
 import { OAMSegment } from './segments/oam-segment';
+import { MemorySegmentDecorator } from './segments/memory-segment-decorator';
 
 export const VRAM_LENGTH = 8 * 1024;
 export const INTERNAL_RAM_LENGTH = 4 * 1024;
 export const OAM_LENGTH = 160;
 export const IOREGISTERS_LENGTH = 128;
 export const HRAM_LENGTH = 127;
-export const IEREGISTER_LENGTH = 1;
 
 /**
  * Usage:
@@ -69,7 +69,7 @@ export class AddressBus {
 
   // Interrupts Enable Registers
   // 0xFFFF
-  private ieRegister: MemorySegment;
+  private ieRegister: IMemorySegment;
 
   // Joypad (used by the I/O Register)
   private joypad: Joypad;
@@ -95,6 +95,14 @@ export class AddressBus {
 
   // Double speed mode (available in CGB mode only)
   private doubleSpeedModeEnabled: boolean;
+
+  // Interrupt flags (activation/triggers)
+  // Since they are checked really often it is faster
+  // to actually have an array of boolean for each
+  // one of them instead of going through the whole
+  // MemorySegment/MemorySegmentDecorator mechanism.
+  private interruptTriggerFlags: [boolean, boolean, boolean, boolean, boolean];
+  private interruptEnableFlags: [boolean, boolean, boolean, boolean, boolean];
 
   /**
    * Initialize a new empty memory layout.
@@ -191,6 +199,10 @@ export class AddressBus {
       this.gameCartridge.reset();
     }
 
+    // Reset interrupt flags
+    this.interruptTriggerFlags = [false, false, false, false, false];
+    this.interruptEnableFlags = [false, false, false, false, false];
+
     // Empty video RAM (8kB)
     // Only bank #0 is available in DMG mode
     this.videoRamBanks = [
@@ -229,7 +241,21 @@ export class AddressBus {
     this.hram = new MemorySegment(HRAM_LENGTH);
 
     // Empty Interrupts Enable Register (1B)
-    this.ieRegister = new MemorySegment(IEREGISTER_LENGTH);
+    this.ieRegister = new MemorySegmentDecorator(new MemorySegment(1), {
+      getByte: (decorated: IMemorySegment, offset: number) => {
+        let value = decorated.getByte(offset) & 0xE0;
+        for (let i = 0; i < 5; i++) {
+          value |= (this.interruptEnableFlags[i] ? 1 : 0) << i;
+        }
+        return value;
+      },
+      setByte: (decorated: IMemorySegment, offset: number, value: number) => {
+        decorated.setByte(offset, value);
+        for (let i = 0; i < 5; i++) {
+          this.interruptEnableFlags[i] = ((value >> i) & 1) === 1;
+        }
+      }
+    });
 
     // Set the interrupt callback on the joypad
     // to catch button presses
@@ -394,7 +420,21 @@ export class AddressBus {
    * @param interrupt
    */
   public triggerInterrupt(interrupt: CPUInterrupt): void {
-    this.ioRegisters.setByte(0x000F, this.ioRegisters.getByte(0x000F) | (1 << interrupt));
+    this.interruptTriggerFlags[interrupt] = true;
+  }
+
+  /**
+   * Return the status of all interrupts.
+   */
+  public getInterruptTriggerFlags(): [boolean, boolean, boolean, boolean, boolean] {
+    return this.interruptTriggerFlags;
+  }
+
+  /**
+   * Return the activation status of all interupts.
+   */
+  public getInterruptEnableFlags(): [boolean, boolean, boolean, boolean, boolean] {
+    return this.interruptEnableFlags;
   }
 
   /**

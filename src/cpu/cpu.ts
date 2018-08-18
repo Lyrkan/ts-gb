@@ -2,7 +2,6 @@ import { AddressBus, EMULATION_MODE } from '../memory/address-bus';
 import { CPURegisters } from './cpu-registers';
 import { OPCODES, ICPUCallbacks } from './opcodes';
 import { CPUTimer } from './cpu-timer';
-import { checkBit } from '../utils';
 
 export class CPU {
   // Registers
@@ -166,7 +165,7 @@ export class CPU {
     // Do nothing if stopped until a button
     // is pressed.
     if (this.stopped) {
-      if (!checkBit(CPUInterrupt.JOYPAD, this.addressBus.getByte(0xFF0F))) {
+      if (!this.addressBus.getInterruptTriggerFlags()[CPUInterrupt.JOYPAD]) {
         return;
       }
 
@@ -179,16 +178,11 @@ export class CPU {
     // interrupt but will make the CPU leave that state.
     if (this.halted) {
       if (!this.interruptsEnabled) {
-        // Check if an interrupt is enabled
-        const interruptFlags = this.addressBus.getByte(0xFF0F);
-        if ((interruptFlags & 0x1F) === 0) {
-          return;
-        }
-
         // Check if an enabled interrupt has been triggered
-        const ieRegister = this.addressBus.getByte(0xFFFF);
+        const interruptEnableFlags = this.addressBus.getInterruptEnableFlags();
+        const interruptTriggerFlags = this.addressBus.getInterruptTriggerFlags();
         for (let bit = 0; bit < 5; bit++) {
-          if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+          if (interruptEnableFlags[bit] && interruptTriggerFlags[bit]) {
             // If interrupts are globally disabled we need
             // to know that the last instruction was an
             // HALT to emulate the HALT bug (repeated
@@ -213,17 +207,11 @@ export class CPU {
       return;
     }
 
-    // Check if there is at least one pending interrupt
-    const interruptFlags = this.addressBus.getByte(0xFF0F);
-    if ((interruptFlags & 0x1F) === 0) {
-      return;
-    }
-
     // Check each interrupt state
-    const ieRegister = this.addressBus.getByte(0xFFFF);
-
+    const interruptEnableFlags = this.addressBus.getInterruptEnableFlags();
+    const interruptTriggerFlags = this.addressBus.getInterruptTriggerFlags();
     for (let bit = 0; bit < 5; bit++) {
-      if (checkBit(bit, ieRegister) && checkBit(bit, interruptFlags)) {
+      if (interruptEnableFlags[bit] && interruptTriggerFlags[bit]) {
         // An interrupt takes 5 cycles to dispatch
         this.skipCycles = 5;
 
@@ -245,7 +233,7 @@ export class CPU {
         this.registers.PC = 0x0040 + (8 * bit);
 
         // Disable this interrupt
-        this.addressBus.setByte(0xFF0F, interruptFlags & ~(1 << bit));
+        interruptTriggerFlags[bit] = false;
         return;
       }
     }

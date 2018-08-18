@@ -43,11 +43,11 @@ export class IOSegment extends MemorySegment {
   }
 
   public getByte(offset: number) {
-    let value = super.getByte(offset);
+    let value = null;
 
     if (offset === 0x0000) {
       // Joypad status
-      value |= 0xF;
+      value = super.getByte(offset) | 0xF;
 
       if (!checkBit(4, value)) {
         value &= this.joypad.isPressed(BUTTON.DOWN) ? ~0x08 : 0xFF;
@@ -78,7 +78,12 @@ export class IOSegment extends MemorySegment {
       value |= this.cpuTimer.getMode() & 0b11;
     } else if (offset === 0x000F) {
       // Interrupt flags: Unused bits are always set to 1
-      value |= 0xE0;
+      value = 0xE0;
+
+      const interruptTriggerFlags = this.addressBus.getInterruptTriggerFlags();
+      for (let i = 0; i < 5; i++) {
+        value |= (interruptTriggerFlags[i] ? 1 : 0) << i;
+      }
     } else if (offset === 0x0010) {
       // Audio - NR10 - CH1 Frequency Sweep
       value = this.audio.ch1.nrx0;
@@ -168,11 +173,11 @@ export class IOSegment extends MemorySegment {
       value |= lcdControl.lcdEnabled ? (1 << 7) : 0;
     } else if (offset === 0x0041) {
       // LCD Status: bit 7 is always set to 1
-      value |= 1 << 7;
+      value = super.getByte(offset) | (1 << 7);
     } else if (offset === 0x004D) {
       // Double speed mode flag (CGB mode only)
       if (this.addressBus.getEmulationMode() === EMULATION_MODE.CGB) {
-        value |= 0x7E;
+        value = super.getByte(offset) | 0x7E;
 
         if (this.addressBus.isDoubleSpeedModeEnabled()) {
           value |= 1 << 7;
@@ -194,7 +199,7 @@ export class IOSegment extends MemorySegment {
       // BG Palette index (CGB mode only)
       // Bit 6 is always set to 1.
       if (this.addressBus.getEmulationMode() === EMULATION_MODE.CGB) {
-        value |= 1 << 6;
+        value = super.getByte(offset) | (1 << 6);
       }
     } else if (offset === 0x0069) {
       // Background palette data (CGB mode only)
@@ -210,7 +215,7 @@ export class IOSegment extends MemorySegment {
       }
     }
 
-    return value;
+    return (value !== null) ? value : super.getByte(offset);
   }
 
   public setByte(offset: number, value: number) {
@@ -237,6 +242,12 @@ export class IOSegment extends MemorySegment {
       }
 
       this.cpuTimer.setMode(value & 0b11);
+    } else if (offset === 0x000F) {
+      const interruptTriggerFlags = this.addressBus.getInterruptTriggerFlags();
+      for (let i = 0; i < 5; i++) {
+        interruptTriggerFlags[i] = ((value >> i) & 1) === 1;
+      }
+      return;
     } else if (offset === 0x0010) {
       // Audio - NR10 - CH1 Frequency Sweep
       this.audio.ch1.nrx0 = value;
