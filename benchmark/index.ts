@@ -52,7 +52,7 @@ const argv = yargs
     });
   })
   .help('help').alias('help', 'h')
-  .version('1.0.0', 'version').alias('version', 'v')
+  .version('version', '1.0.0').alias('version', 'v')
   .options({
     iterations: {
       description: 'How many times the test should be executed',
