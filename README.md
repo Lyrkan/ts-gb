@@ -20,13 +20,13 @@ $ yarn add ts-gb
 
 
 ```ts
-import { System } from 'ts-gb/system';
+import { System } from 'ts-gb/dist/system';
 
 // Initializing a System instance that holds
 // all the necessary components. You can also
 // initialize each one of them manually if you
 // want to.
-const sytem = new System();
+const system = new System();
 
 // Loading an optional bootrom
 system.loadBootRom(arrayBuffer);
