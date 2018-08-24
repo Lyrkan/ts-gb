@@ -51,15 +51,23 @@ export class TerminalRenderer {
             const bgOffset = ((y + subY) * SCREEN_WIDTH * 3) + (x * 3);
             const fgOffset = ((y + (subY * 2)) * SCREEN_WIDTH * 3) + (x * 3);
 
-            bgR = buffer[bgOffset];
-            bgG = buffer[bgOffset + 1];
-            bgB = buffer[bgOffset + 2];
+            bgR += buffer[bgOffset];
+            bgG += buffer[bgOffset + 1];
+            bgB += buffer[bgOffset + 2];
 
-            fgR = buffer[fgOffset];
-            fgG = buffer[fgOffset + 1];
-            fgB = buffer[fgOffset + 2];
+            fgR += buffer[fgOffset];
+            fgG += buffer[fgOffset + 1];
+            fgB += buffer[fgOffset + 2];
           }
         }
+
+        bgR >>= 2;
+        bgG >>= 2;
+        bgB >>= 2;
+
+        fgR >>= 2;
+        fgG >>= 2;
+        fgB >>= 2;
 
         process.stdout.write(chalk.bgRgb(bgR, bgG, bgB).rgb(fgR, fgG, fgB)(LOWER_HALF_BLOCK));
       }
