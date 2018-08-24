@@ -2,6 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import { CPU_CLOCK_FREQUENCY } from '../src/cpu/cpu';
 import { System } from '../src/system';
+import { TerminalRenderer } from '../src/display/renderers/terminal-renderer';
 
 const crypto = require('crypto');
 const fs = require('fs');
@@ -9,6 +10,7 @@ const path = require('path');
 
 describe('Functional tests', () => {
   let system: System;
+  let renderer: TerminalRenderer;
 
   const loadGame = (romPath: string) => {
     const fullPath = path.join(__dirname, romPath);
@@ -39,10 +41,15 @@ describe('Functional tests', () => {
     const sha1 = crypto.createHash('sha1');
     sha1.update(buffer);
     expect(sha1.digest('hex')).to.equal(hash);
+
+    process.stdout.write('\n');
+    renderer.renderFrame();
+    process.stdout.write('\n');
   };
 
   beforeEach(() => {
     system = new System();
+    renderer = new TerminalRenderer(system.display, { resetPosition: false });
   });
 
   describe('Blargg\'s test ROMs', () => {
