@@ -20,3 +20,25 @@ export function checkBit(bit: number, value: number): boolean {
   const mask = 1 << bit;
   return (value & mask) === mask;
 }
+
+/**
+ * Try to require an optional dependency or
+ * throw an error explaining why that dependency
+ * is required.
+ *
+ * @param dependency Dependency to require
+ * @param requiredBy Module that requires the given
+ */
+export function requireOptional<T>(dependency: string, requiredBy: string): T {
+  try {
+    return require(dependency) as T;
+  } catch (e) {
+    throw new Error(`
+    ${dependency} is required by ${requiredBy}
+Please add it to your project using one of the following commands:
+
+  $ npm add ${dependency}
+  $ yarn add ${dependency}
+  `);
+  }
+}

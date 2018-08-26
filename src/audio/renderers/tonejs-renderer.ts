@@ -1,20 +1,9 @@
 import { IAudioEventListener, EventName, EventSource, Audio } from '../audio';
 import { QuadrangularChannel, WAVE_DUTY_MAP } from '../channels/quadrangular-channel';
 import { NoiseChannel } from '../channels/noise-channel';
+import { requireOptional } from '../../utils';
 
-const Tone: any = (() => {
-  try {
-    return require('tone');
-  } catch (e) {
-    throw new Error(`
-Tone.js is required by the TonejsRenderer
-Please add it to your project using one of the following commands:
-
-  $ npm add tone
-  $ yarn add tone
-  `);
-  }
-})();
+const Tone: any = requireOptional('tone', 'TonejsRenderer');
 
 // Used to scale the volume in the
 // setVolume/getVolume methods.
