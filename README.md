@@ -9,8 +9,8 @@ TypeScript Game Boy emulator (WIP)
 
 # How to use it
 
-You easily use all the classes provided by `ts-gb` to integrate
-it to a website or an electron app.
+You can easily use all the classes provided by `ts-gb` to integrate
+it into a website or an electron app.
 
 ## Wiring everything manually
 
